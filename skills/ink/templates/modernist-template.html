@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <!-- Modernist Mood: DM Serif Display + Lora -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+  <style>
+    /* {{BASE_STYLES}} — paste contents of base-styles.css here */
+
+    /* ================================================================
+       Modernist Mood Overrides
+       Modernist monograph: Swiss-influenced, rigorous, disciplined.
+       Monochrome palette, DM Serif Display italic display, ruled geometry.
+       ================================================================ */
+
+    body.mood-modernist {
+      --ink-accent: #1A1A1A;
+      --ink-accent-light: rgba(26, 26, 26, 0.06);
+      --ink-accent-medium: rgba(26, 26, 26, 0.12);
+      --ink-text: #1A1A1A;
+      --ink-text-secondary: #555555;
+      --ink-text-muted: #888888;
+      --ink-surface: #F4F4F2;
+      --ink-border: #1A1A1A;
+      --ink-border-light: #DDDDDD;
+      --ink-dark: #1A1A1A;
+      --font-primary: 'Lora', Georgia, serif;
+      --font-display: 'DM Serif Display', Georgia, serif;
+      --radius-card: 0px;
+      --radius-button: 0px;
+      --radius-control: 0px;
+      --radius-small: 0px;
+      --lh-body: 1.8;
+      background: #FFFFFF;
+    }
+
+    /* Cover: asymmetric, dramatic negative space */
+    .cover {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: 1fr auto 1fr;
+      padding: 1.5in 0;
+    }
+
+    .cover-top-rule {
+      border: none;
+      border-top: 3px solid var(--ink-text);
+      margin-bottom: var(--space-xl);
+      grid-row: 1;
+      align-self: start;
+    }
+
+    .cover-main {
+      grid-row: 2;
+    }
+
+    .cover-eyebrow {
+      font-family: var(--font-primary);
+      font-variant-caps: all-small-caps;
+      letter-spacing: 0.16em;
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+      margin-bottom: var(--space-lg);
+    }
+
+    .cover-title {
+      font-family: var(--font-display);
+      font-size: clamp(40pt, 9vw, 80pt);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.0;
+      letter-spacing: -0.01em;
+      color: var(--ink-text);
+      margin-bottom: var(--space-xl);
+    }
+
+    .cover-subtitle {
+      font-family: var(--font-primary);
+      font-size: var(--text-title-4);
+      color: var(--ink-text-secondary);
+      max-width: 55ch;
+      line-height: 1.6;
+      border-top: 1px solid var(--ink-border-light);
+      padding-top: var(--space-md);
+    }
+
+    .cover-bottom {
+      grid-row: 3;
+      align-self: end;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+      font-family: var(--font-primary);
+      border-top: 1px solid var(--ink-border-light);
+      padding-top: var(--space-md);
+    }
+
+    /* Section dividers: heavy ruled lines */
+    .section-divider {
+      border: none;
+      border-top: 3px solid var(--ink-text);
+      margin: 0 0 var(--space-xl) 0;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    .section-divider-light {
+      border: none;
+      border-top: 1px solid var(--ink-border-light);
+      margin: var(--space-xl) 0;
+    }
+
+    /* Section headers */
+    .section-number-label {
+      font-family: var(--font-primary);
+      font-variant-caps: all-small-caps;
+      letter-spacing: 0.14em;
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+      margin-bottom: var(--space-xs);
+    }
+
+    .section-title-modernist {
+      font-family: var(--font-display);
+      font-size: clamp(22pt, 4vw + 0.5rem, 44pt);
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: -0.01em;
+      color: var(--ink-text);
+      line-height: 1.1;
+      margin-bottom: var(--space-xl);
+    }
+
+    /* Chapter opener */
+    .chapter-opener {
+      page: chapter-opener;
+      page-break-before: always;
+      break-before: page;
+      min-height: 55vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: var(--space-xl) 0;
+    }
+
+    /* Asymmetric grid for body + image */
+    .grid-editorial-2-1 {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: var(--space-xl);
+      margin: var(--space-xl) 0;
+      align-items: start;
+    }
+
+    .grid-editorial-1-2 {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: var(--space-xl);
+      margin: var(--space-xl) 0;
+      align-items: start;
+    }
+
+    /* Running text */
+    .body-text-modernist p {
+      font-size: var(--text-body);
+      line-height: 1.8;
+      color: var(--ink-text);
+      margin-bottom: var(--space-sm);
+      hyphens: auto;
+      -webkit-hyphens: auto;
+    }
+
+    /* Large display number / section index */
+    .display-number {
+      font-family: var(--font-display);
+      font-size: clamp(48pt, 10vw, 96pt);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--ink-border-light);
+      line-height: 1.0;
+      margin-bottom: var(--space-sm);
+    }
+
+    /* Callout box: flat, ruled */
+    .callout-modernist {
+      border-top: 3px solid var(--ink-text);
+      border-bottom: 1px solid var(--ink-text);
+      padding: var(--space-md) 0;
+      margin: var(--space-xl) 0;
+      page-break-inside: avoid;
+    }
+
+    .callout-modernist p {
+      font-family: var(--font-display);
+      font-size: var(--text-title-4);
+      font-style: italic;
+      color: var(--ink-text);
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    /* Figure */
+    figure {
+      margin: 0;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    figure img {
+      width: 100%;
+      display: block;
+    }
+
+    figcaption {
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+      font-style: italic;
+      margin-top: var(--space-xs);
+      line-height: var(--lh-tight);
+      padding-top: var(--space-xs);
+      border-top: 1px solid var(--ink-border-light);
+      font-variant-numeric: oldstyle-nums;
+    }
+
+    /* Full-bleed image */
+    .full-bleed {
+      margin-left: -1.15in;
+      margin-right: -1.15in;
+      width: calc(100% + 2 * 1.15in);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .full-bleed img {
+      width: 100%;
+      height: clamp(30vh, 50vh, 70vh);
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Preview bar */
+    .preview-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: #1A1A1A;
+      color: white;
+      padding: 10px 24px;
+      font-size: 11pt;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      font-family: 'Lora', Georgia, serif;
+    }
+
+    .preview-bar .preview-label { color: #AAAAAA; font-style: italic; font-weight: normal; }
+    .preview-bar .preview-hint { color: #666666; }
+
+    @media print {
+      .preview-bar { display: none !important; }
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+      p, li { orphans: 3; widows: 3; }
+    }
+  </style>
+</head>
+<body class="mood-modernist">
+
+  <div class="preview-bar no-print">
+    <span><span class="preview-label">Modernist</span> &nbsp;Modernist Monograph Preview</span>
+    <span class="preview-hint">Cmd+P &rarr; Save as PDF</span>
+  </div>
+
+
+  <!-- ============================================================
+       COVER
+       ============================================================ -->
+  <div class="cover">
+    <hr class="cover-top-rule">
+    <div class="cover-main">
+      <div class="cover-eyebrow">{{EYEBROW_LABEL}}</div>
+      <h1 class="cover-title">{{TITLE}}</h1>
+      <p class="cover-subtitle">{{SUBTITLE}}</p>
+    </div>
+    <div class="cover-bottom">
+      <span>{{AUTHOR}}</span>
+      <span>{{DATE}}</span>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       CHAPTER OPENER
+       ============================================================ -->
+  <section class="chapter-opener">
+    <hr class="section-divider">
+    <div class="section-number-label">I.</div>
+    <h2 class="section-title-modernist">{{CHAPTER_1_TITLE}}</h2>
+    <p style="font-size: var(--text-title-4); color: var(--ink-text-secondary); max-width: 60ch; line-height: 1.6;">{{CHAPTER_1_INTRO}}</p>
+  </section>
+
+
+  <!-- ============================================================
+       FULL-BLEED IMAGE
+       ============================================================ -->
+  <div class="full-bleed">
+    <img src="{{HERO_IMAGE_SRC}}" alt="{{HERO_IMAGE_ALT}}">
+  </div>
+
+  <hr class="section-divider-light">
+
+
+  <!-- ============================================================
+       ASYMMETRIC GRID: TEXT + IMAGE
+       ============================================================ -->
+  <div class="grid-editorial-2-1">
+    <div class="body-text-modernist">
+      <div class="display-number">01</div>
+      <p>{{BODY_PARAGRAPH_1}}</p>
+      <p>{{BODY_PARAGRAPH_2}}</p>
+    </div>
+    <figure>
+      <img src="{{FIGURE_IMAGE_SRC}}" alt="{{FIGURE_IMAGE_ALT}}">
+      <figcaption>{{FIGURE_CAPTION_TEXT}}</figcaption>
+    </figure>
+  </div>
+
+
+  <!-- ============================================================
+       CALLOUT — RULED QUOTE
+       ============================================================ -->
+  <div class="callout-modernist">
+    <p>{{CALLOUT_QUOTE}}</p>
+  </div>
+
+
+  <!-- ============================================================
+       SECTION 2
+       ============================================================ -->
+  <hr class="section-divider">
+  <div class="section-number-label">II.</div>
+  <h2 class="section-title-modernist">{{CHAPTER_2_TITLE}}</h2>
+
+  <div class="body-text-modernist">
+    <p>{{BODY_PARAGRAPH_3}}</p>
+    <p>{{BODY_PARAGRAPH_4}}</p>
+  </div>
+
+
+</body>
+</html>

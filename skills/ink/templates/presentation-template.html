@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <style>
+    /* {{BASE_STYLES}} — paste contents of base-styles.css here */
+
+    /* ================================================================
+       Presentation-Specific Styles
+       Each <section class="slide"> is one page
+       ================================================================ */
+
+    body.presentation {
+      background: white;
+    }
+
+    /* Base Slide */
+    .slide {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 1in 0;
+      position: relative;
+    }
+
+    .slide + .slide {
+      page-break-before: always;
+      break-before: page;
+    }
+
+    /* Slide: page number */
+    .slide-number {
+      position: absolute;
+      bottom: 0.5in;
+      right: 0;
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    /* Slide brand mark */
+    .slide-brand {
+      position: absolute;
+      bottom: 0.5in;
+      left: 0;
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+    }
+
+    /* ----------------------------------------------------------------
+       Title Slide
+       ---------------------------------------------------------------- */
+    .slide-title {
+      justify-content: flex-end;
+      padding-bottom: 1.5in;
+    }
+
+    .slide-title .accent-bar-thick {
+      width: 80px;
+      margin-bottom: var(--space-xl);
+    }
+
+    .slide-title .title-text {
+      font-size: var(--text-title-0);
+      font-weight: 700;
+      line-height: var(--lh-title);
+      letter-spacing: -0.025em;
+      color: var(--ink-text);
+      margin-bottom: var(--space-sm);
+      max-width: 85%;
+    }
+
+    .slide-title .subtitle-text {
+      font-size: var(--text-title-3);
+      color: var(--ink-text-muted);
+      font-weight: 400;
+      line-height: var(--lh-tight);
+      max-width: 70%;
+    }
+
+    .slide-title .title-meta {
+      margin-top: var(--space-xxl);
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+    }
+
+    /* ----------------------------------------------------------------
+       Section Divider Slide (dark background)
+       ---------------------------------------------------------------- */
+    .slide-divider {
+      background: var(--ink-dark);
+      color: white;
+      justify-content: center;
+      align-items: flex-start;
+      padding-left: 0;
+    }
+
+    .slide-divider .divider-number {
+      font-size: var(--text-annotation);
+      color: var(--ink-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 600;
+      margin-bottom: var(--space-md);
+    }
+
+    .slide-divider .divider-title {
+      font-size: var(--text-title-1);
+      font-weight: 700;
+      line-height: var(--lh-title);
+      letter-spacing: -0.015em;
+      max-width: 80%;
+    }
+
+    .slide-divider .divider-subtitle {
+      font-size: var(--text-headline);
+      color: var(--ink-text-muted);
+      font-weight: 400;
+      margin-top: var(--space-sm);
+      max-width: 70%;
+    }
+
+    .slide-divider .slide-brand { color: rgba(255, 255, 255, 0.3); }
+    .slide-divider .slide-number { color: rgba(255, 255, 255, 0.3); }
+
+    /* ----------------------------------------------------------------
+       Content Slide
+       ---------------------------------------------------------------- */
+    .slide-content {
+      justify-content: flex-start;
+      padding-top: 0.75in;
+    }
+
+    .slide-header {
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--ink-border-light);
+      page-break-after: avoid;
+    }
+
+    .slide-header .slide-heading {
+      font-size: var(--text-title-2);
+      font-weight: 600;
+      color: var(--ink-text-secondary);
+      line-height: var(--lh-title);
+    }
+
+    .slide-header .slide-subheading {
+      font-size: var(--text-callout);
+      color: var(--ink-text-muted);
+      margin-top: var(--space-micro);
+    }
+
+    .slide-body {
+      flex: 1;
+    }
+
+    .slide-body p {
+      font-size: var(--text-body);
+      line-height: var(--lh-body);
+      margin-bottom: var(--space-sm);
+      color: var(--ink-text);
+    }
+
+    .slide-body ul,
+    .slide-body ol {
+      font-size: var(--text-body);
+      margin-bottom: var(--space-sm);
+    }
+
+    .slide-body li {
+      line-height: var(--lh-body);
+      margin-bottom: var(--space-tiny);
+    }
+
+    /* ----------------------------------------------------------------
+       Data Slide (metrics + commentary)
+       ---------------------------------------------------------------- */
+    .slide-data {
+      justify-content: flex-start;
+      padding-top: 0.75in;
+    }
+
+    .slide-data .data-cards {
+      margin-bottom: var(--space-lg);
+    }
+
+    .slide-data .data-card {
+      background: var(--ink-surface);
+      border-radius: var(--radius-card);
+      padding: var(--space-md);
+      text-align: center;
+      border: 1px solid var(--ink-border-light);
+    }
+
+    .slide-data .data-card .stat-value {
+      font-size: var(--text-title-1);
+      font-weight: 700;
+      color: var(--ink-accent);
+      line-height: 1;
+    }
+
+    .slide-data .data-card .stat-label {
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      margin-top: var(--space-tiny);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
+
+    .slide-data .data-commentary {
+      font-size: var(--text-body);
+      line-height: var(--lh-body);
+      color: var(--ink-text);
+    }
+
+    .slide-data .data-commentary p {
+      margin-bottom: var(--space-xs);
+    }
+
+    /* ----------------------------------------------------------------
+       Two-Column Slide
+       ---------------------------------------------------------------- */
+    .slide-two-col .two-col-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+      flex: 1;
+    }
+
+    .slide-two-col .col-label {
+      font-size: var(--text-annotation);
+      color: var(--ink-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+    }
+
+    .slide-two-col .col-content {
+      font-size: var(--text-body);
+      line-height: var(--lh-body);
+    }
+
+    .slide-two-col .col-content p {
+      margin-bottom: var(--space-xs);
+    }
+
+    /* ----------------------------------------------------------------
+       Quote Slide
+       ---------------------------------------------------------------- */
+    .slide-quote {
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .slide-quote .quote-text {
+      font-size: var(--text-title-2);
+      font-weight: 500;
+      font-style: italic;
+      color: var(--ink-text-secondary);
+      line-height: var(--lh-tight);
+      border-left: 4px solid var(--ink-accent);
+      padding-left: var(--space-lg);
+      max-width: 85%;
+    }
+
+    .slide-quote .quote-attribution {
+      margin-top: var(--space-md);
+      padding-left: var(--space-lg);
+      font-size: var(--text-headline);
+      color: var(--ink-text-muted);
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    /* ----------------------------------------------------------------
+       End Slide
+       ---------------------------------------------------------------- */
+    .slide-end {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .slide-end .end-accent {
+      width: 60px;
+      height: 6px;
+      background: var(--ink-accent);
+      border-radius: 3px;
+      margin-bottom: var(--space-lg);
+    }
+
+    .slide-end .end-title {
+      font-size: var(--text-title-2);
+      font-weight: 600;
+      color: var(--ink-text);
+      margin-bottom: var(--space-xs);
+    }
+
+    .slide-end .end-subtitle {
+      font-size: var(--text-headline);
+      color: var(--ink-text-muted);
+      font-weight: 400;
+    }
+
+    /* Print */
+    @media print {
+      .slide-divider {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body class="presentation">
+
+  <!-- Preview Bar -->
+  <div class="preview-bar no-print">
+    <span><span class="preview-label">PDF</span> &nbsp;Presentation Preview</span>
+    <span class="preview-hint">Cmd+P &rarr; Save as PDF &nbsp;|&nbsp; Each section = 1 page</span>
+  </div>
+
+  <!-- ============================================================
+       TITLE SLIDE
+       ============================================================ -->
+  <section class="slide slide-title">
+    <div class="accent-bar-thick"></div>
+    <h1 class="title-text">{{TITLE}}</h1>
+    <p class="subtitle-text">{{SUBTITLE}}</p>
+    <div class="title-meta">
+      <p>{{AUTHOR}} &middot; {{DATE}}</p>
+    </div>
+    <span class="slide-brand">{{BRAND}}</span>
+  </section>
+
+
+  <!-- ============================================================
+       SECTION DIVIDER
+       ============================================================ -->
+  <section class="slide slide-divider">
+    <div class="divider-number">Section 01</div>
+    <h2 class="divider-title">{{SECTION_1_TITLE}}</h2>
+    <p class="divider-subtitle">{{SECTION_1_SUBTITLE}}</p>
+    <span class="slide-brand">{{BRAND}}</span>
+    <span class="slide-number">02</span>
+  </section>
+
+
+  <!-- ============================================================
+       CONTENT SLIDE
+       ============================================================ -->
+  <section class="slide slide-content">
+    <div class="slide-header">
+      <h3 class="slide-heading">{{SLIDE_TITLE}}</h3>
+      <p class="slide-subheading">{{SLIDE_SUBTITLE}}</p>
+    </div>
+    <div class="slide-body">
+      <p>{{SLIDE_CONTENT}}</p>
+      <ul>
+        <li>{{BULLET_1}}</li>
+        <li>{{BULLET_2}}</li>
+        <li>{{BULLET_3}}</li>
+      </ul>
+    </div>
+    <span class="slide-brand">{{BRAND}}</span>
+    <span class="slide-number">03</span>
+  </section>
+
+
+  <!-- ============================================================
+       DATA SLIDE
+       ============================================================ -->
+  <section class="slide slide-data">
+    <div class="slide-header">
+      <h3 class="slide-heading">{{DATA_SLIDE_TITLE}}</h3>
+    </div>
+    <div class="data-cards grid-3">
+      <div class="data-card">
+        <div class="stat-value">{{METRIC_1_VALUE}}</div>
+        <div class="stat-label">{{METRIC_1_LABEL}}</div>
+      </div>
+      <div class="data-card">
+        <div class="stat-value">{{METRIC_2_VALUE}}</div>
+        <div class="stat-label">{{METRIC_2_LABEL}}</div>
+      </div>
+      <div class="data-card">
+        <div class="stat-value">{{METRIC_3_VALUE}}</div>
+        <div class="stat-label">{{METRIC_3_LABEL}}</div>
+      </div>
+    </div>
+    <div class="data-commentary">
+      <p>{{DATA_COMMENTARY}}</p>
+    </div>
+    <span class="slide-brand">{{BRAND}}</span>
+    <span class="slide-number">04</span>
+  </section>
+
+
+  <!-- ============================================================
+       TWO-COLUMN SLIDE
+       ============================================================ -->
+  <section class="slide slide-content slide-two-col">
+    <div class="slide-header">
+      <h3 class="slide-heading">{{TWO_COL_TITLE}}</h3>
+    </div>
+    <div class="two-col-body">
+      <div>
+        <div class="col-label">{{COL_A_LABEL}}</div>
+        <div class="col-content">
+          <p>{{COL_A_CONTENT}}</p>
+        </div>
+      </div>
+      <div>
+        <div class="col-label">{{COL_B_LABEL}}</div>
+        <div class="col-content">
+          <p>{{COL_B_CONTENT}}</p>
+        </div>
+      </div>
+    </div>
+    <span class="slide-brand">{{BRAND}}</span>
+    <span class="slide-number">05</span>
+  </section>
+
+
+  <!-- ============================================================
+       QUOTE SLIDE
+       ============================================================ -->
+  <section class="slide slide-quote">
+    <div class="quote-text">{{QUOTE_TEXT}}</div>
+    <div class="quote-attribution">&mdash; {{QUOTE_AUTHOR}}</div>
+    <span class="slide-brand">{{BRAND}}</span>
+    <span class="slide-number">06</span>
+  </section>
+
+
+  <!-- ============================================================
+       END SLIDE
+       ============================================================ -->
+  <section class="slide slide-end">
+    <div class="end-accent"></div>
+    <h2 class="end-title">{{END_TITLE}}</h2>
+    <p class="end-subtitle">{{END_SUBTITLE}}</p>
+    <span class="slide-brand">{{BRAND}}</span>
+  </section>
+
+</body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <!-- Folio Mood: Playfair Display + Libre Baskerville -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    /* {{BASE_STYLES}} — paste contents of base-styles.css here */
+
+    /* ================================================================
+       Folio Mood Overrides
+       Encyclopedic reference: dense, authoritative, richly visual.
+       Clean white, crimson accent, bold Playfair display, two-column body.
+       ================================================================ */
+
+    body.mood-folio {
+      --ink-accent: #C41E3A;
+      --ink-accent-light: rgba(196, 30, 58, 0.08);
+      --ink-accent-medium: rgba(196, 30, 58, 0.15);
+      --ink-text: #111111;
+      --ink-text-secondary: #444444;
+      --ink-text-muted: #777777;
+      --ink-surface: #F0F0F0;
+      --ink-border: #CCCCCC;
+      --ink-border-light: #E0E0E0;
+      --ink-dark: #111111;
+      --font-primary: 'Libre Baskerville', Georgia, serif;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --radius-card: 0px;
+      --radius-button: 0px;
+      --radius-control: 0px;
+      --radius-small: 0px;
+      background: #FFFFFF;
+    }
+
+    /* Cover: stark, authoritative */
+    .cover {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1.5in 0;
+      border-bottom: 6px solid var(--ink-accent);
+    }
+
+    .cover-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .cover-publisher {
+      font-family: var(--font-primary);
+      font-variant-caps: all-small-caps;
+      letter-spacing: 0.14em;
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+    }
+
+    .cover-edition {
+      font-family: var(--font-primary);
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+      text-align: right;
+    }
+
+    .cover-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1in 0;
+    }
+
+    .cover-title {
+      font-family: var(--font-display);
+      font-size: clamp(32pt, 6vw, 64pt);
+      font-weight: 900;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      color: var(--ink-text);
+      margin-bottom: var(--space-lg);
+    }
+
+    .cover-accent-rule {
+      height: 4px;
+      background: var(--ink-accent);
+      width: 80px;
+      margin-bottom: var(--space-lg);
+    }
+
+    .cover-subtitle {
+      font-family: var(--font-primary);
+      font-size: var(--text-title-3);
+      color: var(--ink-text-secondary);
+      max-width: 65ch;
+      line-height: 1.5;
+    }
+
+    .cover-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+      font-family: var(--font-primary);
+    }
+
+    /* Section header: bold ruled */
+    .section-header-folio {
+      page-break-before: always;
+      break-before: page;
+      padding: 0 0 var(--space-md) 0;
+      border-bottom: 4px solid var(--ink-accent);
+      margin-bottom: var(--space-xl);
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    .section-number-label {
+      font-family: var(--font-primary);
+      font-variant-caps: all-small-caps;
+      letter-spacing: 0.12em;
+      font-size: var(--text-caption);
+      color: var(--ink-accent);
+      margin-bottom: var(--space-xs);
+    }
+
+    .section-title-folio {
+      font-family: var(--font-display);
+      font-size: clamp(22pt, 3.5vw + 0.5rem, 40pt);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--ink-text);
+      line-height: 1.1;
+    }
+
+    /* Chapter opener */
+    .chapter-opener {
+      page: chapter-opener;
+      page-break-before: always;
+      break-before: page;
+      min-height: 50vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: var(--space-xl) 0;
+      border-bottom: 4px solid var(--ink-accent);
+      margin-bottom: var(--space-xl);
+    }
+
+    /* Two-column body text */
+    .two-col-body {
+      columns: 2;
+      column-gap: 2.5em;
+      column-rule: 1px solid var(--ink-border-light);
+      orphans: 3;
+      widows: 3;
+      hyphens: auto;
+      -webkit-hyphens: auto;
+    }
+
+    .two-col-body p {
+      font-size: var(--text-body);
+      line-height: 1.65;
+      margin-bottom: var(--space-sm);
+    }
+
+    .two-col-body h3 { break-inside: avoid; break-after: avoid; }
+    .two-col-body figure { break-inside: avoid; }
+
+    .callout-full {
+      column-span: all;
+      background: var(--ink-surface);
+      border-left: 4px solid var(--ink-accent);
+      padding: var(--space-md) var(--space-lg);
+      margin: var(--space-lg) 0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Plate figures */
+    .plate-figure {
+      page-break-inside: avoid;
+      break-inside: avoid;
+      margin: var(--space-lg) 0;
+    }
+
+    .plate-figure img {
+      width: 100%;
+      display: block;
+    }
+
+    .plate-caption {
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+      font-style: italic;
+      margin-top: var(--space-xs);
+      line-height: var(--lh-tight);
+      padding: var(--space-xs) 0;
+      border-top: 1px solid var(--ink-border-light);
+    }
+
+    .plate-number {
+      font-family: var(--font-display);
+      font-variant-caps: all-small-caps;
+      font-style: normal;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--ink-accent);
+      margin-right: var(--space-xs);
+    }
+
+    /* Stat row */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-md);
+      margin: var(--space-xl) 0;
+    }
+
+    .stat-box {
+      padding: var(--space-md);
+      border-top: 3px solid var(--ink-accent);
+      page-break-inside: avoid;
+    }
+
+    .stat-box .stat-value {
+      font-family: var(--font-display);
+      font-size: clamp(18pt, 3vw, 32pt);
+      font-weight: 700;
+      color: var(--ink-accent);
+      line-height: 1.1;
+    }
+
+    .stat-box .stat-label {
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+      font-variant-caps: all-small-caps;
+      letter-spacing: 0.08em;
+      margin-top: var(--space-micro);
+    }
+
+    /* Preview bar */
+    .preview-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: #111111;
+      color: white;
+      padding: 10px 24px;
+      font-size: 11pt;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      font-family: 'Libre Baskerville', Georgia, serif;
+    }
+
+    .preview-bar .preview-label { color: #C41E3A; font-weight: 700; }
+    .preview-bar .preview-hint { color: #777777; }
+
+    @media print {
+      .preview-bar { display: none !important; }
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+      p, li { orphans: 3; widows: 3; }
+      .two-col-body { columns: 2; }
+    }
+  </style>
+</head>
+<body class="mood-folio">
+
+  <div class="preview-bar no-print">
+    <span><span class="preview-label">Folio</span> &nbsp;Encyclopedic Reference Preview</span>
+    <span class="preview-hint">Cmd+P &rarr; Save as PDF</span>
+  </div>
+
+
+  <!-- ============================================================
+       COVER
+       ============================================================ -->
+  <div class="cover">
+    <div class="cover-top">
+      <span class="cover-publisher">{{PUBLISHER_LABEL}}</span>
+      <span class="cover-edition">{{EDITION_LABEL}}</span>
+    </div>
+    <div class="cover-main">
+      <div class="cover-accent-rule"></div>
+      <h1 class="cover-title">{{TITLE}}</h1>
+      <p class="cover-subtitle">{{SUBTITLE}}</p>
+    </div>
+    <div class="cover-bottom">
+      <span>{{AUTHOR}}</span>
+      <span>{{DATE}}</span>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       CHAPTER OPENER
+       ============================================================ -->
+  <section class="chapter-opener">
+    <div class="section-number-label">Chapter 01</div>
+    <h2 style="font-family: var(--font-display); font-size: clamp(26pt, 5vw, 48pt); font-weight: 700; letter-spacing: -0.02em; margin-bottom: var(--space-md);">{{CHAPTER_1_TITLE}}</h2>
+    <p style="font-size: var(--text-title-4); color: var(--ink-text-secondary); max-width: 65ch;">{{CHAPTER_1_INTRO}}</p>
+  </section>
+
+
+  <!-- ============================================================
+       STAT ROW
+       ============================================================ -->
+  <div class="stat-row">
+    <div class="stat-box">
+      <div class="stat-value">{{STAT_1_VALUE}}</div>
+      <div class="stat-label">{{STAT_1_LABEL}}</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value">{{STAT_2_VALUE}}</div>
+      <div class="stat-label">{{STAT_2_LABEL}}</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value">{{STAT_3_VALUE}}</div>
+      <div class="stat-label">{{STAT_3_LABEL}}</div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       TWO-COLUMN BODY WITH CALLOUT SPAN
+       ============================================================ -->
+  <div class="two-col-body">
+    <p>{{BODY_PARAGRAPH_1}}</p>
+    <p>{{BODY_PARAGRAPH_2}}</p>
+
+    <!-- Full-width callout spans both columns -->
+    <div class="callout-full">
+      <p style="font-family: var(--font-display); font-size: var(--text-title-4); font-weight: 700; margin: 0; color: var(--ink-text);">{{CALLOUT_TEXT}}</p>
+    </div>
+
+    <p>{{BODY_PARAGRAPH_3}}</p>
+    <p>{{BODY_PARAGRAPH_4}}</p>
+  </div>
+
+
+  <!-- ============================================================
+       PLATE FIGURE
+       ============================================================ -->
+  <div class="plate-figure">
+    <img src="{{PLATE_IMAGE_SRC}}" alt="{{PLATE_IMAGE_ALT}}">
+    <p class="plate-caption">
+      <span class="plate-number">Plate I</span>
+      {{PLATE_CAPTION_TEXT}}
+    </p>
+  </div>
+
+
+</body>
+</html>

@@ -1,0 +1,1977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reprioritize the Engineering Backlog</title>
+  <style>
+    /* ==========================================================================
+   Ink Design System — Print-Optimized CSS
+
+   CONFIGURATION: Edit the section below to customize colors, fonts, and
+   branding. All visual decisions flow from these variables.
+   ========================================================================== */
+
+/* === CONFIGURATION ========================================================
+   Change these values to customize the entire design system.
+   All colors, fonts, and branding flow from this section.
+   ========================================================================== */
+:root {
+  /* Brand — change this one color to theme everything */
+  --ink-accent: #2563EB;
+  --ink-accent-light: rgba(37, 99, 235, 0.08);
+  --ink-accent-medium: rgba(37, 99, 235, 0.15);
+
+  /* Brand Name — appears in footers and headers */
+  --brand-name: "Document";
+  --brand-show: block;   /* Set to 'none' to hide brand text */
+
+  /* Typography — Crisp baseline (system fonts, no custom dependency) */
+  --font-primary: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+
+  /* EDITORIAL MOOD FONTS — agent sets active bindings based on chosen mood */
+  /* Crisp (default) — current system stack */
+  --font-display-crisp: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  --font-body-crisp: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  /* Monograph — luxury monograph, high contrast serif */
+  --font-display-monograph: 'Cormorant Garamond', 'Didot', 'Bodoni MT', Georgia, serif;
+  --font-body-monograph: 'EB Garamond', 'Garamond', Georgia, serif;
+  /* Folio — encyclopedic reference, bold display */
+  --font-display-folio: 'Playfair Display', 'Bodoni 72', Georgia, serif;
+  --font-body-folio: 'Libre Baskerville', 'Baskerville', Georgia, serif;
+  /* Modernist — modernist / architectural, disciplined grid */
+  --font-display-modernist: 'DM Serif Display', 'Freight Big', Georgia, serif;
+  --font-body-modernist: 'Lora', 'Palatino', Georgia, serif;
+  /* Arcade — pixel-manual / Pac-Man journal, 8-bit display + readable terminal body */
+  --font-display-arcade: 'Press Start 2P', 'Silkscreen', ui-monospace, monospace;
+  --font-body-arcade: 'VT323', 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Active bindings — default to crisp; override via .mood-* class on body/wrapper */
+  --font-display: var(--font-display-crisp);
+}
+/* === END CONFIGURATION ==================================================== */
+
+
+/* --------------------------------------------------------------------------
+   1. CSS Custom Properties (derived from configuration)
+   -------------------------------------------------------------------------- */
+
+:root {
+  /* Text Colors */
+  --ink-text: #1A1A1A;
+  --ink-text-secondary: #4A5568;
+  --ink-text-muted: #718096;
+
+  /* Surface & Borders */
+  --ink-surface: #F7F8FA;
+  --ink-border: #E2E8F0;
+  --ink-border-light: #EDF2F7;
+
+  /* Dark (for dark slides, preview bar) */
+  --ink-dark: #1A202C;
+
+  /* Semantic Colors */
+  --ink-error: #E53E3E;
+  --ink-error-light: rgba(229, 62, 62, 0.10);
+  --ink-success: #38A169;
+  --ink-success-light: rgba(56, 161, 105, 0.10);
+  --ink-warning: #D69E2E;
+  --ink-warning-light: rgba(214, 158, 46, 0.10);
+
+  /* Font Sizes — fluid scale via clamp() (scales with viewport, floors at print-safe pt sizes) */
+  --text-display: clamp(36pt, 7vw + 1rem, 72pt);
+  --text-title-0: clamp(28pt, 5vw + 0.5rem, 48pt);
+  --text-title-1: clamp(22pt, 3.5vw + 0.5rem, 36pt);
+  --text-title-2: clamp(18pt, 2.5vw + 0.5rem, 26pt);
+  --text-title-3: clamp(15pt, 2vw + 0.3rem, 20pt);
+  --text-title-4: clamp(13pt, 1.5vw + 0.3rem, 17pt);
+  --text-headline: clamp(11pt, 1.2vw + 0.2rem, 14pt);
+  --text-body: clamp(10pt, 1.1vw + 0.2rem, 12pt);
+  --text-callout: clamp(9pt, 1vw + 0.2rem, 11pt);
+  --text-subhead: clamp(8.5pt, 0.9vw + 0.2rem, 10pt);
+  --text-caption: clamp(7.5pt, 0.8vw + 0.1rem, 9pt);
+  --text-annotation: clamp(7pt, 0.7vw + 0.1rem, 8pt);
+
+  /* Line Heights */
+  --lh-title: 1.2;
+  --lh-body: 1.6;
+  --lh-tight: 1.35;
+
+  /* Spacing (8px grid) */
+  --space-micro: 4px;
+  --space-tiny: 8px;
+  --space-xs: 12px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 32px;
+  --space-modal: 36px;
+  --space-xl: 48px;
+  --space-xxl: 56px;
+
+  /* Radius */
+  --radius-card: 20px;
+  --radius-button: 12px;
+  --radius-control: 8px;
+  --radius-small: 6px;
+  --radius-pill: 100px;
+
+  /* Shadows */
+  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.07);
+  --shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.10);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+
+/* --------------------------------------------------------------------------
+   2. Page Setup
+   -------------------------------------------------------------------------- */
+
+@page {
+  size: letter;
+  margin: 1in 1.15in;
+
+  /* Running page number in bottom center */
+  @bottom-center {
+    content: counter(page);
+    font-family: var(--font-primary);
+    font-size: 8pt;
+    color: #718096; /* ink-text-muted */
+    font-variant-numeric: oldstyle-nums;
+  }
+}
+
+@page :first {
+  margin-top: 0;
+  /* Suppress page number on cover page */
+  @bottom-center {
+    content: none;
+  }
+}
+
+/* Named page for chapter openers — larger top margin, no page number */
+@page chapter-opener {
+  margin: 1.5in 1.15in 1in;
+  @bottom-center {
+    content: none;
+  }
+}
+
+/* Named page for landscape data spreads */
+@page data-spread {
+  size: letter landscape;
+  margin: 0.75in 1in;
+  @bottom-center {
+    content: none;
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   3. Reset & Base
+   -------------------------------------------------------------------------- */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: var(--text-body);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body {
+  font-family: var(--font-primary);
+  color: var(--ink-text);
+  line-height: var(--lh-body);
+  background: white;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+/* --------------------------------------------------------------------------
+   4. Typography
+   -------------------------------------------------------------------------- */
+
+.title-0 {
+  font-size: var(--text-title-0);
+  line-height: var(--lh-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink-text);
+}
+
+.title-1 {
+  font-size: var(--text-title-1);
+  line-height: var(--lh-title);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--ink-text);
+}
+
+.title-2 {
+  font-size: var(--text-title-2);
+  line-height: var(--lh-title);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink-text-secondary);
+}
+
+.title-3 {
+  font-size: var(--text-title-3);
+  line-height: var(--lh-title);
+  font-weight: 600;
+  color: var(--ink-text-secondary);
+}
+
+.title-4 {
+  font-size: var(--text-title-4);
+  line-height: var(--lh-tight);
+  font-weight: 600;
+  color: var(--ink-text-secondary);
+}
+
+.headline {
+  font-size: var(--text-headline);
+  font-weight: 600;
+  color: var(--ink-text);
+}
+
+.body-text {
+  font-size: var(--text-body);
+  line-height: var(--lh-body);
+  color: var(--ink-text);
+}
+
+.callout-text {
+  font-size: var(--text-callout);
+  line-height: var(--lh-body);
+  color: var(--ink-text-secondary);
+}
+
+.caption {
+  font-size: var(--text-caption);
+  color: var(--ink-text-muted);
+  line-height: var(--lh-tight);
+}
+
+.annotation {
+  font-size: var(--text-annotation);
+  color: var(--ink-text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.text-accent { color: var(--ink-accent); }
+.text-success { color: var(--ink-success); }
+.text-error { color: var(--ink-error); }
+.text-warning { color: var(--ink-warning); }
+.text-muted { color: var(--ink-text-muted); }
+.text-secondary { color: var(--ink-text-secondary); }
+
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+.font-medium { font-weight: 500; }
+.font-normal { font-weight: 400; }
+
+/* --- Editorial Typography (OpenType features, drop caps, small caps) ------- */
+
+/* Body text with full editorial OpenType stack */
+.body-editorial {
+  font-family: var(--font-primary);
+  font-variant-ligatures: common-ligatures discretionary-ligatures;
+  font-variant-numeric: oldstyle-nums proportional-nums;
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+  hanging-punctuation: first last;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  orphans: 3;
+  widows: 3;
+}
+
+/* Book-convention paragraph indent (second and subsequent paragraphs) */
+.body-editorial p + p {
+  text-indent: 1.5em;
+  margin-top: 0;
+}
+
+.body-editorial p:first-of-type {
+  text-indent: 0;
+}
+
+/* Drop cap — initial-letter property (Chrome 110+) */
+.drop-cap p:first-of-type::first-letter {
+  initial-letter: 3;
+  font-family: var(--font-display);
+  font-weight: 300;
+  color: var(--ink-accent);
+  margin-right: 0.08em;
+  padding-right: 0.04em;
+}
+
+/* Float fallback for older browsers */
+@supports not (initial-letter: 3) {
+  .drop-cap p:first-of-type::first-letter {
+    float: left;
+    font-size: 4.2em;
+    line-height: 0.75;
+    margin: 0.08em 0.1em 0 0;
+    font-family: var(--font-display);
+    color: var(--ink-accent);
+  }
+}
+
+/* Small caps utility */
+.small-caps {
+  font-variant-caps: all-small-caps;
+  font-variant-numeric: oldstyle-nums;
+  letter-spacing: 0.08em;
+}
+
+/* Section label — upgraded from .annotation with small caps */
+.section-label {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.12em;
+  font-size: var(--text-caption);
+  color: var(--ink-text-muted);
+  font-family: var(--font-primary);
+  margin-bottom: var(--space-xs);
+  display: block;
+}
+
+
+/* --------------------------------------------------------------------------
+   5. Layout Utilities
+   -------------------------------------------------------------------------- */
+
+/* Page breaks */
+.page-break { page-break-before: always; break-before: page; }
+.avoid-break { page-break-inside: avoid; break-inside: avoid; }
+.no-break-after { page-break-after: avoid; break-after: avoid; }
+
+/* Flex */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-1 { flex: 1; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+
+/* Grid */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-md); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-sm); }
+.grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-md); }
+.grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: var(--space-md); }
+
+/* Gaps */
+.gap-micro { gap: var(--space-micro); }
+.gap-tiny { gap: var(--space-tiny); }
+.gap-xs { gap: var(--space-xs); }
+.gap-sm { gap: var(--space-sm); }
+.gap-md { gap: var(--space-md); }
+.gap-lg { gap: var(--space-lg); }
+.gap-xl { gap: var(--space-xl); }
+
+/* Spacing */
+.mt-tiny { margin-top: var(--space-tiny); }
+.mt-xs { margin-top: var(--space-xs); }
+.mt-sm { margin-top: var(--space-sm); }
+.mt-md { margin-top: var(--space-md); }
+.mt-lg { margin-top: var(--space-lg); }
+.mt-xl { margin-top: var(--space-xl); }
+.mb-tiny { margin-bottom: var(--space-tiny); }
+.mb-xs { margin-bottom: var(--space-xs); }
+.mb-sm { margin-bottom: var(--space-sm); }
+.mb-md { margin-bottom: var(--space-md); }
+.mb-lg { margin-bottom: var(--space-lg); }
+.mb-xl { margin-bottom: var(--space-xl); }
+
+.p-sm { padding: var(--space-sm); }
+.p-md { padding: var(--space-md); }
+.p-lg { padding: var(--space-lg); }
+.p-xl { padding: var(--space-xl); }
+
+/* Text alignment */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-left { text-align: left; }
+
+
+/* --------------------------------------------------------------------------
+   6. Components — Cards
+   -------------------------------------------------------------------------- */
+
+.doc-card {
+  background: white;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-lg);
+  page-break-inside: avoid;
+}
+
+.doc-card-flat {
+  background: var(--ink-surface);
+  border-radius: var(--radius-card);
+  padding: var(--space-lg);
+  border: 1px solid var(--ink-border-light);
+  page-break-inside: avoid;
+}
+
+.doc-card-bordered {
+  background: white;
+  border-radius: var(--radius-card);
+  padding: var(--space-lg);
+  border: 1px solid var(--ink-border);
+  page-break-inside: avoid;
+}
+
+.doc-card-accent {
+  background: white;
+  border-radius: var(--radius-card);
+  padding: var(--space-lg);
+  border-left: 4px solid var(--ink-accent);
+  box-shadow: var(--shadow-light);
+  page-break-inside: avoid;
+}
+
+.doc-card-dark {
+  background: var(--ink-dark);
+  border-radius: var(--radius-card);
+  padding: var(--space-lg);
+  color: white;
+  page-break-inside: avoid;
+}
+
+.doc-card-tinted {
+  background: var(--ink-accent-light);
+  border-radius: var(--radius-card);
+  padding: var(--space-lg);
+  border: 1px solid var(--ink-border-light);
+  page-break-inside: avoid;
+}
+
+
+/* --------------------------------------------------------------------------
+   6b. Editorial Layout Components
+   -------------------------------------------------------------------------- */
+
+/* Full-bleed: breaks out of page margin to span full width */
+.full-bleed {
+  margin-left: calc(-1 * var(--page-margin, 1.15in));
+  margin-right: calc(-1 * var(--page-margin, 1.15in));
+  width: calc(100% + 2 * var(--page-margin, 1.15in));
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.full-bleed img,
+.full-bleed figure img {
+  width: 100%;
+  height: clamp(30vh, 50vh, 70vh);
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* Sidenote / marginalia layout */
+.body-with-margin {
+  display: grid;
+  grid-template-columns: 1fr min(65ch, 55%) 1fr;
+  column-gap: 2.5rem;
+}
+
+.body-with-margin > * {
+  grid-column: 2;
+}
+
+.sidenote {
+  grid-column: 3;
+  align-self: start;
+  font-size: var(--text-caption);
+  color: var(--ink-text-muted);
+  line-height: var(--lh-tight);
+  font-variant-numeric: oldstyle-nums;
+  border-left: 2px solid var(--ink-border-light);
+  padding-left: var(--space-xs);
+  margin-top: -0.2em; /* optical alignment with triggering text */
+}
+
+.sidenote-ref {
+  font-variant-position: super;
+  font-size: 0.7em;
+  color: var(--ink-accent);
+}
+
+/* Two-column body text */
+.two-col-body {
+  columns: 2;
+  column-gap: 2.5em;
+  column-rule: 1px solid var(--ink-border-light);
+  orphans: 3;
+  widows: 3;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+.two-col-body h2,
+.two-col-body h3,
+.two-col-body .callout-box,
+.two-col-body figure {
+  break-inside: avoid;
+}
+
+/* Span callouts full-width across both columns */
+.two-col-body .callout-full {
+  column-span: all;
+  margin: var(--space-lg) 0;
+}
+
+/* Editorial pull quote — large-format, centered, rule-bounded */
+.pull-quote-editorial {
+  font-family: var(--font-display);
+  font-size: clamp(16pt, 3vw, 24pt);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.35;
+  color: var(--ink-text);
+  text-align: center;
+  padding: var(--space-xl) var(--space-xl);
+  margin: var(--space-xl) 0;
+  border-top: 1px solid var(--ink-border);
+  border-bottom: 1px solid var(--ink-border);
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.pull-quote-editorial::before {
+  content: '\201C'; /* typographic opening double-quote */
+  display: block;
+  font-size: 4em;
+  line-height: 0.6;
+  color: var(--ink-accent);
+  margin-bottom: 0.2em;
+  font-style: normal;
+}
+
+/* Chapter opener — named page template for multi-chapter documents */
+.chapter-opener {
+  page: chapter-opener;
+  page-break-before: always;
+  break-before: page;
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--space-xl) 0;
+  border-bottom: 3px solid var(--ink-accent);
+  margin-bottom: var(--space-xl);
+}
+
+/* Figure + caption (editorial plate style) */
+figure {
+  margin: var(--space-md) 0;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+figure img {
+  width: 100%;
+  display: block;
+  border-radius: var(--radius-small);
+}
+
+figcaption {
+  font-size: var(--text-caption);
+  color: var(--ink-text-muted);
+  font-style: italic;
+  margin-top: var(--space-xs);
+  line-height: var(--lh-tight);
+  padding-left: var(--space-xs);
+  border-left: 2px solid var(--ink-border-light);
+  font-variant-numeric: oldstyle-nums;
+}
+
+figcaption .plate-number {
+  font-variant-caps: all-small-caps;
+  font-style: normal;
+  letter-spacing: 0.08em;
+  color: var(--ink-text-secondary);
+  margin-right: var(--space-xs);
+}
+
+/* Mood overrides — Monograph */
+.mood-monograph {
+  --ink-accent: #B8A48E;
+  --ink-text: #1C1A16;
+  --ink-text-secondary: #6B5E4E;
+  --ink-text-muted: #9E8E7E;
+  --ink-surface: #F5F0E8;
+  --ink-border: #E8E0D5;
+  --ink-border-light: #EDE8E0;
+  --font-primary: 'EB Garamond', Georgia, serif;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --radius-card: 0px;
+  --radius-button: 0px;
+  background: #FAFAF8;
+  font-variant-ligatures: common-ligatures discretionary-ligatures;
+  font-variant-numeric: oldstyle-nums;
+  line-height: 1.72;
+}
+
+/* Mood overrides — Folio */
+.mood-folio {
+  --ink-accent: #C41E3A;
+  --ink-text: #111111;
+  --ink-text-secondary: #444444;
+  --ink-text-muted: #777777;
+  --ink-surface: #F0F0F0;
+  --ink-border: #CCCCCC;
+  --ink-border-light: #E0E0E0;
+  --font-primary: 'Libre Baskerville', Georgia, serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --radius-card: 0px;
+  --radius-button: 0px;
+}
+
+.mood-folio .section-body {
+  columns: 2;
+  column-gap: 2.5em;
+  column-rule: 1px solid var(--ink-border-light);
+  orphans: 3;
+  widows: 3;
+}
+
+/* Mood overrides — Modernist */
+.mood-modernist {
+  --ink-accent: #1A1A1A;
+  --ink-text: #1A1A1A;
+  --ink-text-secondary: #555555;
+  --ink-text-muted: #888888;
+  --ink-surface: #F4F4F2;
+  --ink-border: #1A1A1A;
+  --ink-border-light: #DDDDDD;
+  --font-primary: 'Lora', Georgia, serif;
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --radius-card: 0px;
+  --radius-button: 0px;
+  --lh-body: 1.8;
+}
+
+.mood-modernist .divider {
+  border-top: 3px solid #1A1A1A;
+}
+
+.mood-modernist .title-0,
+.mood-modernist .title-1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(40pt, 9vw, 80pt);
+}
+
+/* Mood overrides — Arcade (pixel-manual, Pac-Man journal) */
+.mood-arcade {
+  --ink-accent: #FFCC00;            /* Pac-Man yellow */
+  --ink-accent-alt-1: #E63946;      /* Blinky red */
+  --ink-accent-alt-2: #4FC3F7;      /* Inky cyan */
+  --ink-accent-alt-3: #FFB7CE;      /* Pinky pink */
+  --ink-accent-alt-4: #FFB852;      /* Clyde orange */
+  --ink-text: #1A1A1A;
+  --ink-text-secondary: #5A4A2A;    /* sepia ink */
+  --ink-text-muted: #8B7A52;
+  --ink-surface: #FFFFFF;
+  --ink-border: #1A1A1A;            /* heavy ink rules */
+  --ink-border-light: #C8B98A;
+  --ink-dark: #0A0A0A;
+  --font-primary: var(--font-body-arcade);
+  --font-display: var(--font-display-arcade);
+  --radius-card: 0px;
+  --radius-button: 0px;
+  --lh-body: 1.35;                  /* tighter for terminal feel */
+  background: #F4ECD8;              /* warm cream manual paper */
+}
+
+/* Pixel-perfect display headlines — letterspaced, all caps, tight leading */
+.mood-arcade .title-0,
+.mood-arcade .title-1,
+.mood-arcade .title-2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+  color: var(--ink-text);
+  /* Press Start 2P is dense — dial sizes back vs serif moods */
+  font-size: clamp(14pt, 3.2vw, 28pt);
+}
+
+.mood-arcade .title-0 {
+  font-size: clamp(20pt, 5vw, 42pt);
+}
+
+/* Body uses VT323 — readable terminal-style mono, larger size for legibility */
+.mood-arcade .body,
+.mood-arcade .body-editorial,
+.mood-arcade p {
+  font-family: var(--font-body-arcade);
+  font-size: clamp(13pt, 1.6vw + 0.4rem, 16pt);
+  line-height: 1.4;
+  font-variant-ligatures: none;
+  letter-spacing: 0;
+  hyphens: none;
+}
+
+/* Section labels — "INSERT COIN" / "PRESS START" feel */
+.mood-arcade .section-label,
+.mood-arcade .small-caps {
+  font-family: var(--font-display);
+  font-variant-caps: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: clamp(7pt, 0.9vw, 9pt);
+  color: var(--ink-accent);
+}
+
+/* Heavy double-rule dividers (cabinet-stripe vibe) */
+.mood-arcade .divider {
+  border: none;
+  height: 8px;
+  background:
+    linear-gradient(to bottom,
+      var(--ink-border) 0,
+      var(--ink-border) 2px,
+      transparent 2px,
+      transparent 6px,
+      var(--ink-border) 6px,
+      var(--ink-border) 8px);
+  margin: var(--space-xl) 0;
+}
+
+/* Pixel-step border for cards/callouts — no rounded corners, ever */
+.mood-arcade .card,
+.mood-arcade .callout-box,
+.mood-arcade .metric-card,
+.mood-arcade .stat-card {
+  border: 3px solid var(--ink-border);
+  border-radius: 0;
+  box-shadow: 4px 4px 0 var(--ink-border);  /* hard pixel drop-shadow */
+  background: var(--ink-surface);
+}
+
+/* Score / stat display — "SCORE: 1UP" feel */
+.mood-arcade .stat-value,
+.mood-arcade .metric-value {
+  font-family: var(--font-display);
+  color: var(--ink-accent);
+  letter-spacing: 0.04em;
+}
+
+/* ASCII-ish callout — uses box-drawing pseudo-elements */
+.mood-arcade .ascii-frame {
+  position: relative;
+  border: 3px solid var(--ink-border);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--ink-surface);
+  font-family: var(--font-body-arcade);
+}
+
+.mood-arcade .ascii-frame::before {
+  content: "▶ ";
+  color: var(--ink-accent);
+  font-family: var(--font-display);
+  font-size: 0.75em;
+}
+
+/* Pull quote: arcade attract-mode marquee feel */
+.mood-arcade .pull-quote-editorial {
+  font-family: var(--font-display);
+  font-size: clamp(11pt, 2.2vw, 18pt);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  color: var(--ink-text);
+  background: var(--ink-accent);
+  padding: var(--space-lg);
+  border: 3px solid var(--ink-border);
+  border-radius: 0;
+  text-align: center;
+  font-style: normal;
+  box-shadow: 6px 6px 0 var(--ink-border);
+}
+
+.mood-arcade .pull-quote-editorial::before {
+  content: "◀ ";
+  color: var(--ink-text);
+  font-style: normal;
+  font-size: 1em;
+  display: inline;
+  margin: 0;
+  line-height: 1;
+}
+
+.mood-arcade .pull-quote-editorial::after {
+  content: " ▶";
+  color: var(--ink-text);
+}
+
+/* Halftone surface fill via pseudo-element (screen only — flatten in print) */
+.mood-arcade .halftone {
+  background-image:
+    radial-gradient(circle, var(--ink-text) 1.2px, transparent 1.4px);
+  background-size: 8px 8px;
+  background-position: 0 0;
+}
+
+/* Disable drop-cap in arcade — pixel font drop caps look broken */
+.mood-arcade .drop-cap p:first-of-type::first-letter {
+  initial-letter: normal;
+  float: none;
+  font-size: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+/* Pixelated image rendering for any small graphic flagged as pixel art */
+.mood-arcade .pixel-art,
+.mood-arcade .pixel-art img {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* Optional CRT scanline overlay — screen only, opt-in via .scanlines class */
+.mood-arcade.scanlines::after,
+.mood-arcade .scanlines::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.05) 0,
+    rgba(0, 0, 0, 0.05) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  z-index: 9999;
+  mix-blend-mode: multiply;
+}
+
+@media print {
+  /* Kill scanlines and hard shadows in print — they look muddy */
+  .mood-arcade.scanlines::after,
+  .mood-arcade .scanlines::after { display: none; }
+  .mood-arcade .card,
+  .mood-arcade .callout-box,
+  .mood-arcade .pull-quote-editorial { box-shadow: none; }
+}
+
+/* --------------------------------------------------------------------------
+   7. Components — Stats & Metrics
+   -------------------------------------------------------------------------- */
+
+.stat-callout {
+  text-align: center;
+  padding: var(--space-md) var(--space-sm);
+  page-break-inside: avoid;
+}
+
+.stat-callout .stat-value {
+  font-size: var(--text-title-1);
+  font-weight: 700;
+  color: var(--ink-accent);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.stat-callout .stat-label {
+  font-size: var(--text-annotation);
+  color: var(--ink-text-muted);
+  margin-top: var(--space-tiny);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.stat-callout .stat-detail {
+  font-size: var(--text-caption);
+  color: var(--ink-text-muted);
+  margin-top: var(--space-micro);
+}
+
+.stat-callout-compact {
+  text-align: left;
+  padding: var(--space-sm);
+  page-break-inside: avoid;
+}
+
+.stat-callout-compact .stat-value {
+  font-size: var(--text-title-3);
+  font-weight: 700;
+  color: var(--ink-accent);
+  line-height: 1.1;
+}
+
+.stat-callout-compact .stat-label {
+  font-size: var(--text-annotation);
+  color: var(--ink-text-muted);
+  margin-top: var(--space-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+/* Metric change indicators */
+.metric-up { color: var(--ink-success); }
+.metric-up::before { content: "\2191  "; }
+.metric-down { color: var(--ink-error); }
+.metric-down::before { content: "\2193  "; }
+.metric-neutral { color: var(--ink-text-muted); }
+.metric-neutral::before { content: "\2014  "; }
+
+
+/* --------------------------------------------------------------------------
+   8. Components — Accent Bars & Dividers
+   -------------------------------------------------------------------------- */
+
+.accent-bar {
+  height: 3px;
+  background: var(--ink-accent);
+  border-radius: 2px;
+}
+
+.accent-bar-thick {
+  height: 6px;
+  background: var(--ink-accent);
+  border-radius: 3px;
+}
+
+.accent-bar-wide {
+  height: 4px;
+  background: var(--ink-accent);
+  border-radius: 2px;
+  margin: var(--space-lg) 0;
+}
+
+.accent-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ink-accent);
+  display: inline-block;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--ink-border-light);
+  margin: var(--space-lg) 0;
+}
+
+.divider-subtle {
+  border: none;
+  border-top: 1px solid var(--ink-border);
+  margin: var(--space-md) 0;
+}
+
+.divider-strong {
+  border: none;
+  border-top: 2px solid var(--ink-border);
+  margin: var(--space-lg) 0;
+}
+
+
+/* --------------------------------------------------------------------------
+   9. Components — Text Blocks
+   -------------------------------------------------------------------------- */
+
+.pull-quote {
+  border-left: 4px solid var(--ink-accent);
+  padding: var(--space-sm) var(--space-md);
+  margin: var(--space-lg) 0;
+  font-size: var(--text-title-4);
+  font-weight: 500;
+  color: var(--ink-text-secondary);
+  font-style: italic;
+  line-height: var(--lh-tight);
+  page-break-inside: avoid;
+}
+
+.callout-box {
+  background: var(--ink-accent-light);
+  border-radius: var(--radius-control);
+  padding: var(--space-sm) var(--space-md);
+  margin: var(--space-md) 0;
+  page-break-inside: avoid;
+}
+
+.callout-box-warning {
+  background: var(--ink-warning-light);
+  border-radius: var(--radius-control);
+  padding: var(--space-sm) var(--space-md);
+  margin: var(--space-md) 0;
+  page-break-inside: avoid;
+}
+
+.callout-box-error {
+  background: var(--ink-error-light);
+  border-radius: var(--radius-control);
+  padding: var(--space-sm) var(--space-md);
+  margin: var(--space-md) 0;
+  page-break-inside: avoid;
+}
+
+.callout-box-success {
+  background: var(--ink-success-light);
+  border-radius: var(--radius-control);
+  padding: var(--space-sm) var(--space-md);
+  margin: var(--space-md) 0;
+  page-break-inside: avoid;
+}
+
+.highlight-strip {
+  background: var(--ink-accent-light);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-control);
+  margin: var(--space-md) 0;
+  page-break-inside: avoid;
+}
+
+
+/* --------------------------------------------------------------------------
+   10. Components — Tables
+   -------------------------------------------------------------------------- */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-md) 0;
+  font-size: var(--text-callout);
+  page-break-inside: avoid;
+}
+
+thead {
+  display: table-header-group;
+}
+
+th {
+  background: var(--ink-surface);
+  font-weight: 600;
+  text-align: left;
+  padding: var(--space-xs) var(--space-sm);
+  border-bottom: 2px solid var(--ink-border);
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-text-secondary);
+}
+
+td {
+  padding: var(--space-xs) var(--space-sm);
+  border-bottom: 1px solid var(--ink-border-light);
+  vertical-align: top;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover {
+  background: var(--ink-surface);
+}
+
+/* Compact table variant */
+table.compact th,
+table.compact td {
+  padding: var(--space-tiny) var(--space-xs);
+  font-size: var(--text-caption);
+}
+
+
+/* --------------------------------------------------------------------------
+   11. Components — Code
+   -------------------------------------------------------------------------- */
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--ink-surface);
+  padding: 1px 5px;
+  border-radius: var(--radius-small);
+  color: var(--ink-text-secondary);
+}
+
+pre {
+  background: var(--ink-surface);
+  border: 1px solid var(--ink-border-light);
+  border-radius: var(--radius-control);
+  padding: var(--space-sm);
+  font-size: var(--text-caption);
+  line-height: 1.5;
+  overflow-x: auto;
+  page-break-inside: avoid;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+
+/* --------------------------------------------------------------------------
+   12. Components — Lists
+   -------------------------------------------------------------------------- */
+
+ul, ol {
+  margin: var(--space-xs) 0;
+  padding-left: var(--space-md);
+}
+
+li {
+  margin: var(--space-micro) 0;
+  line-height: var(--lh-body);
+}
+
+li + li {
+  margin-top: var(--space-tiny);
+}
+
+/* Checklist */
+.checklist {
+  list-style: none;
+  padding-left: 0;
+}
+
+.checklist li {
+  padding: var(--space-micro) 0;
+  padding-left: var(--space-md);
+  position: relative;
+}
+
+.checklist li::before {
+  content: '\2610';
+  position: absolute;
+  left: 0;
+  color: var(--ink-accent);
+  font-size: 1.1em;
+}
+
+.checklist li.checked::before {
+  content: '\2611';
+}
+
+/* Bullet-free list */
+.clean-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+
+/* --------------------------------------------------------------------------
+   13. Components — Badges & Tags
+   -------------------------------------------------------------------------- */
+
+.badge {
+  display: inline-block;
+  padding: 2px var(--space-xs);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.badge-accent {
+  background: var(--ink-accent-medium);
+  color: var(--ink-accent);
+}
+
+.badge-success {
+  background: var(--ink-success-light);
+  color: var(--ink-success);
+}
+
+.badge-warning {
+  background: var(--ink-warning-light);
+  color: #B7791F;
+}
+
+.badge-error {
+  background: var(--ink-error-light);
+  color: var(--ink-error);
+}
+
+.badge-neutral {
+  background: var(--ink-border-light);
+  color: var(--ink-text-muted);
+}
+
+.badge-dark {
+  background: var(--ink-text);
+  color: white;
+}
+
+
+/* --------------------------------------------------------------------------
+   14. Components — Timeline
+   -------------------------------------------------------------------------- */
+
+.timeline {
+  position: relative;
+  padding-left: var(--space-lg);
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--ink-border-light);
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: var(--space-md);
+  page-break-inside: avoid;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: calc(-1 * var(--space-lg) + 3px);
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ink-accent);
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px var(--ink-accent);
+}
+
+.timeline-item.completed::before {
+  background: var(--ink-success);
+  box-shadow: 0 0 0 2px var(--ink-success);
+}
+
+.timeline-item.pending::before {
+  background: var(--ink-border);
+  box-shadow: 0 0 0 2px var(--ink-border);
+}
+
+.timeline-date {
+  font-size: var(--text-annotation);
+  color: var(--ink-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  margin-bottom: var(--space-micro);
+}
+
+.timeline-title {
+  font-size: var(--text-headline);
+  font-weight: 600;
+  margin-bottom: var(--space-micro);
+}
+
+.timeline-body {
+  font-size: var(--text-callout);
+  color: var(--ink-text-secondary);
+}
+
+
+/* --------------------------------------------------------------------------
+   15. Components — Progress
+   -------------------------------------------------------------------------- */
+
+.progress-bar {
+  height: 8px;
+  background: var(--ink-border-light);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--ink-accent);
+  border-radius: var(--radius-pill);
+  transition: width 0.3s ease;
+}
+
+
+/* --------------------------------------------------------------------------
+   16. Links
+   -------------------------------------------------------------------------- */
+
+a {
+  color: var(--ink-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+
+/* --------------------------------------------------------------------------
+   17. Print Overrides
+   -------------------------------------------------------------------------- */
+
+@media print {
+  body {
+    background: white;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .page-break {
+    page-break-before: always;
+    break-before: page;
+  }
+
+  /* Remove box shadows in print — use borders instead */
+  .doc-card {
+    box-shadow: none;
+    border: 1px solid var(--ink-border-light);
+  }
+
+  /* Ensure backgrounds print */
+  .doc-card-dark,
+  .doc-card-tinted,
+  .callout-box,
+  .callout-box-warning,
+  .callout-box-error,
+  .callout-box-success,
+  .highlight-strip,
+  .badge,
+  .accent-bar,
+  .accent-bar-thick,
+  .accent-bar-wide,
+  .accent-dot,
+  .progress-bar,
+  .progress-bar-fill,
+  th {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Clean up links for print */
+  a {
+    color: var(--ink-accent);
+    text-decoration: none;
+  }
+
+  a[href]::after {
+    content: none;
+  }
+
+  /* Ensure headings don't orphan */
+  h1, h2, h3, h4, h5, h6,
+  .title-0, .title-1, .title-2, .title-3, .title-4, .headline {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  /* Keep cards, tables, stats together */
+  .doc-card,
+  .doc-card-flat,
+  .doc-card-bordered,
+  .doc-card-accent,
+  .doc-card-dark,
+  .doc-card-tinted,
+  .stat-callout,
+  .stat-callout-compact,
+  .timeline-item,
+  table,
+  figure,
+  .pull-quote,
+  .callout-box {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Repeat table headers across pages */
+  thead {
+    display: table-header-group;
+  }
+
+  /* Remove hover effects */
+  tr:hover {
+    background: transparent;
+  }
+
+  /* Universal animation kill — ensures composed state, not mid-animation frame, prints */
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    animation-duration: 0s !important;
+    transition: none !important;
+    transition-duration: 0s !important;
+  }
+
+  /* Body typography orphan/widow control */
+  p, li {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Headings: extend orphan control */
+  h1, h2, h3, h4, h5, h6,
+  .title-0, .title-1, .title-2, .title-3, .title-4,
+  .headline, .section-label {
+    page-break-after: avoid;
+    break-after: avoid;
+    orphans: 4;
+  }
+
+  /* Sidenotes: collapse to inline footnote-style at print */
+  .body-with-margin {
+    display: block;
+  }
+
+  .sidenote {
+    display: block;
+    font-size: 7.5pt;
+    border-left: 1px solid #E2E8F0;
+    padding: 4px 8px;
+    margin: 8px 0;
+    color: #718096;
+  }
+
+  /* Print color preservation for editorial components */
+  .chapter-opener,
+  .full-bleed,
+  .mood-monograph,
+  .mood-folio,
+  .mood-modernist {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Viewport-locked slides: release for print flow */
+  .slide {
+    height: auto;
+    overflow: visible;
+    page-break-before: always;
+    break-before: page;
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   18. Screen-Only Preview Bar
+   -------------------------------------------------------------------------- */
+
+.preview-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--ink-dark);
+  color: white;
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--text-caption);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  font-family: var(--font-primary);
+}
+
+.preview-bar .preview-label {
+  color: var(--ink-accent);
+  font-weight: 600;
+}
+
+.preview-bar .preview-hint {
+  color: var(--ink-text-muted);
+}
+
+@media print {
+  .preview-bar {
+    display: none !important;
+  }
+}
+
+
+    /* ================================================================
+       Editor-Specific Styles
+       Throwaway single-page tool. Controls + live preview + a
+       copy-as-prompt / copy-as-JSON / copy-as-markdown button.
+       Vanilla JS only — this is the documented exception to the
+       no-JS-dependencies rule. Built to die in the browser.
+       ================================================================ */
+
+    body.editor {
+      padding: var(--space-md) var(--space-md) var(--space-xl);
+      max-width: 100%;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .editor-header .editor-title {
+      font-size: var(--text-title-2);
+      font-weight: 700;
+      color: var(--ink-text);
+      line-height: var(--lh-title);
+      letter-spacing: -0.01em;
+    }
+
+    .editor-header .editor-subtitle {
+      font-size: var(--text-callout);
+      color: var(--ink-text-muted);
+      margin-top: var(--space-tiny);
+      max-width: 56ch;
+    }
+
+    .editor-actions {
+      display: flex;
+      gap: var(--space-tiny);
+      flex-wrap: wrap;
+    }
+
+    .editor-button {
+      font-family: var(--font-primary);
+      font-size: var(--text-caption);
+      font-weight: 600;
+      padding: var(--space-tiny) var(--space-sm);
+      border-radius: var(--radius-button);
+      background: var(--ink-text);
+      color: #FFFFFF;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.15s ease;
+      letter-spacing: 0.02em;
+    }
+
+    .editor-button:hover { opacity: 0.85; }
+    .editor-button:active { opacity: 0.75; }
+
+    .editor-button.secondary {
+      background: transparent;
+      color: var(--ink-text);
+      border: 1px solid var(--ink-border);
+    }
+
+    .editor-button.success {
+      background: var(--ink-success);
+    }
+
+    /* Workspace = controls + preview */
+    .editor-workspace {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-md);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 900px) {
+      .editor-workspace {
+        grid-template-columns: 1.4fr 1fr;
+      }
+    }
+
+    .editor-panel {
+      background: #FFFFFF;
+      border: 1px solid var(--ink-border);
+      border-radius: var(--radius-card);
+      padding: var(--space-md);
+    }
+
+    .editor-panel h2 {
+      font-size: var(--text-headline);
+      font-weight: 700;
+      color: var(--ink-text);
+      margin-bottom: var(--space-xs);
+      letter-spacing: -0.005em;
+    }
+
+    .editor-label {
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: var(--space-tiny);
+    }
+
+    /* Bucket columns (kanban-style sorter) */
+    .bucket-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-sm);
+    }
+
+    @media (min-width: 600px) {
+      .bucket-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .bucket {
+      background: var(--ink-surface);
+      border: 2px dashed var(--ink-border);
+      border-radius: var(--radius-control);
+      padding: var(--space-xs);
+      min-height: 240px;
+      transition: border-color 0.15s ease, background 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-tiny);
+    }
+
+    .bucket.is-drag-over {
+      border-color: var(--ink-accent);
+      background: var(--ink-accent-light);
+    }
+
+    .bucket-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0 var(--space-tiny) var(--space-tiny);
+      border-bottom: 1px solid var(--ink-border);
+    }
+
+    .bucket-header .bucket-name {
+      font-size: var(--text-caption);
+      font-weight: 700;
+      color: var(--ink-text);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .bucket-header .bucket-count {
+      font-size: var(--text-annotation);
+      font-weight: 600;
+      color: var(--ink-text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Cards */
+    .card {
+      background: #FFFFFF;
+      border: 1px solid var(--ink-border);
+      border-radius: var(--radius-small);
+      padding: var(--space-tiny) var(--space-xs);
+      cursor: grab;
+      box-shadow: var(--shadow-light);
+      user-select: none;
+      transition: transform 0.1s ease, box-shadow 0.15s ease;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-medium);
+    }
+
+    .card.is-dragging {
+      opacity: 0.4;
+      cursor: grabbing;
+    }
+
+    .card .card-id {
+      font-family: var(--font-mono);
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    .card .card-title {
+      font-size: var(--text-callout);
+      font-weight: 600;
+      color: var(--ink-text);
+      margin-top: 2px;
+      line-height: 1.35;
+    }
+
+    .card .card-meta {
+      display: flex;
+      gap: var(--space-tiny);
+      margin-top: var(--space-tiny);
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+    }
+
+    .card .card-meta .tag {
+      padding: 2px 6px;
+      border-radius: var(--radius-pill);
+      background: var(--ink-surface);
+      font-weight: 600;
+    }
+
+    /* Preview pane */
+    .preview-output {
+      background: var(--ink-dark);
+      color: #E6E6E6;
+      border-radius: var(--radius-control);
+      padding: var(--space-sm) var(--space-md);
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      line-height: 1.55;
+      white-space: pre-wrap;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+
+    .preview-output .preview-heading {
+      color: #82AAFF;
+      font-weight: 700;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: var(--space-md);
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--ink-text);
+      color: #FFFFFF;
+      padding: var(--space-tiny) var(--space-md);
+      border-radius: var(--radius-pill);
+      font-size: var(--text-caption);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 100;
+    }
+
+    .toast.is-visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body class="editor">
+
+  <header class="editor-header">
+    <div>
+      <h1 class="editor-title">Reprioritize the Engineering Backlog</h1>
+      <p class="editor-subtitle">Drag tickets between Now / Next / Later / Cut. Hit Copy when you're happy; paste back into Claude with a one-line rationale per bucket.</p>
+    </div>
+    <div class="editor-actions">
+      <button class="editor-button secondary" id="reset-btn" type="button">Reset</button>
+      <button class="editor-button success" id="copy-btn" type="button">Copy as Markdown</button>
+    </div>
+  </header>
+
+  <div class="editor-workspace">
+
+    <!-- Controls / sortable workspace -->
+    <section class="editor-panel">
+      <div class="editor-label">Drag to sort</div>
+      <h2>14 tickets · arrange by quarter</h2>
+
+      <!-- Bucket columns (drag targets) -->
+      <div class="bucket-grid" id="bucket-grid">
+
+        <div class="bucket" data-bucket="now">
+          <div class="bucket-header">
+            <span class="bucket-name">Now</span>
+            <span class="bucket-count" data-count="now">0</span>
+          </div>
+        </div>
+
+        <div class="bucket" data-bucket="next">
+          <div class="bucket-header">
+            <span class="bucket-name">Next</span>
+            <span class="bucket-count" data-count="next">0</span>
+          </div>
+        </div>
+
+        <div class="bucket" data-bucket="later">
+          <div class="bucket-header">
+            <span class="bucket-name">Later</span>
+            <span class="bucket-count" data-count="later">0</span>
+          </div>
+        </div>
+
+        <div class="bucket" data-bucket="cut">
+          <div class="bucket-header">
+            <span class="bucket-name">Cut</span>
+            <span class="bucket-count" data-count="cut">0</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Live preview pane -->
+    <section class="editor-panel">
+      <div class="editor-label">Output preview</div>
+      <h2>Markdown the Copy button will produce</h2>
+      <pre class="preview-output" id="preview-output"></pre>
+    </section>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ================================================================
+    // Vanilla JS only — drag/drop sorter with markdown export.
+    // Replace the INITIAL_DATA below at template-fill time with the
+    // user's actual cards. Keep id stable so the export is meaningful.
+    // ================================================================
+
+    const INITIAL_DATA = [
+      {"id": "ENG-301", "title": "Migrate auth flow off legacy session middleware", "tags": ["auth", "L"], "bucket": "now"},
+      {"id": "ENG-302", "title": "Add rate limit headers to public API responses", "tags": ["api", "S"], "bucket": "now"},
+      {"id": "ENG-303", "title": "Fix flaky test in checkout integration suite", "tags": ["tests", "XS"], "bucket": "now"},
+      {"id": "ENG-304", "title": "Quote engine: round-trip currency conversion bug", "tags": ["billing", "M"], "bucket": "now"},
+      {"id": "ENG-305", "title": "Webhook retry budget \u2014 exponential, not linear", "tags": ["webhooks", "S"], "bucket": "next"},
+      {"id": "ENG-306", "title": "Audit log surface for compliance dashboard", "tags": ["compliance", "M"], "bucket": "next"},
+      {"id": "ENG-307", "title": "Self-serve API key rotation for org admins", "tags": ["api", "M"], "bucket": "next"},
+      {"id": "ENG-308", "title": "Storybook coverage for revamped form primitives", "tags": ["frontend", "S"], "bucket": "next"},
+      {"id": "ENG-309", "title": "Revisit OTel sampling strategy for prod traces", "tags": ["observability", "L"], "bucket": "later"},
+      {"id": "ENG-310", "title": "Investigate moving job queue from Redis to NATS", "tags": ["infra", "L"], "bucket": "later"},
+      {"id": "ENG-311", "title": "i18n scaffolding for billing emails", "tags": ["i18n", "M"], "bucket": "later"},
+      {"id": "ENG-312", "title": "Server-rendered marketing site (was Next-on-Vercel)", "tags": ["marketing", "L"], "bucket": "later"},
+      {"id": "ENG-313", "title": "Re-skin deprecated admin tool to new design system", "tags": ["frontend", "M"], "bucket": "cut"},
+      {"id": "ENG-314", "title": "On-call rotation portal (replace Google Sheet)", "tags": ["ops", "M"], "bucket": "cut"}
+    ];
+
+    const RATIONALE = {"now": "Quarter-blockers \u2014 auth migration deadline, the API rate-limit promise, and the two production bugs we owe customers.", "next": "Picked up the moment a Now slot frees. All four are Q3 commitments; none are blocking today.", "later": "Real work, not committed yet. We'd love to get to these but won't promise.", "cut": "Off the roadmap unless the cost of not doing them changes. Be explicit so they stop drifting back in."};
+
+    const state = {
+      items: INITIAL_DATA.map(item => ({ ...item }))
+    };
+
+    const buckets = ['now', 'next', 'later', 'cut'];
+
+    function render() {
+      // Clear existing cards
+      buckets.forEach(b => {
+        const col = document.querySelector(`[data-bucket="${b}"]`);
+        col.querySelectorAll('.card').forEach(c => c.remove());
+      });
+      // Re-render
+      state.items.forEach(item => {
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.draggable = true;
+        card.dataset.id = item.id;
+        card.innerHTML = `
+          <div class="card-id">${item.id}</div>
+          <div class="card-title">${item.title}</div>
+          <div class="card-meta">
+            ${item.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+          </div>
+        `;
+        card.addEventListener('dragstart', onDragStart);
+        card.addEventListener('dragend', onDragEnd);
+        const col = document.querySelector(`[data-bucket="${item.bucket}"]`);
+        col.appendChild(card);
+      });
+      // Update counts
+      buckets.forEach(b => {
+        const n = state.items.filter(i => i.bucket === b).length;
+        document.querySelector(`[data-count="${b}"]`).textContent = n;
+      });
+      updatePreview();
+    }
+
+    function onDragStart(e) {
+      e.target.classList.add('is-dragging');
+      e.dataTransfer.setData('text/plain', e.target.dataset.id);
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function onDragEnd(e) {
+      e.target.classList.remove('is-dragging');
+    }
+
+    document.querySelectorAll('.bucket').forEach(b => {
+      b.addEventListener('dragover', e => {
+        e.preventDefault();
+        b.classList.add('is-drag-over');
+      });
+      b.addEventListener('dragleave', () => b.classList.remove('is-drag-over'));
+      b.addEventListener('drop', e => {
+        e.preventDefault();
+        b.classList.remove('is-drag-over');
+        const id = e.dataTransfer.getData('text/plain');
+        const item = state.items.find(i => i.id === id);
+        if (item) {
+          item.bucket = b.dataset.bucket;
+          render();
+        }
+      });
+    });
+
+    function buildMarkdown() {
+      let out = `# Engineering Backlog — May 2026 reprioritization\n\n`;
+      buckets.forEach(b => {
+        const items = state.items.filter(i => i.bucket === b);
+        if (!items.length) return;
+        out += `## ${b.toUpperCase()}\n\n`;
+        items.forEach(it => {
+          out += `- **${it.id}** — ${it.title} _(${it.tags.join(', ')})_\n`;
+        });
+        const note = RATIONALE[b];
+        if (note) out += `\n> ${note}\n`;
+        out += '\n';
+      });
+      return out.trim();
+    }
+
+    function updatePreview() {
+      document.getElementById('preview-output').textContent = buildMarkdown();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('is-visible');
+      setTimeout(() => t.classList.remove('is-visible'), 1600);
+    }
+
+    document.getElementById('copy-btn').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(buildMarkdown());
+        showToast('Copied — paste back into Claude');
+      } catch {
+        showToast('Copy failed — preview is selectable');
+      }
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      state.items = INITIAL_DATA.map(item => ({ ...item }));
+      render();
+      showToast('Reset to initial bucket assignment');
+    });
+
+    render();
+  </script>
+
+</body>
+</html>

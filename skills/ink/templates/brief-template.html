@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <style>
+    /* {{BASE_STYLES}} — paste contents of base-styles.css here */
+
+    /* ================================================================
+       Brief-Specific Styles
+       Designed to fit on a single page (US Letter)
+       ================================================================ */
+
+    body.brief {
+      padding: 0.75in 0.25in;
+      max-width: 100%;
+    }
+
+    /* Header */
+    .brief-header {
+      margin-bottom: var(--space-md);
+    }
+
+    .brief-header .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--space-sm);
+    }
+
+    .brief-header .brief-title {
+      font-size: var(--text-title-2);
+      font-weight: 700;
+      color: var(--ink-text);
+      line-height: var(--lh-title);
+      letter-spacing: -0.01em;
+    }
+
+    .brief-header .brief-meta {
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+      margin-top: var(--space-micro);
+    }
+
+    /* Section Labels */
+    .brief-label {
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+    }
+
+    /* Summary Block */
+    .brief-summary {
+      margin-bottom: var(--space-md);
+    }
+
+    .brief-summary p {
+      font-size: var(--text-body);
+      line-height: var(--lh-body);
+      color: var(--ink-text);
+    }
+
+    /* Key Metrics Strip */
+    .brief-metrics {
+      margin-bottom: var(--space-md);
+    }
+
+    .brief-metric-card {
+      background: var(--ink-surface);
+      border-radius: var(--radius-control);
+      padding: var(--space-sm);
+      text-align: center;
+    }
+
+    .brief-metric-card .stat-value {
+      font-size: var(--text-title-3);
+      font-weight: 700;
+      color: var(--ink-accent);
+      line-height: 1.1;
+    }
+
+    .brief-metric-card .stat-label {
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      margin-top: var(--space-micro);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    .brief-metric-card .stat-change {
+      font-size: var(--text-annotation);
+      margin-top: var(--space-micro);
+    }
+
+    /* Body Columns */
+    .brief-body {
+      margin-bottom: var(--space-md);
+    }
+
+    .brief-body p {
+      font-size: var(--text-callout);
+      line-height: var(--lh-body);
+      color: var(--ink-text);
+      margin-bottom: var(--space-xs);
+    }
+
+    .brief-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    .brief-body ul {
+      font-size: var(--text-callout);
+      margin-bottom: var(--space-xs);
+      padding-left: var(--space-sm);
+    }
+
+    .brief-body li {
+      margin-bottom: var(--space-micro);
+      line-height: var(--lh-body);
+    }
+
+    /* Key Points */
+    .key-point {
+      display: flex;
+      gap: var(--space-xs);
+      align-items: flex-start;
+      margin-bottom: var(--space-xs);
+    }
+
+    .key-point-marker {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--ink-accent);
+      flex-shrink: 0;
+      margin-top: 6px;
+    }
+
+    .key-point p {
+      margin: 0;
+      font-size: var(--text-callout);
+      line-height: var(--lh-body);
+    }
+
+    /* Recommendation Box */
+    .brief-recommendation {
+      margin-bottom: var(--space-md);
+    }
+
+    .brief-recommendation .recommendation-content {
+      background: var(--ink-accent-light);
+      border-radius: var(--radius-control);
+      padding: var(--space-sm) var(--space-md);
+      border-left: 4px solid var(--ink-accent);
+    }
+
+    .brief-recommendation .recommendation-content p {
+      font-size: var(--text-callout);
+      line-height: var(--lh-body);
+      color: var(--ink-text);
+      margin-bottom: var(--space-xs);
+    }
+
+    .brief-recommendation .recommendation-content p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Next Steps */
+    .brief-next-steps {
+      margin-bottom: var(--space-md);
+    }
+
+    .brief-next-steps .checklist li {
+      font-size: var(--text-callout);
+    }
+
+    /* Footer */
+    .brief-footer {
+      margin-top: auto;
+      padding-top: var(--space-sm);
+    }
+
+    .brief-footer .footer-text {
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      margin-top: var(--space-tiny);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* Print: ensure single page */
+    @media print {
+      body.brief {
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body class="brief">
+
+  <!-- Preview Bar (visible in browser only) -->
+  <div class="preview-bar no-print">
+    <span><span class="preview-label">PDF</span> &nbsp;Brief Preview</span>
+    <span class="preview-hint">Cmd+P &rarr; Save as PDF &nbsp;|&nbsp; Designed for single page</span>
+  </div>
+
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+  <header class="brief-header">
+    <div class="header-row">
+      <div>
+        <h1 class="brief-title">{{TITLE}}</h1>
+        <p class="brief-meta">{{AUTHOR}} &middot; {{DATE}}</p>
+      </div>
+      <span class="badge badge-accent">{{STATUS}}</span>
+    </div>
+    <div class="accent-bar"></div>
+  </header>
+
+
+  <!-- ============================================================
+       SUMMARY
+       ============================================================ -->
+  <section class="brief-summary">
+    <div class="brief-label">Summary</div>
+    <p>{{SUMMARY}}</p>
+  </section>
+
+
+  <!-- ============================================================
+       KEY METRICS
+       ============================================================ -->
+  <section class="brief-metrics grid-4">
+    <div class="brief-metric-card">
+      <div class="stat-value">{{METRIC_1_VALUE}}</div>
+      <div class="stat-label">{{METRIC_1_LABEL}}</div>
+      <div class="stat-change metric-up">{{METRIC_1_CHANGE}}</div>
+    </div>
+    <div class="brief-metric-card">
+      <div class="stat-value">{{METRIC_2_VALUE}}</div>
+      <div class="stat-label">{{METRIC_2_LABEL}}</div>
+      <div class="stat-change metric-up">{{METRIC_2_CHANGE}}</div>
+    </div>
+    <div class="brief-metric-card">
+      <div class="stat-value">{{METRIC_3_VALUE}}</div>
+      <div class="stat-label">{{METRIC_3_LABEL}}</div>
+      <div class="stat-change metric-neutral">{{METRIC_3_CHANGE}}</div>
+    </div>
+    <div class="brief-metric-card">
+      <div class="stat-value">{{METRIC_4_VALUE}}</div>
+      <div class="stat-label">{{METRIC_4_LABEL}}</div>
+      <div class="stat-change metric-down">{{METRIC_4_CHANGE}}</div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       BODY (Two Columns)
+       ============================================================ -->
+  <section class="brief-body grid-2">
+    <div>
+      <div class="brief-label">Context</div>
+      <p>{{CONTEXT_PARAGRAPH_1}}</p>
+      <p>{{CONTEXT_PARAGRAPH_2}}</p>
+    </div>
+    <div>
+      <div class="brief-label">Key Points</div>
+      <div class="key-point">
+        <div class="key-point-marker"></div>
+        <p>{{KEY_POINT_1}}</p>
+      </div>
+      <div class="key-point">
+        <div class="key-point-marker"></div>
+        <p>{{KEY_POINT_2}}</p>
+      </div>
+      <div class="key-point">
+        <div class="key-point-marker"></div>
+        <p>{{KEY_POINT_3}}</p>
+      </div>
+      <div class="key-point">
+        <div class="key-point-marker"></div>
+        <p>{{KEY_POINT_4}}</p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       RECOMMENDATION
+       ============================================================ -->
+  <section class="brief-recommendation">
+    <div class="brief-label">Recommendation</div>
+    <div class="recommendation-content">
+      <p>{{RECOMMENDATION}}</p>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       NEXT STEPS
+       ============================================================ -->
+  <section class="brief-next-steps">
+    <div class="brief-label">Next Steps</div>
+    <ul class="checklist">
+      <li>{{NEXT_STEP_1}}</li>
+      <li>{{NEXT_STEP_2}}</li>
+      <li>{{NEXT_STEP_3}}</li>
+    </ul>
+  </section>
+
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="brief-footer">
+    <div class="accent-bar"></div>
+    <p class="footer-text">{{BRAND}}</p>
+  </footer>
+
+</body>
+</html>

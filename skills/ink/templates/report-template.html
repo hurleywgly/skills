@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <style>
+    /* {{BASE_STYLES}} — paste contents of base-styles.css here */
+
+    /* ================================================================
+       Report-Specific Styles
+       ================================================================ */
+
+    /* Cover Page */
+    .report-cover {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2in 0 1.5in 0;
+      position: relative;
+    }
+
+    .report-cover .accent-bar-thick {
+      width: 100px;
+      margin-bottom: var(--space-xl);
+    }
+
+    .report-cover .cover-title {
+      font-size: var(--text-title-0);
+      font-weight: 700;
+      line-height: var(--lh-title);
+      letter-spacing: -0.025em;
+      color: var(--ink-text);
+      margin-bottom: var(--space-sm);
+      max-width: 85%;
+    }
+
+    .report-cover .cover-subtitle {
+      font-size: var(--text-title-3);
+      color: var(--ink-text-muted);
+      font-weight: 400;
+      line-height: var(--lh-tight);
+      max-width: 75%;
+    }
+
+    .report-cover .cover-meta {
+      margin-top: var(--space-xxl);
+      color: var(--ink-text-muted);
+      font-size: var(--text-caption);
+      line-height: 1.8;
+    }
+
+    .report-cover .cover-meta strong {
+      color: var(--ink-text-secondary);
+      font-weight: 600;
+    }
+
+    /* Table of Contents */
+    .toc {
+      padding: var(--space-xl) 0;
+    }
+
+    .toc-heading {
+      font-size: var(--text-title-3);
+      font-weight: 600;
+      color: var(--ink-text-secondary);
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-xs);
+      border-bottom: 2px solid var(--ink-border-light);
+    }
+
+    .toc-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .toc-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: var(--space-xs) 0;
+      border-bottom: 1px dotted var(--ink-border);
+    }
+
+    .toc-item:last-child {
+      border-bottom: none;
+    }
+
+    .toc-item a {
+      color: var(--ink-text);
+      text-decoration: none;
+      font-size: var(--text-headline);
+      font-weight: 500;
+    }
+
+    .toc-item .toc-page {
+      color: var(--ink-text-muted);
+      font-size: var(--text-caption);
+      flex-shrink: 0;
+      margin-left: var(--space-sm);
+    }
+
+    .toc-item.toc-sub {
+      padding-left: var(--space-md);
+    }
+
+    .toc-item.toc-sub a {
+      font-size: var(--text-body);
+      font-weight: 400;
+      color: var(--ink-text-secondary);
+    }
+
+    /* Report Sections */
+    .report-section {
+      margin-bottom: var(--space-xl);
+    }
+
+    .report-section > .section-header {
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-xs);
+      border-bottom: 1px solid var(--ink-border-light);
+      page-break-after: avoid;
+    }
+
+    .report-section > .section-header .section-number {
+      font-size: var(--text-annotation);
+      color: var(--ink-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      display: block;
+      margin-bottom: var(--space-micro);
+    }
+
+    .report-section > .section-header .section-title {
+      font-size: var(--text-title-2);
+      font-weight: 600;
+      color: var(--ink-text-secondary);
+      line-height: var(--lh-title);
+    }
+
+    .report-subsection {
+      margin-bottom: var(--space-lg);
+    }
+
+    .report-subsection > .subsection-title {
+      font-size: var(--text-title-4);
+      font-weight: 600;
+      color: var(--ink-text-secondary);
+      margin-bottom: var(--space-sm);
+      page-break-after: avoid;
+    }
+
+    /* Report Footer */
+    .report-footer {
+      margin-top: var(--space-xxl);
+      padding-top: var(--space-md);
+      border-top: 1px solid var(--ink-border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+    }
+
+    .report-footer .footer-brand {
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Content spacing within sections */
+    .report-section p {
+      margin-bottom: var(--space-sm);
+    }
+
+    .report-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .report-section ul,
+    .report-section ol {
+      margin-bottom: var(--space-sm);
+    }
+
+    .report-section h4 {
+      font-size: var(--text-headline);
+      font-weight: 600;
+      color: var(--ink-text-secondary);
+      margin-top: var(--space-md);
+      margin-bottom: var(--space-xs);
+      page-break-after: avoid;
+    }
+
+    /* Appendix styling */
+    .report-appendix {
+      font-size: var(--text-callout);
+      color: var(--ink-text-secondary);
+    }
+
+    .report-appendix .section-header .section-number {
+      color: var(--ink-text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Preview Bar (visible in browser only, hidden in print) -->
+  <div class="preview-bar no-print">
+    <span><span class="preview-label">PDF</span> &nbsp;Report Preview</span>
+    <span class="preview-hint">Cmd+P &rarr; Save as PDF</span>
+  </div>
+
+  <!-- ============================================================
+       COVER PAGE
+       ============================================================ -->
+  <div class="report-cover">
+    <div class="accent-bar-thick"></div>
+    <h1 class="cover-title">{{TITLE}}</h1>
+    <p class="cover-subtitle">{{SUBTITLE}}</p>
+    <div class="cover-meta">
+      <p><strong>{{AUTHOR}}</strong></p>
+      <p>{{DATE}}</p>
+      <p>{{STATUS}}</p>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       TABLE OF CONTENTS
+       ============================================================ -->
+  <div class="page-break"></div>
+  <div class="toc">
+    <h2 class="toc-heading">Contents</h2>
+    <ol class="toc-list">
+      <!-- Example TOC items — replace with actual sections -->
+      <li class="toc-item">
+        <a href="#section-1">Overview</a>
+      </li>
+      <li class="toc-item">
+        <a href="#section-2">Problem Statement</a>
+      </li>
+      <li class="toc-item">
+        <a href="#section-3">Solution</a>
+      </li>
+      <li class="toc-item toc-sub">
+        <a href="#section-3-1">Technical Approach</a>
+      </li>
+      <li class="toc-item toc-sub">
+        <a href="#section-3-2">User Experience</a>
+      </li>
+      <li class="toc-item">
+        <a href="#section-4">Metrics & Success Criteria</a>
+      </li>
+      <li class="toc-item">
+        <a href="#section-5">Timeline & Milestones</a>
+      </li>
+      <li class="toc-item">
+        <a href="#section-6">Risks & Mitigations</a>
+      </li>
+    </ol>
+  </div>
+
+
+  <!-- ============================================================
+       CONTENT SECTIONS
+       ============================================================ -->
+  <div class="page-break"></div>
+
+  <!-- Section 1 -->
+  <section class="report-section" id="section-1">
+    <div class="section-header">
+      <span class="section-number">Section 01</span>
+      <h2 class="section-title">Overview</h2>
+    </div>
+
+    <p class="body-text">
+      {{SECTION_1_CONTENT}}
+    </p>
+
+    <!-- Example: Pull quote -->
+    <div class="pull-quote">
+      {{KEY_INSIGHT}}
+    </div>
+  </section>
+
+
+  <!-- Section 2 -->
+  <section class="report-section" id="section-2">
+    <div class="section-header">
+      <span class="section-number">Section 02</span>
+      <h2 class="section-title">Problem Statement</h2>
+    </div>
+
+    <p class="body-text">
+      {{SECTION_2_CONTENT}}
+    </p>
+  </section>
+
+
+  <!-- Section 3 (with subsections) — add page-break if needed -->
+  <div class="page-break"></div>
+  <section class="report-section" id="section-3">
+    <div class="section-header">
+      <span class="section-number">Section 03</span>
+      <h2 class="section-title">Solution</h2>
+    </div>
+
+    <div class="report-subsection" id="section-3-1">
+      <h3 class="subsection-title">Technical Approach</h3>
+      <p class="body-text">{{SUBSECTION_CONTENT}}</p>
+    </div>
+
+    <div class="report-subsection" id="section-3-2">
+      <h3 class="subsection-title">User Experience</h3>
+      <p class="body-text">{{SUBSECTION_CONTENT}}</p>
+    </div>
+  </section>
+
+
+  <!-- Section 4 — Metrics (example with stat cards) -->
+  <section class="report-section" id="section-4">
+    <div class="section-header">
+      <span class="section-number">Section 04</span>
+      <h2 class="section-title">Metrics &amp; Success Criteria</h2>
+    </div>
+
+    <div class="grid-3 mb-lg">
+      <div class="doc-card-flat stat-callout">
+        <span class="stat-value">{{METRIC_1_VALUE}}</span>
+        <span class="stat-label">{{METRIC_1_LABEL}}</span>
+      </div>
+      <div class="doc-card-flat stat-callout">
+        <span class="stat-value">{{METRIC_2_VALUE}}</span>
+        <span class="stat-label">{{METRIC_2_LABEL}}</span>
+      </div>
+      <div class="doc-card-flat stat-callout">
+        <span class="stat-value">{{METRIC_3_VALUE}}</span>
+        <span class="stat-label">{{METRIC_3_LABEL}}</span>
+      </div>
+    </div>
+
+    <p class="body-text">{{METRICS_DETAIL}}</p>
+  </section>
+
+
+  <!-- Section 5 — Timeline (example with timeline component) -->
+  <div class="page-break"></div>
+  <section class="report-section" id="section-5">
+    <div class="section-header">
+      <span class="section-number">Section 05</span>
+      <h2 class="section-title">Timeline &amp; Milestones</h2>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-item completed">
+        <div class="timeline-date">{{MILESTONE_1_DATE}}</div>
+        <div class="timeline-title">{{MILESTONE_1_TITLE}}</div>
+        <div class="timeline-body">{{MILESTONE_1_DETAIL}}</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">{{MILESTONE_2_DATE}}</div>
+        <div class="timeline-title">{{MILESTONE_2_TITLE}}</div>
+        <div class="timeline-body">{{MILESTONE_2_DETAIL}}</div>
+      </div>
+      <div class="timeline-item pending">
+        <div class="timeline-date">{{MILESTONE_3_DATE}}</div>
+        <div class="timeline-title">{{MILESTONE_3_TITLE}}</div>
+        <div class="timeline-body">{{MILESTONE_3_DETAIL}}</div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Section 6 — Risks (example with callout boxes) -->
+  <section class="report-section" id="section-6">
+    <div class="section-header">
+      <span class="section-number">Section 06</span>
+      <h2 class="section-title">Risks &amp; Mitigations</h2>
+    </div>
+
+    <!-- Example: Table format -->
+    <table>
+      <thead>
+        <tr>
+          <th>Risk</th>
+          <th>Severity</th>
+          <th>Mitigation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{RISK_1}}</td>
+          <td><span class="badge badge-error">High</span></td>
+          <td>{{MITIGATION_1}}</td>
+        </tr>
+        <tr>
+          <td>{{RISK_2}}</td>
+          <td><span class="badge badge-warning">Medium</span></td>
+          <td>{{MITIGATION_2}}</td>
+        </tr>
+        <tr>
+          <td>{{RISK_3}}</td>
+          <td><span class="badge badge-neutral">Low</span></td>
+          <td>{{MITIGATION_3}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <div class="report-footer">
+    <span class="footer-brand">{{BRAND}}</span>
+    <span>{{DATE}}</span>
+  </div>
+
+</body>
+</html>

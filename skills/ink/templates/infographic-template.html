@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <style>
+    /* {{BASE_STYLES}} — paste contents of base-styles.css here */
+
+    /* ================================================================
+       Infographic-Specific Styles
+       Visual, data-rich layout with modular content blocks
+       ================================================================ */
+
+    body.infographic {
+      background: white;
+    }
+
+    /* Header */
+    .infographic-header {
+      padding: var(--space-xl) 0 var(--space-lg) 0;
+      border-bottom: 1px solid var(--ink-border-light);
+      margin-bottom: var(--space-lg);
+    }
+
+    .infographic-header .accent-bar-thick {
+      width: 80px;
+      margin-bottom: var(--space-lg);
+    }
+
+    .infographic-header .header-title {
+      font-size: var(--text-title-1);
+      font-weight: 700;
+      color: var(--ink-text);
+      line-height: var(--lh-title);
+      letter-spacing: -0.015em;
+      margin-bottom: var(--space-xs);
+    }
+
+    .infographic-header .header-subtitle {
+      font-size: var(--text-headline);
+      color: var(--ink-text-muted);
+      font-weight: 400;
+      line-height: var(--lh-body);
+      max-width: 80%;
+    }
+
+    .infographic-header .header-meta {
+      margin-top: var(--space-md);
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
+
+    /* Metrics Strip */
+    .metric-strip {
+      margin-bottom: var(--space-lg);
+    }
+
+    .metric-strip .metric-card {
+      background: var(--ink-surface);
+      border-radius: var(--radius-card);
+      padding: var(--space-md) var(--space-sm);
+      text-align: center;
+      border: 1px solid var(--ink-border-light);
+    }
+
+    .metric-strip .metric-card .stat-value {
+      font-size: var(--text-title-1);
+      font-weight: 700;
+      color: var(--ink-accent);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .metric-strip .metric-card .stat-label {
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      margin-top: var(--space-tiny);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
+
+    .metric-strip .metric-card .stat-context {
+      font-size: var(--text-caption);
+      color: var(--ink-text-secondary);
+      margin-top: var(--space-tiny);
+    }
+
+    /* Section Divider */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin: var(--space-lg) 0;
+      page-break-after: avoid;
+    }
+
+    .section-divider .divider-label {
+      font-size: var(--text-annotation);
+      color: var(--ink-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .section-divider .divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--ink-border-light);
+    }
+
+    /* Content Blocks */
+    .content-block {
+      margin-bottom: var(--space-lg);
+      page-break-inside: avoid;
+    }
+
+    .content-block .block-title {
+      font-size: var(--text-title-3);
+      font-weight: 600;
+      color: var(--ink-text-secondary);
+      margin-bottom: var(--space-sm);
+      line-height: var(--lh-title);
+    }
+
+    .content-block .block-body {
+      font-size: var(--text-body);
+      line-height: var(--lh-body);
+      color: var(--ink-text);
+    }
+
+    .content-block .block-body p {
+      margin-bottom: var(--space-xs);
+    }
+
+    .content-block .block-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Insight Block (icon + text side by side) */
+    .insight-block {
+      display: flex;
+      gap: var(--space-md);
+      align-items: flex-start;
+      padding: var(--space-md);
+      background: var(--ink-surface);
+      border-radius: var(--radius-card);
+      border: 1px solid var(--ink-border-light);
+      margin-bottom: var(--space-md);
+      page-break-inside: avoid;
+    }
+
+    .insight-block .insight-icon {
+      font-size: 28pt;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .insight-block .insight-content {
+      flex: 1;
+    }
+
+    .insight-block .insight-title {
+      font-size: var(--text-headline);
+      font-weight: 600;
+      color: var(--ink-text);
+      margin-bottom: var(--space-micro);
+    }
+
+    .insight-block .insight-text {
+      font-size: var(--text-callout);
+      color: var(--ink-text-secondary);
+      line-height: var(--lh-body);
+    }
+
+    /* Comparison Grid (Before/After or Option A/B) */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+    }
+
+    .comparison-card {
+      padding: var(--space-md);
+      border-radius: var(--radius-card);
+      page-break-inside: avoid;
+    }
+
+    .comparison-card.comparison-before {
+      background: var(--ink-surface);
+      border: 1px solid var(--ink-border);
+    }
+
+    .comparison-card.comparison-after {
+      background: white;
+      border: 2px solid var(--ink-accent);
+    }
+
+    .comparison-card .comparison-label {
+      font-size: var(--text-annotation);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+    }
+
+    .comparison-before .comparison-label { color: var(--ink-text-muted); }
+    .comparison-after .comparison-label { color: var(--ink-accent); }
+
+    .comparison-card .comparison-body {
+      font-size: var(--text-callout);
+      line-height: var(--lh-body);
+      color: var(--ink-text);
+    }
+
+    /* Highlight Box (key takeaway) */
+    .highlight-box {
+      background: var(--ink-accent-light);
+      border-radius: var(--radius-card);
+      padding: var(--space-md) var(--space-lg);
+      margin: var(--space-lg) 0;
+      border-left: 4px solid var(--ink-accent);
+      page-break-inside: avoid;
+    }
+
+    .highlight-box .highlight-label {
+      font-size: var(--text-annotation);
+      color: var(--ink-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+    }
+
+    .highlight-box .highlight-text {
+      font-size: var(--text-title-4);
+      font-weight: 500;
+      color: var(--ink-text);
+      line-height: var(--lh-tight);
+    }
+
+    /* Number List (ordered visual list) */
+    .number-list {
+      list-style: none;
+      padding: 0;
+      counter-reset: number-counter;
+    }
+
+    .number-list li {
+      counter-increment: number-counter;
+      display: flex;
+      gap: var(--space-sm);
+      align-items: flex-start;
+      margin-bottom: var(--space-md);
+      page-break-inside: avoid;
+    }
+
+    .number-list li::before {
+      content: counter(number-counter);
+      background: var(--ink-accent);
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-caption);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .number-list .list-content {
+      flex: 1;
+    }
+
+    .number-list .list-title {
+      font-size: var(--text-headline);
+      font-weight: 600;
+      color: var(--ink-text);
+      margin-bottom: var(--space-micro);
+    }
+
+    .number-list .list-detail {
+      font-size: var(--text-callout);
+      color: var(--ink-text-secondary);
+      line-height: var(--lh-body);
+    }
+
+    /* Footer */
+    .infographic-footer {
+      margin-top: var(--space-xl);
+      padding-top: var(--space-md);
+    }
+
+    .infographic-footer .footer-text {
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      margin-top: var(--space-tiny);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .infographic-footer .footer-detail {
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+      margin-top: var(--space-micro);
+    }
+  </style>
+</head>
+<body class="infographic">
+
+  <!-- Preview Bar -->
+  <div class="preview-bar no-print">
+    <span><span class="preview-label">PDF</span> &nbsp;Infographic Preview</span>
+    <span class="preview-hint">Cmd+P &rarr; Save as PDF</span>
+  </div>
+
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+  <header class="infographic-header">
+    <div class="accent-bar-thick"></div>
+    <h1 class="header-title">{{TITLE}}</h1>
+    <p class="header-subtitle">{{SUBTITLE}}</p>
+    <p class="header-meta">{{AUTHOR}} &middot; {{DATE}}</p>
+  </header>
+
+
+  <!-- ============================================================
+       KEY METRICS STRIP
+       ============================================================ -->
+  <section class="metric-strip grid-3">
+    <div class="metric-card">
+      <div class="stat-value">{{METRIC_1_VALUE}}</div>
+      <div class="stat-label">{{METRIC_1_LABEL}}</div>
+      <div class="stat-context">{{METRIC_1_CONTEXT}}</div>
+    </div>
+    <div class="metric-card">
+      <div class="stat-value">{{METRIC_2_VALUE}}</div>
+      <div class="stat-label">{{METRIC_2_LABEL}}</div>
+      <div class="stat-context">{{METRIC_2_CONTEXT}}</div>
+    </div>
+    <div class="metric-card">
+      <div class="stat-value">{{METRIC_3_VALUE}}</div>
+      <div class="stat-label">{{METRIC_3_LABEL}}</div>
+      <div class="stat-context">{{METRIC_3_CONTEXT}}</div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       CONTENT BLOCKS
+       Mix and match these patterns based on content:
+       ============================================================ -->
+
+  <!-- Section Divider -->
+  <div class="section-divider">
+    <span class="divider-label">{{SECTION_1_LABEL}}</span>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- Standard Content Block -->
+  <div class="content-block">
+    <h2 class="block-title">{{BLOCK_1_TITLE}}</h2>
+    <div class="block-body">
+      <p>{{BLOCK_1_CONTENT}}</p>
+    </div>
+  </div>
+
+  <!-- Insight Blocks (icon + text) -->
+  <div class="insight-block">
+    <div class="insight-icon">{{ICON_1}}</div>
+    <div class="insight-content">
+      <div class="insight-title">{{INSIGHT_1_TITLE}}</div>
+      <div class="insight-text">{{INSIGHT_1_TEXT}}</div>
+    </div>
+  </div>
+
+  <div class="insight-block">
+    <div class="insight-icon">{{ICON_2}}</div>
+    <div class="insight-content">
+      <div class="insight-title">{{INSIGHT_2_TITLE}}</div>
+      <div class="insight-text">{{INSIGHT_2_TEXT}}</div>
+    </div>
+  </div>
+
+  <!-- Highlight Box (key takeaway) -->
+  <div class="highlight-box">
+    <div class="highlight-label">Key Takeaway</div>
+    <div class="highlight-text">{{KEY_TAKEAWAY}}</div>
+  </div>
+
+
+  <!-- Section Divider -->
+  <div class="section-divider">
+    <span class="divider-label">{{SECTION_2_LABEL}}</span>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- Comparison Grid -->
+  <div class="comparison-grid">
+    <div class="comparison-card comparison-before">
+      <div class="comparison-label">{{COMPARISON_LABEL_A}}</div>
+      <div class="comparison-body">{{COMPARISON_CONTENT_A}}</div>
+    </div>
+    <div class="comparison-card comparison-after">
+      <div class="comparison-label">{{COMPARISON_LABEL_B}}</div>
+      <div class="comparison-body">{{COMPARISON_CONTENT_B}}</div>
+    </div>
+  </div>
+
+
+  <!-- Section Divider -->
+  <div class="section-divider">
+    <span class="divider-label">{{SECTION_3_LABEL}}</span>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- Numbered List -->
+  <ol class="number-list">
+    <li>
+      <div class="list-content">
+        <div class="list-title">{{STEP_1_TITLE}}</div>
+        <div class="list-detail">{{STEP_1_DETAIL}}</div>
+      </div>
+    </li>
+    <li>
+      <div class="list-content">
+        <div class="list-title">{{STEP_2_TITLE}}</div>
+        <div class="list-detail">{{STEP_2_DETAIL}}</div>
+      </div>
+    </li>
+    <li>
+      <div class="list-content">
+        <div class="list-title">{{STEP_3_TITLE}}</div>
+        <div class="list-detail">{{STEP_3_DETAIL}}</div>
+      </div>
+    </li>
+  </ol>
+
+  <!-- Timeline (can also be used in infographics) -->
+  <div class="timeline">
+    <div class="timeline-item completed">
+      <div class="timeline-date">{{TIMELINE_1_DATE}}</div>
+      <div class="timeline-title">{{TIMELINE_1_TITLE}}</div>
+      <div class="timeline-body">{{TIMELINE_1_DETAIL}}</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">{{TIMELINE_2_DATE}}</div>
+      <div class="timeline-title">{{TIMELINE_2_TITLE}}</div>
+      <div class="timeline-body">{{TIMELINE_2_DETAIL}}</div>
+    </div>
+    <div class="timeline-item pending">
+      <div class="timeline-date">{{TIMELINE_3_DATE}}</div>
+      <div class="timeline-title">{{TIMELINE_3_TITLE}}</div>
+      <div class="timeline-body">{{TIMELINE_3_DETAIL}}</div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="infographic-footer">
+    <div class="accent-bar"></div>
+    <p class="footer-text">{{BRAND}}</p>
+    <p class="footer-detail">{{FOOTER_DETAIL}}</p>
+  </footer>
+
+</body>
+</html>

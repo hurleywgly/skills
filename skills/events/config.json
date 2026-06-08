@@ -1,0 +1,45 @@
+{
+  "_comment": "Customize this file for your own metro area and interests. Placeholders below are examples — replace them. The skill loads this on every run.",
+  "location": {
+    "metro": "Your City",
+    "neighborhoods": ["Downtown", "Neighborhood A", "Neighborhood B"],
+    "zip": "00000",
+    "max_commute_minutes": 45
+  },
+  "interests": {
+    "_comment": "Your topics. primary = high signal; secondary = nice-to-have; exclude = instant-discard terms.",
+    "primary": [
+      "AI",
+      "applied AI",
+      "LLMs",
+      "developer tools",
+      "startups"
+    ],
+    "secondary": ["product management", "open source"],
+    "exclude": [
+      "robotics-only",
+      "blockchain-only",
+      "purely academic",
+      "getting started workshop",
+      "101"
+    ]
+  },
+  "output": {
+    "min_events": 2,
+    "max_events": 5,
+    "mix": {
+      "technical_builder": "1-2",
+      "startup_product_networking": "1-2",
+      "virtual_optional": "0-1"
+    },
+    "lookahead_weeks": 6,
+    "conference_lookahead_months": 6,
+    "soon_threshold_days": 14
+  },
+  "networking_overlay": false,
+  "networking_source": null,
+  "discord_delivery": {
+    "enabled": false,
+    "channel_id": null
+  }
+}

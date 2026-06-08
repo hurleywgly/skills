@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ink Design System — Editorial Mood Showcase</title>
+
+  <!-- Google Fonts for all three editorial moods -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Serif+Display:ital@0;1&family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================
+       INK DESIGN SYSTEM — base-styles.css embedded
+       ============================================================ */
+
+    /* Configuration */
+    :root {
+      --ink-accent: #2563EB;
+      --ink-accent-light: rgba(37, 99, 235, 0.08);
+      --ink-accent-medium: rgba(37, 99, 235, 0.15);
+      --brand-name: "Ink";
+      --brand-show: block;
+      --font-primary: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      --font-display-crisp: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+      --font-body-crisp: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+      --font-display-monograph: 'Cormorant Garamond', 'Didot', Georgia, serif;
+      --font-body-monograph: 'EB Garamond', 'Garamond', Georgia, serif;
+      --font-display-folio: 'Playfair Display', 'Bodoni 72', Georgia, serif;
+      --font-body-folio: 'Libre Baskerville', 'Baskerville', Georgia, serif;
+      --font-display-modernist: 'DM Serif Display', Georgia, serif;
+      --font-body-modernist: 'Lora', Georgia, serif;
+      --font-display: var(--font-display-crisp);
+    }
+
+    /* Custom properties */
+    :root {
+      --ink-text: #1A1A1A;
+      --ink-text-secondary: #4A5568;
+      --ink-text-muted: #718096;
+      --ink-surface: #F7F8FA;
+      --ink-border: #E2E8F0;
+      --ink-border-light: #EDF2F7;
+      --ink-dark: #1A202C;
+      --ink-error: #E53E3E;
+      --ink-error-light: rgba(229, 62, 62, 0.10);
+      --ink-success: #38A169;
+      --ink-success-light: rgba(56, 161, 105, 0.10);
+      --ink-warning: #D69E2E;
+      --ink-warning-light: rgba(214, 158, 46, 0.10);
+      --text-display: clamp(36pt, 7vw + 1rem, 72pt);
+      --text-title-0: clamp(28pt, 5vw + 0.5rem, 48pt);
+      --text-title-1: clamp(22pt, 3.5vw + 0.5rem, 36pt);
+      --text-title-2: clamp(18pt, 2.5vw + 0.5rem, 26pt);
+      --text-title-3: clamp(15pt, 2vw + 0.3rem, 20pt);
+      --text-title-4: clamp(13pt, 1.5vw + 0.3rem, 17pt);
+      --text-headline: clamp(11pt, 1.2vw + 0.2rem, 14pt);
+      --text-body: clamp(10pt, 1.1vw + 0.2rem, 12pt);
+      --text-callout: clamp(9pt, 1vw + 0.2rem, 11pt);
+      --text-subhead: clamp(8.5pt, 0.9vw + 0.2rem, 10pt);
+      --text-caption: clamp(7.5pt, 0.8vw + 0.1rem, 9pt);
+      --text-annotation: clamp(7pt, 0.7vw + 0.1rem, 8pt);
+      --lh-title: 1.2;
+      --lh-body: 1.6;
+      --lh-tight: 1.35;
+      --space-micro: 4px;
+      --space-tiny: 8px;
+      --space-xs: 12px;
+      --space-sm: 16px;
+      --space-md: 24px;
+      --space-lg: 32px;
+      --space-modal: 36px;
+      --space-xl: 48px;
+      --space-xxl: 56px;
+      --radius-card: 20px;
+      --radius-button: 12px;
+      --radius-control: 8px;
+      --radius-small: 6px;
+      --radius-pill: 100px;
+      --shadow-light: 0 2px 8px rgba(0,0,0,0.04);
+      --shadow-medium: 0 4px 16px rgba(0,0,0,0.07);
+      --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    /* Page setup */
+    @page {
+      size: letter;
+      margin: 1in 1.15in;
+      @bottom-center {
+        content: counter(page);
+        font-size: 8pt;
+        color: #718096;
+        font-variant-numeric: oldstyle-nums;
+      }
+    }
+
+    @page :first { margin-top: 0; @bottom-center { content: none; } }
+    @page chapter-opener { margin: 1.5in 1.15in 1in; @bottom-center { content: none; } }
+
+    /* Reset */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      font-size: var(--text-body);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    body {
+      font-family: var(--font-primary);
+      color: var(--ink-text);
+      line-height: var(--lh-body);
+      background: white;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ============================================================
+       SHOWCASE-SPECIFIC LAYOUT
+       ============================================================ */
+
+    /* Mood section wrappers — each demo section applies its own mood */
+    .mood-section {
+      padding: 1in 1.15in;
+      page-break-before: always;
+      break-before: page;
+    }
+
+    /* First section (testing guide) — no page break */
+    .mood-section:first-of-type {
+      page-break-before: avoid;
+      break-before: avoid;
+    }
+
+    /* Shared figure/image styles */
+    figure { margin: var(--space-md) 0; page-break-inside: avoid; break-inside: avoid; }
+    figure img { width: 100%; display: block; }
+    figcaption {
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+      font-style: italic;
+      margin-top: var(--space-xs);
+      line-height: var(--lh-tight);
+      padding-left: var(--space-xs);
+      border-left: 2px solid var(--ink-border-light);
+      font-variant-numeric: oldstyle-nums;
+    }
+
+    /* ============================================================
+       MOOD 1: CRISP-BUSINESS (existing baseline)
+       ============================================================ */
+    .mood-crisp {
+      background: white;
+      --font-primary: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+      --font-display: var(--font-display-crisp);
+    }
+
+    .mood-crisp .cover-title {
+      font-family: var(--font-primary);
+      font-size: var(--text-title-0);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--ink-text);
+      margin-bottom: var(--space-md);
+    }
+
+    /* ============================================================
+       MOOD 2: MONOGRAPH-PHOTOGRAPHIC
+       ============================================================ */
+    .mood-monograph {
+      background: #FAFAF8;
+      --ink-accent: #B8A48E;
+      --ink-text: #1C1A16;
+      --ink-text-secondary: #6B5E4E;
+      --ink-text-muted: #9E8E7E;
+      --ink-surface: #F5F0E8;
+      --ink-border: #E8E0D5;
+      --ink-border-light: #EDE8E0;
+      --font-primary: 'EB Garamond', Georgia, serif;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --radius-card: 0px;
+      font-variant-ligatures: common-ligatures discretionary-ligatures;
+      font-variant-numeric: oldstyle-nums;
+      line-height: 1.72;
+    }
+
+    /* ============================================================
+       MOOD 3: FOLIO-ENCYCLOPEDIC
+       ============================================================ */
+    .mood-folio {
+      background: #FFFFFF;
+      --ink-accent: #C41E3A;
+      --ink-text: #111111;
+      --ink-text-secondary: #444444;
+      --ink-text-muted: #777777;
+      --ink-surface: #F0F0F0;
+      --ink-border: #CCCCCC;
+      --ink-border-light: #E0E0E0;
+      --font-primary: 'Libre Baskerville', Georgia, serif;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --radius-card: 0px;
+    }
+
+    /* ============================================================
+       MOOD 4: MODERNIST-ARCHITECTURAL
+       ============================================================ */
+    .mood-modernist {
+      background: #FFFFFF;
+      --ink-accent: #1A1A1A;
+      --ink-text: #1A1A1A;
+      --ink-text-secondary: #555555;
+      --ink-text-muted: #888888;
+      --ink-surface: #F4F4F2;
+      --ink-border: #1A1A1A;
+      --ink-border-light: #DDDDDD;
+      --font-primary: 'Lora', Georgia, serif;
+      --font-display: 'DM Serif Display', Georgia, serif;
+      --radius-card: 0px;
+      --lh-body: 1.8;
+    }
+
+    /* ============================================================
+       EDITORIAL COMPONENTS (shared)
+       ============================================================ */
+
+    /* Drop cap */
+    .drop-cap p:first-of-type::first-letter {
+      initial-letter: 3;
+      font-family: var(--font-display);
+      font-weight: 300;
+      color: var(--ink-accent);
+      margin-right: 0.08em;
+      padding-right: 0.04em;
+    }
+
+    @supports not (initial-letter: 3) {
+      .drop-cap p:first-of-type::first-letter {
+        float: left;
+        font-size: 4.2em;
+        line-height: 0.75;
+        margin: 0.08em 0.1em 0 0;
+        font-family: var(--font-display);
+        color: var(--ink-accent);
+      }
+    }
+
+    /* Sidenote layout */
+    .body-with-margin {
+      display: grid;
+      grid-template-columns: 1fr min(65ch, 55%) 1fr;
+      column-gap: 2.5rem;
+    }
+
+    .body-with-margin > * { grid-column: 2; }
+
+    .sidenote {
+      grid-column: 3;
+      align-self: start;
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+      line-height: var(--lh-tight);
+      border-left: 2px solid var(--ink-border-light);
+      padding-left: var(--space-xs);
+      margin-top: -0.2em;
+      font-style: italic;
+    }
+
+    /* Editorial pull quote */
+    .pull-quote-editorial {
+      font-family: var(--font-display);
+      font-size: clamp(16pt, 3vw, 24pt);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.35;
+      color: var(--ink-text);
+      text-align: center;
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+      border-top: 1px solid var(--ink-border);
+      border-bottom: 1px solid var(--ink-border);
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    .pull-quote-editorial::before {
+      content: '\201C';
+      display: block;
+      font-size: 4em;
+      line-height: 0.6;
+      color: var(--ink-accent);
+      margin-bottom: 0.2em;
+      font-style: normal;
+    }
+
+    /* Full-bleed image */
+    .full-bleed {
+      margin-left: -1.15in;
+      margin-right: -1.15in;
+      width: calc(100% + 2.3in);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .full-bleed img {
+      width: 100%;
+      height: clamp(25vh, 40vh, 60vh);
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Chapter opener */
+    .chapter-opener {
+      page: chapter-opener;
+      page-break-before: always;
+      break-before: page;
+      min-height: 55vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding-bottom: var(--space-xl);
+      border-bottom: 2px solid var(--ink-accent);
+      margin-bottom: var(--space-xl);
+    }
+
+    /* Horizontal rule */
+    .rule { border: none; border-top: 1px solid var(--ink-border); margin: var(--space-xl) 0; }
+    .rule-heavy { border: none; border-top: 3px solid var(--ink-text); margin: var(--space-xl) 0; }
+
+    /* Two-column body */
+    .two-col-body {
+      columns: 2;
+      column-gap: 2.5em;
+      column-rule: 1px solid var(--ink-border-light);
+      orphans: 3;
+      widows: 3;
+    }
+
+    .two-col-body p { font-size: var(--text-body); line-height: 1.65; margin-bottom: var(--space-sm); }
+
+    /* Section label */
+    .section-label {
+      font-variant-caps: all-small-caps;
+      letter-spacing: 0.12em;
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+      font-family: var(--font-primary);
+      margin-bottom: var(--space-xs);
+      display: block;
+    }
+
+    /* ============================================================
+       PREVIEW / TESTING BAR
+       ============================================================ */
+
+    .preview-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: var(--ink-dark);
+      color: white;
+      padding: 10px 24px;
+      font-size: 11pt;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      font-family: var(--font-primary);
+    }
+
+    .preview-bar .preview-label { color: #63B3ED; font-weight: 600; }
+    .preview-bar .preview-hint { color: var(--ink-text-muted); }
+
+    @media print {
+      .preview-bar { display: none !important; }
+      .testing-guide { display: none !important; }
+      .body-with-margin { display: block; }
+      .sidenote {
+        display: block;
+        font-size: 7.5pt;
+        border-left: 1px solid #E2E8F0;
+        padding: 4px 8px;
+        margin: 8px 0;
+      }
+      *, *::before, *::after {
+        animation: none !important;
+        animation-duration: 0s !important;
+        transition: none !important;
+        transition-duration: 0s !important;
+      }
+      p, li { orphans: 3; widows: 3; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Preview Bar -->
+  <div class="preview-bar no-print">
+    <span><span class="preview-label">Ink</span> &nbsp;Editorial Mood Showcase</span>
+    <span class="preview-hint">Cmd+P → Save as PDF to test all four moods</span>
+  </div>
+
+
+  <!-- ============================================================
+       TESTING GUIDE (screen-only, hidden in print)
+       ============================================================ -->
+  <section class="testing-guide" style="padding: 80px 1.15in 48px; background: #1A202C; color: white;">
+    <h1 style="font-size: 28pt; font-weight: 700; margin-bottom: 16px; color: white;">Ink Redesign — Testing Checklist</h1>
+    <p style="color: #A0AEC0; font-size: 12pt; margin-bottom: 24px;">Open in Chrome. Run Cmd+P → Save as PDF to validate all print paths.</p>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+      <div>
+        <h2 style="font-size: 14pt; font-weight: 600; color: #63B3ED; margin-bottom: 12px;">Typography Tests</h2>
+        <ul style="color: #CBD5E0; font-size: 11pt; line-height: 2; padding-left: 20px;">
+          <li>Drop cap renders in Monograph section (initial-letter)</li>
+          <li>Cormorant Garamond loads for Monograph display</li>
+          <li>Playfair Display loads for Folio display</li>
+          <li>DM Serif Display italic loads for Modernist display</li>
+          <li>EB Garamond loads for Monograph body text</li>
+          <li>Fluid type scale: resize window, check scale responds</li>
+          <li>Small caps on section labels</li>
+        </ul>
+      </div>
+      <div>
+        <h2 style="font-size: 14pt; font-weight: 600; color: #63B3ED; margin-bottom: 12px;">Layout Tests</h2>
+        <ul style="color: #CBD5E0; font-size: 11pt; line-height: 2; padding-left: 20px;">
+          <li>Sidenote column doesn't collide with body text</li>
+          <li>Chapter-opener triggers page break in print</li>
+          <li>Named @page chapter-opener applies wider top margin</li>
+          <li>Full-bleed image spans edge-to-edge in print</li>
+          <li>Pull quote horizontal rules are sharp, not thick</li>
+          <li>Two-column body splits evenly</li>
+          <li>Sidenotes collapse to inline in @media print</li>
+        </ul>
+      </div>
+      <div>
+        <h2 style="font-size: 14pt; font-weight: 600; color: #63B3ED; margin-bottom: 12px;">Print Path Tests</h2>
+        <ul style="color: #CBD5E0; font-size: 11pt; line-height: 2; padding-left: 20px;">
+          <li>Page numbers appear at bottom center (PDF)</li>
+          <li>Cover page has no page number (@page :first)</li>
+          <li>Colored SVG placeholder backgrounds print (print-color-adjust: exact)</li>
+          <li>No orphaned headings at page breaks</li>
+          <li>Animations stripped in PDF (universal kill rule)</li>
+        </ul>
+      </div>
+      <div>
+        <h2 style="font-size: 14pt; font-weight: 600; color: #63B3ED; margin-bottom: 12px;">Mood Isolation</h2>
+        <ul style="color: #CBD5E0; font-size: 11pt; line-height: 2; padding-left: 20px;">
+          <li>Each mood section has its own accent color</li>
+          <li>Crisp section: blue accent, system fonts, rounded cards</li>
+          <li>Monograph section: sand accent, warm cream bg</li>
+          <li>Folio section: crimson accent, white bg, bold display</li>
+          <li>Modernist section: near-black accent, italic display</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       MOOD 1: CRISP-BUSINESS
+       ============================================================ -->
+  <section class="mood-section mood-crisp" style="padding-top: 80px;">
+
+    <!-- Cover spread -->
+    <div style="min-height: 60vh; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: var(--space-xl);">
+      <div style="height: 4px; background: var(--ink-accent); width: 80px; margin-bottom: var(--space-xl);"></div>
+      <span class="section-label" style="color: var(--ink-accent);">Mood 1 — Crisp Business</span>
+      <h1 style="font-family: var(--font-primary); font-size: var(--text-title-0); font-weight: 700; letter-spacing: -0.02em; color: var(--ink-text); margin-bottom: var(--space-md); max-width: 80%;">The Current Ink Baseline</h1>
+      <p style="font-size: var(--text-title-3); color: var(--ink-text-muted); max-width: 65ch;">System fonts, blue accent, 20px-radius cards — business-ready, no external dependencies.</p>
+    </div>
+
+    <hr class="rule">
+
+    <!-- Stat cards -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-md); margin: var(--space-xl) 0;">
+      <div style="background: var(--ink-surface); border-radius: var(--radius-card); padding: var(--space-md); border: 1px solid var(--ink-border-light);">
+        <div style="font-size: var(--text-title-2); font-weight: 700; color: var(--ink-accent); line-height: 1.1;">18</div>
+        <div style="font-size: var(--text-caption); color: var(--ink-text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px;">CSS Patterns</div>
+      </div>
+      <div style="background: var(--ink-surface); border-radius: var(--radius-card); padding: var(--space-md); border: 1px solid var(--ink-border-light);">
+        <div style="font-size: var(--text-title-2); font-weight: 700; color: var(--ink-accent); line-height: 1.1;">4</div>
+        <div style="font-size: var(--text-caption); color: var(--ink-text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px;">Mood Systems</div>
+      </div>
+      <div style="background: var(--ink-surface); border-radius: var(--radius-card); padding: var(--space-md); border: 1px solid var(--ink-border-light);">
+        <div style="font-size: var(--text-title-2); font-weight: 700; color: var(--ink-accent); line-height: 1.1;">0</div>
+        <div style="font-size: var(--text-caption); color: var(--ink-text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px;">New Build Tools</div>
+      </div>
+    </div>
+
+    <!-- Pull quote (existing style) -->
+    <div style="border-left: 4px solid var(--ink-accent); padding: var(--space-sm) var(--space-md); margin: var(--space-lg) 0; font-size: var(--text-title-4); font-weight: 500; color: var(--ink-text-secondary); font-style: italic; line-height: var(--lh-tight);">
+      The gap from business-doc to coffee-table-book is specific and closeable — no new pipeline required.
+    </div>
+
+  </section>
+
+
+  <!-- ============================================================
+       MOOD 2: MONOGRAPH-PHOTOGRAPHIC
+       ============================================================ -->
+  <section class="mood-section mood-monograph">
+
+    <!-- Chapter opener (named page) -->
+    <div class="chapter-opener" style="border-bottom-color: #B8A48E;">
+      <span class="section-label" style="font-family: var(--font-primary); letter-spacing: 0.16em; font-size: var(--text-caption); color: #9E8E7E; margin-bottom: var(--space-sm);">Mood 2 — Monograph</span>
+      <h1 style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(32pt, 6vw, 60pt); font-weight: 300; line-height: 1.1; color: #1C1A16; margin-bottom: var(--space-md);">The Luxury Monograph</h1>
+      <p style="font-family: 'EB Garamond', Georgia, serif; font-size: var(--text-title-4); font-style: italic; color: #6B5E4E; max-width: 60ch; line-height: 1.55;">Light on text, heavy on beauty. Cormorant Garamond at 300 weight, warm cream palette, generous negative space.</p>
+    </div>
+
+    <!-- Composition: full-bleed wide-aspect editorial photograph (signature monograph layout) -->
+    <div class="full-bleed">
+      <img src="_assets/monograph-spread.png" alt="Stack of vintage leather books with dried botanical specimen on warm cream surface" style="width: 100%; height: clamp(34vh, 48vh, 56vh); object-fit: cover; object-position: center;">
+    </div>
+
+    <!-- Body with sidenote -->
+    <div class="body-with-margin" style="margin-top: var(--space-xl);">
+      <div class="drop-cap" style="font-family: 'EB Garamond', Georgia, serif; color: #1C1A16; line-height: 1.72;">
+        <p style="font-size: var(--text-body);">The editorial ambition of Monograph has always been to treat the book as an object of beauty first and a vessel of information second. The warm cream of aged ivory paper, the restraint of a single-weight display face at a third of normal weight — these are not accidents but decisions shaped by decades of publishing culture.</p>
+        <p style="font-size: var(--text-body); text-indent: 1.5em;">What distinguishes this mood from the baseline is the quality of negative space. Where the crisp system defaults to filling available width with content, the Monograph approach deliberately leaves air — room for the eye to rest before continuing.</p>
+      </div>
+      <aside class="sidenote" style="font-family: 'EB Garamond', Georgia, serif;">
+        The <code style="font-family: monospace; font-size: 0.88em; background: #EDE8E0; padding: 1px 4px;">hanging-punctuation: first last</code> property is applied globally in this mood — opening quotes optically outdent into the margin, a hallmark of hand-set typography.
+      </aside>
+    </div>
+
+    <!-- Editorial pull quote -->
+    <blockquote class="pull-quote-editorial" style="font-family: 'Cormorant Garamond', Georgia, serif; border-top-color: #E8E0D5; border-bottom-color: #E8E0D5;">
+      Typography is the silent architecture beneath every beautiful page.
+    </blockquote>
+
+    <!-- Tech note inset (replaces redundant placeholder figure with a stylized detail) -->
+    <aside style="border-top: 1px solid #E8E0D5; border-bottom: 1px solid #E8E0D5; padding: var(--space-md) 0; margin-top: var(--space-xl); font-family: 'EB Garamond', Georgia, serif; color: #6B5E4E;">
+      <span style="font-variant-caps: all-small-caps; font-style: normal; letter-spacing: 0.08em; margin-right: 8px;">Plate I — note</span>
+      The drop cap above uses <code style="font-family: monospace; font-size: 0.85em; background: #F5F0E8; padding: 1px 4px;">initial-letter: 3</code> (Chrome 110+) with a float fallback via <code style="font-family: monospace; font-size: 0.85em; background: #F5F0E8; padding: 1px 4px;">@supports not (initial-letter: 3)</code>.
+    </aside>
+
+  </section>
+
+
+  <!-- ============================================================
+       MOOD 3: FOLIO-ENCYCLOPEDIC
+       ============================================================ -->
+  <section class="mood-section mood-folio" style="page-break-before: always; break-before: page;">
+
+    <!-- Chapter opener -->
+    <div class="chapter-opener" style="border-bottom: 4px solid #C41E3A;">
+      <div style="font-family: 'Libre Baskerville', Georgia, serif; font-variant-caps: all-small-caps; letter-spacing: 0.12em; font-size: var(--text-caption); color: #C41E3A; margin-bottom: var(--space-sm);">Mood 3 — Folio</div>
+      <h1 style="font-family: 'Playfair Display', Georgia, serif; font-size: clamp(30pt, 5.5vw, 56pt); font-weight: 900; letter-spacing: -0.02em; color: #111111; margin-bottom: var(--space-md);">The Encyclopedic Reference</h1>
+      <p style="font-family: 'Libre Baskerville', Georgia, serif; font-size: var(--text-title-4); color: #444444; max-width: 65ch;">Dense, authoritative, richly visual. Playfair Display weight 900, crimson accent, two-column body text with full-span callouts.</p>
+    </div>
+
+    <!-- Composition: small inline plate-figure floats right; body text wraps around it -->
+    <figure style="float: right; width: 32%; margin: 4px 0 var(--space-sm) var(--space-lg); page-break-inside: avoid;">
+      <img src="_assets/folio-plate.png" alt="Botanical plate — fern specimen in fine ink linework with crimson accent" style="width: 100%; height: auto; display: block; border: 1px solid #CCCCCC;">
+      <figcaption style="font-family: 'Libre Baskerville', Georgia, serif; font-size: 9pt; color: #444; margin-top: 6px; border-top: 1px solid #CCCCCC; padding-top: 6px; line-height: 1.4;">
+        <span style="font-family: 'Playfair Display', Georgia, serif; font-variant-caps: all-small-caps; font-style: normal; font-weight: 700; letter-spacing: 0.08em; color: #C41E3A;">Plate I.</span>
+        Inline plate-figure pattern — image floats, body text reflows around it, just like a printed reference page.
+      </figcaption>
+    </figure>
+
+    <!-- Two-column body with callout span -->
+    <div class="two-col-body" style="margin-top: var(--space-lg); font-family: 'Libre Baskerville', Georgia, serif;">
+      <p>The Folio approach to reference publishing established a template that has defined encyclopedic print culture for four decades. The combination of bold Playfair Display headers at weight 900, set in tight negative tracking, against the warmer grain of Baskerville body text creates a legible contrast that sustains readership across hundreds of pages.</p>
+      <p>Two-column layouts serve density without sacrificing measure. At 65 characters per column — the physiological optimum for sustained reading — this grid allows approximately 30% more content per page than single-column equivalents.</p>
+
+      <!-- Full-width callout spans both columns -->
+      <div style="column-span: all; background: #F0F0F0; border-left: 4px solid #C41E3A; padding: var(--space-md) var(--space-lg); margin: var(--space-lg) 0; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+        <p style="font-family: 'Playfair Display', Georgia, serif; font-size: var(--text-title-4); font-weight: 700; margin: 0; color: #111111;">The two-column grid allows 30% more content per page while maintaining an optimal 65-character measure per column.</p>
+      </div>
+
+      <p>The column rule — a single pixel at border-light weight — acts as a visual guide rather than a divider, allowing the eye to track vertically without confusion. Combined with the <code style="font-family: monospace; background: #E0E0E0; padding: 1px 4px; font-size: 0.85em;">orphans: 3; widows: 3</code> rule, text rivers and lone lines are eliminated from the grid.</p>
+      <p>Hyphenation is applied automatically via <code style="font-family: monospace; background: #E0E0E0; padding: 1px 4px; font-size: 0.85em;">hyphens: auto</code>, maintaining justified text without the aggressive spacing gaps that plague non-hyphenated justified copy at narrow column widths.</p>
+    </div>
+
+    <!-- Closing tech note (replaces redundant placeholder; the inline plate above is the section's image) -->
+    <aside style="clear: both; border-top: 2px solid #C41E3A; padding-top: var(--space-md); margin-top: var(--space-xl); font-family: 'Libre Baskerville', Georgia, serif; color: #444;">
+      <span style="font-family: 'Playfair Display', Georgia, serif; font-variant-caps: all-small-caps; font-style: normal; font-weight: 700; letter-spacing: 0.08em; color: #C41E3A; margin-right: 6px;">Caption pattern</span>
+      Folio plate captions use a top rule instead of a left border — consistent with the mood's horizontal grid language. The inline plate above floats with <code style="font-family: monospace; font-size: 0.85em; background: #F0F0F0; padding: 1px 4px;">float: right; width: 32%</code> so body text reflows naturally around it.
+    </aside>
+
+  </section>
+
+
+  <!-- ============================================================
+       MOOD 4: MODERNIST-ARCHITECTURAL
+       ============================================================ -->
+  <section class="mood-section mood-modernist" style="page-break-before: always; break-before: page;">
+
+    <!-- Composition: title left, image right — asymmetric Swiss split -->
+    <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--space-xl); align-items: stretch; margin-bottom: var(--space-xl); page-break-inside: avoid;">
+      <!-- Title column -->
+      <div class="chapter-opener" style="border-bottom: none; padding-right: var(--space-lg);">
+        <hr style="border: none; border-top: 3px solid #1A1A1A; margin-bottom: var(--space-xl); width: 60%;">
+        <div style="font-family: 'Lora', Georgia, serif; font-variant-caps: all-small-caps; letter-spacing: 0.14em; font-size: var(--text-caption); color: #888888; margin-bottom: var(--space-sm);">Mood 4 — Modernist</div>
+        <h1 style="font-family: 'DM Serif Display', Georgia, serif; font-size: clamp(28pt, 5.5vw, 56pt); font-weight: 400; font-style: italic; line-height: 1.0; color: #1A1A1A; margin-bottom: var(--space-lg);">The Modernist Monograph</h1>
+        <p style="font-family: 'Lora', Georgia, serif; font-size: var(--text-title-4); color: #555555; max-width: 36ch; line-height: 1.7; border-top: 1px solid #DDDDDD; padding-top: var(--space-md);">Swiss-influenced, rigorous, disciplined. DM Serif Display italic at maximum scale, near-black accent, heavy ruled section dividers.</p>
+      </div>
+      <!-- Image column — vertical 4:5 architectural -->
+      <div style="border-bottom: 3px solid #1A1A1A;">
+        <img src="_assets/modernist-column.png" alt="Bauhaus column with diagonal shadow and horizontal rule line — black-and-white" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+      </div>
+    </div>
+
+    <!-- Sidenote layout with body text -->
+    <div class="body-with-margin" style="margin-top: var(--space-xl);">
+      <div style="font-family: 'Lora', Georgia, serif; color: #1A1A1A; line-height: 1.8;">
+        <p style="font-size: var(--text-body);">The Modernist tradition is one of restraint elevated to principle. Where other publishers treat white space as leftover, Modernist treats it as intention — the deliberate silence between notes that allows the visual music to resonate. The DM Serif Display italic face, at its maximum optical scale of 80pt, becomes a visual event rather than merely a heading.</p>
+        <p style="font-size: var(--text-body); margin-top: var(--space-sm);">The near-black monochrome palette removes the noise of chromatic variation, focusing attention entirely on compositional relationships: weight, axis, measure, and rule. The <code style="font-family: monospace; background: #F4F4F2; padding: 1px 4px; font-size: 0.85em;">border-top: 3px solid #1A1A1A</code> section divider performs the same function as a drawn rule in traditional typography.</p>
+      </div>
+      <aside class="sidenote" style="font-family: 'Lora', Georgia, serif;">
+        Modernist's sidenote column is best reserved for annotation rather than supplementary narrative — the asymmetric grid is already a strong visual statement; dense prose in the margin would undercut it.
+      </aside>
+    </div>
+
+    <!-- Ruled callout -->
+    <div style="border-top: 3px solid #1A1A1A; border-bottom: 1px solid #1A1A1A; padding: var(--space-md) 0; margin: var(--space-xl) 0; page-break-inside: avoid;">
+      <p style="font-family: 'DM Serif Display', Georgia, serif; font-size: var(--text-title-3); font-style: italic; color: #1A1A1A; margin: 0; line-height: 1.4;">White space is not emptiness — it is the architecture of attention.</p>
+    </div>
+
+    <!-- Closing technical note (image lives in the split header above) -->
+    <aside style="border-top: 1px solid #DDDDDD; padding-top: var(--space-md); margin-top: var(--space-xl); font-family: 'Lora', Georgia, serif; color: #555555; font-size: var(--text-callout); line-height: 1.6;">
+      The <code style="font-family: monospace; font-size: 0.85em; background: #F4F4F2; padding: 1px 4px;">@page chapter-opener</code> named-page rule adds 1.5in of top margin on chapter opener pages, creating a vertical rhythm distinct from the standard 1in body margin — without any manual spacing in the HTML.
+    </aside>
+
+  </section>
+
+  <!-- ================================================================
+       MOOD 5 — ARCADE
+       Pac-Man manual / 80s game journal: Press Start 2P + VT323,
+       cream paper, arcade yellow + ghost colors, ASCII vocabulary.
+       ================================================================ -->
+  <section class="mood-section mood-arcade" style="background: #F4ECD8; padding: 80px 1.15in; page-break-before: always; break-before: page;">
+
+    <!-- Marquee strip -->
+    <div style="font-family: 'Press Start 2P', monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 9pt; color: #FFCC00; text-align: center; padding: 12px; border: 3px solid #1A1A1A; background: #1A1A1A; box-shadow: 4px 4px 0 #1A1A1A; margin-bottom: 48px;">
+      ★ INSERT COIN ★ ★ INSERT COIN ★ ★ INSERT COIN ★
+    </div>
+
+    <!-- Chapter opener: Mood 5 -->
+    <div class="chapter-opener" style="border-bottom: 4px double #1A1A1A; padding-bottom: 32px; margin-bottom: 48px;">
+      <div style="font-family: 'Press Start 2P', monospace; letter-spacing: 0.18em; font-size: 9pt; color: #E63946; margin-bottom: 24px;">▶ MOOD 5 — ARCADE</div>
+      <h1 style="font-family: 'Press Start 2P', monospace; font-size: clamp(20pt, 5vw, 38pt); line-height: 1.15; color: #1A1A1A; margin: 0 0 24px 0; letter-spacing: 0.04em; text-transform: uppercase;">PAC-MAN <br>MANUAL</h1>
+      <p style="font-family: 'VT323', monospace; font-size: 18pt; color: #5A4A2A; max-width: 60ch; line-height: 1.4;">An 80s arcade journal aesthetic. Press Start 2P for headlines, VT323 for body. Cream manual-paper background, arcade-yellow accent with ghost-color set, hard pixel drop-shadows, ASCII border vocabulary. Every corner is sharp on purpose.</p>
+    </div>
+
+    <!-- Score-stat row (3 stats, "score-display" feel) -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 48px 0;">
+      <div style="border: 3px solid #1A1A1A; background: #1A1A1A; color: #FFCC00; padding: 16px; box-shadow: 4px 4px 0 #1A1A1A;">
+        <div style="font-family: 'Press Start 2P', monospace; font-size: 7pt; letter-spacing: 0.16em; color: #4FC3F7; margin-bottom: 8px;">HIGH SCORE</div>
+        <div style="font-family: 'Press Start 2P', monospace; font-size: 18pt; letter-spacing: 0.04em;">1,234,567</div>
+      </div>
+      <div style="border: 3px solid #1A1A1A; background: #1A1A1A; color: #FFCC00; padding: 16px; box-shadow: 4px 4px 0 #1A1A1A;">
+        <div style="font-family: 'Press Start 2P', monospace; font-size: 7pt; letter-spacing: 0.16em; color: #FFB7CE; margin-bottom: 8px;">LIVES</div>
+        <div style="font-family: 'Press Start 2P', monospace; font-size: 18pt; letter-spacing: 0.04em;">×3</div>
+      </div>
+      <div style="border: 3px solid #1A1A1A; background: #1A1A1A; color: #FFCC00; padding: 16px; box-shadow: 4px 4px 0 #1A1A1A;">
+        <div style="font-family: 'Press Start 2P', monospace; font-size: 7pt; letter-spacing: 0.16em; color: #FFB852; margin-bottom: 8px;">STAGE</div>
+        <div style="font-family: 'Press Start 2P', monospace; font-size: 18pt; letter-spacing: 0.04em;">07-2</div>
+      </div>
+    </div>
+
+    <!-- Pixel-art divider (CSS-drawn, no SVG) -->
+    <div style="height: 16px; margin: 48px 0; background: repeating-linear-gradient(90deg, #1A1A1A 0, #1A1A1A 8px, transparent 8px, transparent 16px) 0 0/16px 8px repeat-x, repeating-linear-gradient(90deg, transparent 0, transparent 8px, #FFCC00 8px, #FFCC00 16px) 0 8px/16px 8px repeat-x;"></div>
+
+    <!-- Two-column body block -->
+    <div style="font-family: 'VT323', monospace; color: #1A1A1A; font-size: 17pt; line-height: 1.4; columns: 2; column-gap: 32px;">
+      <!-- Composition: small inline pixel-art icon, body text wraps around it -->
+      <img src="_assets/arcade-icon.png" alt="Pixel-art arcade joystick icon" style="float: left; width: 88px; height: 88px; margin: 4px 14px 4px 0; border: 3px solid #1A1A1A; box-shadow: 4px 4px 0 #1A1A1A; image-rendering: pixelated;">
+      <p style="margin: 0 0 16px 0;"><span style="font-family: 'Press Start 2P', monospace; font-size: 9pt; letter-spacing: 0.04em; color: #E63946;">STAGE 01 ▶</span> The Pac-Man cabinet manual was an artifact of constraint. The display font had to render in 8×8 pixel cells. The body type had to read on cheap newsprint stock. The colors had to print on a four-ink press. Every limitation became a vocabulary.</p>
+      <p style="margin: 0 0 16px 0;">Today's browsers have none of those constraints — but the look is worth recreating because it carries something the rest of the design world has forgotten: <em style="font-style: normal; color: #E63946;">a delight in the seams</em>. The pixel grid is the grid. The hard drop-shadow is the drop-shadow. The cream paper is the paper.</p>
+      <p style="margin: 0;">Use this mood for retro/nostalgia content, gaming docs, internal "playbooks," product launch announcements with a wink, or anything that wants to feel like a found object from 1983.</p>
+    </div>
+
+    <!-- ASCII callout -->
+    <div style="font-family: 'VT323', monospace; font-size: 17pt; line-height: 1.4; border: 3px solid #1A1A1A; background: #FFFFFF; padding: 20px 28px; margin: 48px 0; box-shadow: 4px 4px 0 #1A1A1A; page-break-inside: avoid;">
+      <span style="font-family: 'Press Start 2P', monospace; font-size: 11pt; letter-spacing: 0.04em; color: #FFCC00;">▶ </span>
+      <strong style="font-family: 'Press Start 2P', monospace; font-size: 9pt; letter-spacing: 0.12em; text-transform: uppercase; color: #1A1A1A;">Tip:</strong>
+      <span> Use the <code style="font-family: 'VT323', monospace; background: #F4ECD8; padding: 2px 6px; border: 1px solid #1A1A1A;">.scanlines</code> opt-in class for a CRT overlay on screen. It's killed automatically in <code style="font-family: 'VT323', monospace; background: #F4ECD8; padding: 2px 6px; border: 1px solid #1A1A1A;">@media print</code> so PDFs stay clean.</span>
+    </div>
+
+    <!-- Pixel-art ghost figure (inline SVG, pixelated rendering) -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin: 48px 0;">
+      <!-- Ghost 1 — Blinky red -->
+      <div style="aspect-ratio: 1 / 1; border: 3px solid #1A1A1A; background: #0A0A0A; display: grid; place-items: center; box-shadow: 6px 6px 0 #1A1A1A; padding: 20px;">
+        <svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" style="width: 80%; height: 80%; image-rendering: pixelated;">
+          <g fill="#E63946">
+            <rect x="4" y="1" width="6" height="1"/>
+            <rect x="3" y="2" width="8" height="1"/>
+            <rect x="2" y="3" width="10" height="1"/>
+            <rect x="1" y="4" width="12" height="1"/>
+            <rect x="1" y="5" width="12" height="6"/>
+            <rect x="1" y="11" width="2" height="1"/><rect x="3" y="12" width="2" height="1"/>
+            <rect x="5" y="11" width="2" height="1"/><rect x="7" y="12" width="2" height="1"/>
+            <rect x="9" y="11" width="2" height="1"/><rect x="11" y="12" width="2" height="1"/>
+          </g>
+          <g fill="#FFFFFF"><rect x="3" y="6" width="3" height="3"/><rect x="8" y="6" width="3" height="3"/></g>
+          <g fill="#1A1A1A"><rect x="4" y="7" width="2" height="2"/><rect x="9" y="7" width="2" height="2"/></g>
+        </svg>
+      </div>
+      <!-- Ghost 2 — Inky cyan -->
+      <div style="aspect-ratio: 1 / 1; border: 3px solid #1A1A1A; background: #0A0A0A; display: grid; place-items: center; box-shadow: 6px 6px 0 #1A1A1A; padding: 20px;">
+        <svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" style="width: 80%; height: 80%; image-rendering: pixelated;">
+          <g fill="#4FC3F7">
+            <rect x="4" y="1" width="6" height="1"/>
+            <rect x="3" y="2" width="8" height="1"/>
+            <rect x="2" y="3" width="10" height="1"/>
+            <rect x="1" y="4" width="12" height="1"/>
+            <rect x="1" y="5" width="12" height="6"/>
+            <rect x="1" y="11" width="2" height="1"/><rect x="3" y="12" width="2" height="1"/>
+            <rect x="5" y="11" width="2" height="1"/><rect x="7" y="12" width="2" height="1"/>
+            <rect x="9" y="11" width="2" height="1"/><rect x="11" y="12" width="2" height="1"/>
+          </g>
+          <g fill="#FFFFFF"><rect x="3" y="6" width="3" height="3"/><rect x="8" y="6" width="3" height="3"/></g>
+          <g fill="#1A1A1A"><rect x="4" y="7" width="2" height="2"/><rect x="9" y="7" width="2" height="2"/></g>
+        </svg>
+      </div>
+      <!-- Ghost 3 — Pinky pink -->
+      <div style="aspect-ratio: 1 / 1; border: 3px solid #1A1A1A; background: #0A0A0A; display: grid; place-items: center; box-shadow: 6px 6px 0 #1A1A1A; padding: 20px;">
+        <svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" style="width: 80%; height: 80%; image-rendering: pixelated;">
+          <g fill="#FFB7CE">
+            <rect x="4" y="1" width="6" height="1"/>
+            <rect x="3" y="2" width="8" height="1"/>
+            <rect x="2" y="3" width="10" height="1"/>
+            <rect x="1" y="4" width="12" height="1"/>
+            <rect x="1" y="5" width="12" height="6"/>
+            <rect x="1" y="11" width="2" height="1"/><rect x="3" y="12" width="2" height="1"/>
+            <rect x="5" y="11" width="2" height="1"/><rect x="7" y="12" width="2" height="1"/>
+            <rect x="9" y="11" width="2" height="1"/><rect x="11" y="12" width="2" height="1"/>
+          </g>
+          <g fill="#FFFFFF"><rect x="3" y="6" width="3" height="3"/><rect x="8" y="6" width="3" height="3"/></g>
+          <g fill="#1A1A1A"><rect x="4" y="7" width="2" height="2"/><rect x="9" y="7" width="2" height="2"/></g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Attract-mode pull quote -->
+    <blockquote style="font-family: 'Press Start 2P', monospace; font-size: clamp(11pt, 2vw, 16pt); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.5; color: #1A1A1A; background: #FFCC00; padding: 32px; border: 3px solid #1A1A1A; text-align: center; font-style: normal; box-shadow: 6px 6px 0 #1A1A1A; margin: 48px 0; page-break-inside: avoid;">
+      ◀ READY PLAYER ONE — PRESS START ▶
+    </blockquote>
+
+    <!-- Section label + closing copy -->
+    <div style="margin-top: 64px;">
+      <div style="font-family: 'Press Start 2P', monospace; letter-spacing: 0.16em; font-size: 9pt; color: #E63946; margin-bottom: 16px;">▶ STAGE CLEAR</div>
+      <p style="font-family: 'VT323', monospace; font-size: 17pt; color: #5A4A2A; line-height: 1.4; max-width: 65ch;">The arcade mood is opt-in. Apply <code style="font-family: 'VT323', monospace; background: #F4ECD8; padding: 2px 6px; border: 1px solid #1A1A1A;">class="mood-arcade"</code> on the body or a wrapper, load Press Start 2P + VT323 from Google Fonts, and the rest of base-styles.css falls in line. Pair with <code style="font-family: 'VT323', monospace; background: #F4ECD8; padding: 2px 6px; border: 1px solid #1A1A1A;">image strategy: placeholders</code> for inline pixel-art SVGs like the ghosts above, or <code style="font-family: 'VT323', monospace; background: #F4ECD8; padding: 2px 6px; border: 1px solid #1A1A1A;">generated</code> if you want Gemini to render scanned-cabinet-art heroes.</p>
+    </div>
+
+  </section>
+
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <style>
+    /* {{BASE_STYLES}} — paste contents of base-styles.css here */
+
+    /* ================================================================
+       Exploration-Specific Styles
+       Grid of N distinct approaches. Defaults to 3 columns; falls back
+       to 2 then 1 on narrow viewports. Each cell = label + name +
+       sketch + tradeoff caption.
+       ================================================================ */
+
+    body.exploration {
+      padding: 0.85in 0.6in;
+      max-width: 100%;
+    }
+
+    /* Header */
+    .explore-header {
+      margin-bottom: var(--space-md);
+    }
+
+    .explore-header .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-md);
+      margin-bottom: var(--space-sm);
+    }
+
+    .explore-header .explore-title {
+      font-size: var(--text-title-1);
+      font-weight: 700;
+      color: var(--ink-text);
+      line-height: var(--lh-title);
+      letter-spacing: -0.012em;
+    }
+
+    .explore-header .explore-subtitle {
+      font-size: var(--text-callout);
+      color: var(--ink-text-muted);
+      margin-top: var(--space-tiny);
+      max-width: 56ch;
+    }
+
+    .explore-header .explore-meta {
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+      text-align: right;
+    }
+
+    .explore-label {
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+    }
+
+    /* Grid */
+    .explore-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+
+    @media (max-width: 1100px) {
+      .explore-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 700px) {
+      .explore-grid { grid-template-columns: 1fr; }
+    }
+
+    .variant-card {
+      background: var(--ink-surface);
+      border-radius: var(--radius-control);
+      padding: var(--space-sm) var(--space-md) var(--space-md);
+      border-top: 3px solid var(--ink-accent);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      page-break-inside: avoid;
+    }
+
+    .variant-card .variant-label {
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+    }
+
+    .variant-card .variant-name {
+      font-size: var(--text-headline);
+      font-weight: 700;
+      color: var(--ink-text);
+      line-height: 1.2;
+    }
+
+    /* Sketch slot — SVG or styled placeholder */
+    .variant-sketch {
+      background: #FFFFFF;
+      border: 1px solid var(--ink-border);
+      border-radius: var(--radius-small);
+      aspect-ratio: 4 / 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-top: var(--space-tiny);
+    }
+
+    .variant-sketch svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .variant-tradeoff {
+      font-size: var(--text-callout);
+      line-height: var(--lh-body);
+      color: var(--ink-text);
+      margin-top: var(--space-tiny);
+    }
+
+    .variant-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-tiny);
+      margin-top: auto;
+      padding-top: var(--space-xs);
+      border-top: 1px solid var(--ink-border);
+    }
+
+    .variant-tags .tag {
+      font-size: var(--text-annotation);
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      background: var(--ink-accent-light);
+      color: var(--ink-accent);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    /* Synthesis row at the bottom */
+    .explore-synthesis {
+      background: var(--ink-accent-light);
+      border-left: 4px solid var(--ink-accent);
+      border-radius: var(--radius-control);
+      padding: var(--space-sm) var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+
+    .explore-synthesis p {
+      font-size: var(--text-callout);
+      line-height: var(--lh-body);
+      color: var(--ink-text);
+    }
+
+    .explore-synthesis p + p {
+      margin-top: var(--space-xs);
+    }
+
+    /* Footer */
+    .explore-footer {
+      margin-top: var(--space-md);
+      padding-top: var(--space-sm);
+    }
+
+    .explore-footer .footer-text {
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      margin-top: var(--space-tiny);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    @media print {
+      body.exploration { padding: 0; }
+      .variant-card { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body class="exploration">
+
+  <div class="preview-bar no-print">
+    <span><span class="preview-label">EXPLORE</span> &nbsp;{{VARIANT_COUNT}} variants for comparison</span>
+    <span class="preview-hint">Compare side-by-side &nbsp;|&nbsp; Pick a direction</span>
+  </div>
+
+  <header class="explore-header">
+    <div class="header-row">
+      <div>
+        <h1 class="explore-title">{{TITLE}}</h1>
+        <p class="explore-subtitle">{{SUBTITLE}}</p>
+      </div>
+      <div class="explore-meta">
+        <div>{{AUTHOR}}</div>
+        <div>{{DATE}}</div>
+        <div>{{VARIANT_COUNT}} variants</div>
+      </div>
+    </div>
+    <div class="accent-bar"></div>
+  </header>
+
+  <!-- ============================================================
+       VARIANT GRID — repeat .variant-card per option (4–9 typical).
+       Each card: label, name, sketch (SVG or placeholder), tradeoff,
+       tags for at-a-glance characterization.
+       ============================================================ -->
+  <section class="explore-grid">
+
+    <article class="variant-card">
+      <div class="variant-label">Variant 01</div>
+      <div class="variant-name">{{VARIANT_1_NAME}}</div>
+      <div class="variant-sketch">{{VARIANT_1_SKETCH}}</div>
+      <p class="variant-tradeoff">{{VARIANT_1_TRADEOFF}}</p>
+      <div class="variant-tags">
+        <span class="tag">{{VARIANT_1_TAG_A}}</span>
+        <span class="tag">{{VARIANT_1_TAG_B}}</span>
+      </div>
+    </article>
+
+    <article class="variant-card">
+      <div class="variant-label">Variant 02</div>
+      <div class="variant-name">{{VARIANT_2_NAME}}</div>
+      <div class="variant-sketch">{{VARIANT_2_SKETCH}}</div>
+      <p class="variant-tradeoff">{{VARIANT_2_TRADEOFF}}</p>
+      <div class="variant-tags">
+        <span class="tag">{{VARIANT_2_TAG_A}}</span>
+        <span class="tag">{{VARIANT_2_TAG_B}}</span>
+      </div>
+    </article>
+
+    <article class="variant-card">
+      <div class="variant-label">Variant 03</div>
+      <div class="variant-name">{{VARIANT_3_NAME}}</div>
+      <div class="variant-sketch">{{VARIANT_3_SKETCH}}</div>
+      <p class="variant-tradeoff">{{VARIANT_3_TRADEOFF}}</p>
+      <div class="variant-tags">
+        <span class="tag">{{VARIANT_3_TAG_A}}</span>
+        <span class="tag">{{VARIANT_3_TAG_B}}</span>
+      </div>
+    </article>
+
+    <article class="variant-card">
+      <div class="variant-label">Variant 04</div>
+      <div class="variant-name">{{VARIANT_4_NAME}}</div>
+      <div class="variant-sketch">{{VARIANT_4_SKETCH}}</div>
+      <p class="variant-tradeoff">{{VARIANT_4_TRADEOFF}}</p>
+      <div class="variant-tags">
+        <span class="tag">{{VARIANT_4_TAG_A}}</span>
+        <span class="tag">{{VARIANT_4_TAG_B}}</span>
+      </div>
+    </article>
+
+    <article class="variant-card">
+      <div class="variant-label">Variant 05</div>
+      <div class="variant-name">{{VARIANT_5_NAME}}</div>
+      <div class="variant-sketch">{{VARIANT_5_SKETCH}}</div>
+      <p class="variant-tradeoff">{{VARIANT_5_TRADEOFF}}</p>
+      <div class="variant-tags">
+        <span class="tag">{{VARIANT_5_TAG_A}}</span>
+        <span class="tag">{{VARIANT_5_TAG_B}}</span>
+      </div>
+    </article>
+
+    <article class="variant-card">
+      <div class="variant-label">Variant 06</div>
+      <div class="variant-name">{{VARIANT_6_NAME}}</div>
+      <div class="variant-sketch">{{VARIANT_6_SKETCH}}</div>
+      <p class="variant-tradeoff">{{VARIANT_6_TRADEOFF}}</p>
+      <div class="variant-tags">
+        <span class="tag">{{VARIANT_6_TAG_A}}</span>
+        <span class="tag">{{VARIANT_6_TAG_B}}</span>
+      </div>
+    </article>
+
+  </section>
+
+  <!-- ============================================================
+       SYNTHESIS — one paragraph naming the axis the variants
+       explore and what to look at when picking. Optional.
+       ============================================================ -->
+  <section class="explore-synthesis">
+    <div class="explore-label">What's varying</div>
+    <p>{{SYNTHESIS_PARAGRAPH}}</p>
+  </section>
+
+  <footer class="explore-footer">
+    <div class="accent-bar"></div>
+    <p class="footer-text">{{BRAND}}</p>
+  </footer>
+
+</body>
+</html>

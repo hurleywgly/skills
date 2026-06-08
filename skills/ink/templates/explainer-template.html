@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <style>
+    /* {{BASE_STYLES}} — paste contents of base-styles.css here */
+
+    /* ================================================================
+       Explainer-Specific Styles
+       Long-form HTML for understanding a system / topic. SVG diagrams,
+       code blocks, sidenotes, pull quotes. The shape Thariq describes
+       as "in-depth research file in HTML."
+       ================================================================ */
+
+    body.explainer {
+      padding: 0.85in 0.6in;
+      max-width: 100%;
+    }
+
+    /* Header */
+    .explainer-header {
+      margin-bottom: var(--space-md);
+    }
+
+    .explainer-header .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-md);
+      margin-bottom: var(--space-sm);
+    }
+
+    .explainer-header .explainer-title {
+      font-size: var(--text-title-1);
+      font-weight: 700;
+      color: var(--ink-text);
+      line-height: var(--lh-title);
+      letter-spacing: -0.012em;
+    }
+
+    .explainer-header .explainer-subtitle {
+      font-size: var(--text-callout);
+      color: var(--ink-text-muted);
+      margin-top: var(--space-tiny);
+      max-width: 60ch;
+    }
+
+    .explainer-header .explainer-meta {
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+      text-align: right;
+    }
+
+    .explainer-label {
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+    }
+
+    /* Lead paragraph with drop cap */
+    .explainer-lead {
+      margin-bottom: var(--space-md);
+      max-width: 68ch;
+    }
+
+    .explainer-lead p {
+      font-size: var(--text-body);
+      line-height: var(--lh-body);
+      color: var(--ink-text);
+    }
+
+    .explainer-lead p::first-letter {
+      initial-letter: 3 1;
+      -webkit-initial-letter: 3 1;
+      font-weight: 700;
+      color: var(--ink-accent);
+      padding-right: 8px;
+      font-size: 3em;
+      float: left;
+      line-height: 0.95;
+      margin-top: 0.15em;
+    }
+
+    /* Section */
+    .explainer-section {
+      margin-bottom: var(--space-md);
+      max-width: 68ch;
+    }
+
+    .explainer-section h2 {
+      font-size: var(--text-title-3);
+      font-weight: 700;
+      color: var(--ink-text);
+      margin-bottom: var(--space-xs);
+      letter-spacing: -0.008em;
+    }
+
+    .explainer-section p {
+      font-size: var(--text-body);
+      line-height: var(--lh-body);
+      color: var(--ink-text);
+      margin-bottom: var(--space-xs);
+    }
+
+    .explainer-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Diagram block — full-bleed-feeling but not full-bleed */
+    .explainer-diagram {
+      background: var(--ink-surface);
+      border-radius: var(--radius-control);
+      padding: var(--space-md);
+      margin: var(--space-md) 0;
+      max-width: none;
+    }
+
+    .explainer-diagram figure {
+      margin: 0;
+    }
+
+    .explainer-diagram svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .explainer-diagram figcaption {
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+      margin-top: var(--space-xs);
+      text-align: center;
+      font-style: italic;
+    }
+
+    /* Code block */
+    .explainer-code {
+      background: #0F1419;
+      color: #E6E6E6;
+      border-radius: var(--radius-small);
+      padding: var(--space-sm) var(--space-md);
+      margin: var(--space-sm) 0;
+      overflow-x: auto;
+    }
+
+    .explainer-code pre {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      line-height: 1.55;
+    }
+
+    .explainer-code .code-comment { color: #7A8896; }
+    .explainer-code .code-keyword { color: #C792EA; }
+    .explainer-code .code-string  { color: #C3E88D; }
+    .explainer-code .code-fn      { color: #82AAFF; }
+    .explainer-code .code-number  { color: #F78C6C; }
+
+    /* Pull quote */
+    .explainer-pullquote {
+      border-left: 4px solid var(--ink-accent);
+      padding: var(--space-xs) var(--space-md);
+      margin: var(--space-md) 0;
+      max-width: 64ch;
+    }
+
+    .explainer-pullquote blockquote {
+      margin: 0;
+      font-size: var(--text-headline);
+      font-style: italic;
+      line-height: 1.45;
+      color: var(--ink-text);
+    }
+
+    .explainer-pullquote cite {
+      display: block;
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+      font-style: normal;
+      margin-top: var(--space-tiny);
+    }
+
+    /* Tradeoffs table */
+    .explainer-tradeoffs {
+      margin: var(--space-md) 0;
+      max-width: none;
+    }
+
+    .explainer-tradeoffs table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-callout);
+    }
+
+    .explainer-tradeoffs th {
+      background: var(--ink-surface);
+      text-align: left;
+      padding: var(--space-xs) var(--space-sm);
+      font-size: var(--text-annotation);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+      color: var(--ink-text-muted);
+      border-bottom: 1px solid var(--ink-border);
+    }
+
+    .explainer-tradeoffs td {
+      padding: var(--space-xs) var(--space-sm);
+      border-bottom: 1px solid var(--ink-border-light);
+      vertical-align: top;
+      line-height: var(--lh-body);
+      color: var(--ink-text);
+    }
+
+    .explainer-tradeoffs td:first-child {
+      font-weight: 600;
+      color: var(--ink-text);
+      white-space: nowrap;
+    }
+
+    /* Gotchas / sidenote-style callouts at end */
+    .explainer-gotchas {
+      background: var(--ink-warning-light);
+      border-left: 4px solid var(--ink-warning);
+      border-radius: var(--radius-control);
+      padding: var(--space-sm) var(--space-md);
+      margin: var(--space-md) 0;
+      max-width: 68ch;
+    }
+
+    .explainer-gotchas ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    .explainer-gotchas li {
+      font-size: var(--text-callout);
+      line-height: var(--lh-body);
+      color: var(--ink-text);
+      padding-left: var(--space-sm);
+      position: relative;
+      margin-bottom: var(--space-xs);
+    }
+
+    .explainer-gotchas li:last-child {
+      margin-bottom: 0;
+    }
+
+    .explainer-gotchas li::before {
+      content: "⚠";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--ink-warning);
+      font-weight: 700;
+    }
+
+    /* Footer */
+    .explainer-footer {
+      margin-top: var(--space-md);
+      padding-top: var(--space-sm);
+    }
+
+    .explainer-footer .footer-text {
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      margin-top: var(--space-tiny);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    @media print {
+      body.explainer { padding: 0; }
+      .explainer-diagram, .explainer-tradeoffs, .explainer-pullquote, .explainer-gotchas {
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body class="explainer">
+
+  <div class="preview-bar no-print">
+    <span><span class="preview-label">EXPLAIN</span> &nbsp;{{TITLE}}</span>
+    <span class="preview-hint">Read once &nbsp;|&nbsp; Built to be skimmable</span>
+  </div>
+
+  <header class="explainer-header">
+    <div class="header-row">
+      <div>
+        <h1 class="explainer-title">{{TITLE}}</h1>
+        <p class="explainer-subtitle">{{SUBTITLE}}</p>
+      </div>
+      <div class="explainer-meta">
+        <div>{{AUTHOR}}</div>
+        <div>{{DATE}}</div>
+        <div>{{READING_TIME}}</div>
+      </div>
+    </div>
+    <div class="accent-bar"></div>
+  </header>
+
+  <!-- ============================================================
+       LEAD — drop-cap intro paragraph
+       ============================================================ -->
+  <section class="explainer-lead">
+    <p>{{LEAD_PARAGRAPH}}</p>
+  </section>
+
+  <!-- ============================================================
+       SECTION 1 — How it works (diagram-anchored)
+       ============================================================ -->
+  <section class="explainer-section">
+    <h2>{{SECTION_1_TITLE}}</h2>
+    <p>{{SECTION_1_PARAGRAPH_1}}</p>
+    <p>{{SECTION_1_PARAGRAPH_2}}</p>
+  </section>
+
+  <div class="explainer-diagram">
+    <figure>
+      {{DIAGRAM_SVG}}
+      <figcaption>{{DIAGRAM_CAPTION}}</figcaption>
+    </figure>
+  </div>
+
+  <!-- ============================================================
+       SECTION 2 — Key concept with code
+       ============================================================ -->
+  <section class="explainer-section">
+    <h2>{{SECTION_2_TITLE}}</h2>
+    <p>{{SECTION_2_PARAGRAPH}}</p>
+  </section>
+
+  <div class="explainer-code">
+    <pre>{{CODE_BLOCK}}</pre>
+  </div>
+
+  <!-- ============================================================
+       PULL QUOTE — the one thing the reader should remember
+       ============================================================ -->
+  <aside class="explainer-pullquote">
+    <blockquote>{{PULL_QUOTE}}</blockquote>
+    <cite>{{PULL_QUOTE_ATTRIBUTION}}</cite>
+  </aside>
+
+  <!-- ============================================================
+       SECTION 3 — Tradeoffs table
+       ============================================================ -->
+  <section class="explainer-section">
+    <h2>{{SECTION_3_TITLE}}</h2>
+    <p>{{SECTION_3_PARAGRAPH}}</p>
+  </section>
+
+  <div class="explainer-tradeoffs">
+    <table>
+      <thead>
+        <tr>
+          <th>{{TRADEOFF_COL_1}}</th>
+          <th>{{TRADEOFF_COL_2}}</th>
+          <th>{{TRADEOFF_COL_3}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>{{TRADEOFF_ROW_1A}}</td><td>{{TRADEOFF_ROW_1B}}</td><td>{{TRADEOFF_ROW_1C}}</td></tr>
+        <tr><td>{{TRADEOFF_ROW_2A}}</td><td>{{TRADEOFF_ROW_2B}}</td><td>{{TRADEOFF_ROW_2C}}</td></tr>
+        <tr><td>{{TRADEOFF_ROW_3A}}</td><td>{{TRADEOFF_ROW_3B}}</td><td>{{TRADEOFF_ROW_3C}}</td></tr>
+        <tr><td>{{TRADEOFF_ROW_4A}}</td><td>{{TRADEOFF_ROW_4B}}</td><td>{{TRADEOFF_ROW_4C}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============================================================
+       GOTCHAS — what surprises people
+       ============================================================ -->
+  <aside class="explainer-gotchas">
+    <div class="explainer-label">Gotchas</div>
+    <ul>
+      <li>{{GOTCHA_1}}</li>
+      <li>{{GOTCHA_2}}</li>
+      <li>{{GOTCHA_3}}</li>
+    </ul>
+  </aside>
+
+  <footer class="explainer-footer">
+    <div class="accent-bar"></div>
+    <p class="footer-text">{{BRAND}}</p>
+  </footer>
+
+</body>
+</html>

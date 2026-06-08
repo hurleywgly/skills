@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <style>
+    /* {{BASE_STYLES}} — paste contents of base-styles.css here */
+
+    /* ================================================================
+       Editor-Specific Styles
+       Throwaway single-page tool. Controls + live preview + a
+       copy-as-prompt / copy-as-JSON / copy-as-markdown button.
+       Vanilla JS only — this is the documented exception to the
+       no-JS-dependencies rule. Built to die in the browser.
+       ================================================================ */
+
+    body.editor {
+      padding: var(--space-md) var(--space-md) var(--space-xl);
+      max-width: 100%;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .editor-header .editor-title {
+      font-size: var(--text-title-2);
+      font-weight: 700;
+      color: var(--ink-text);
+      line-height: var(--lh-title);
+      letter-spacing: -0.01em;
+    }
+
+    .editor-header .editor-subtitle {
+      font-size: var(--text-callout);
+      color: var(--ink-text-muted);
+      margin-top: var(--space-tiny);
+      max-width: 56ch;
+    }
+
+    .editor-actions {
+      display: flex;
+      gap: var(--space-tiny);
+      flex-wrap: wrap;
+    }
+
+    .editor-button {
+      font-family: var(--font-primary);
+      font-size: var(--text-caption);
+      font-weight: 600;
+      padding: var(--space-tiny) var(--space-sm);
+      border-radius: var(--radius-button);
+      background: var(--ink-text);
+      color: #FFFFFF;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.15s ease;
+      letter-spacing: 0.02em;
+    }
+
+    .editor-button:hover { opacity: 0.85; }
+    .editor-button:active { opacity: 0.75; }
+
+    .editor-button.secondary {
+      background: transparent;
+      color: var(--ink-text);
+      border: 1px solid var(--ink-border);
+    }
+
+    .editor-button.success {
+      background: var(--ink-success);
+    }
+
+    /* Workspace = controls + preview */
+    .editor-workspace {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-md);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 900px) {
+      .editor-workspace {
+        grid-template-columns: 1.4fr 1fr;
+      }
+    }
+
+    .editor-panel {
+      background: #FFFFFF;
+      border: 1px solid var(--ink-border);
+      border-radius: var(--radius-card);
+      padding: var(--space-md);
+    }
+
+    .editor-panel h2 {
+      font-size: var(--text-headline);
+      font-weight: 700;
+      color: var(--ink-text);
+      margin-bottom: var(--space-xs);
+      letter-spacing: -0.005em;
+    }
+
+    .editor-label {
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: var(--space-tiny);
+    }
+
+    /* Bucket columns (kanban-style sorter) */
+    .bucket-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-sm);
+    }
+
+    @media (min-width: 600px) {
+      .bucket-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .bucket {
+      background: var(--ink-surface);
+      border: 2px dashed var(--ink-border);
+      border-radius: var(--radius-control);
+      padding: var(--space-xs);
+      min-height: 240px;
+      transition: border-color 0.15s ease, background 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-tiny);
+    }
+
+    .bucket.is-drag-over {
+      border-color: var(--ink-accent);
+      background: var(--ink-accent-light);
+    }
+
+    .bucket-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0 var(--space-tiny) var(--space-tiny);
+      border-bottom: 1px solid var(--ink-border);
+    }
+
+    .bucket-header .bucket-name {
+      font-size: var(--text-caption);
+      font-weight: 700;
+      color: var(--ink-text);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .bucket-header .bucket-count {
+      font-size: var(--text-annotation);
+      font-weight: 600;
+      color: var(--ink-text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Cards */
+    .card {
+      background: #FFFFFF;
+      border: 1px solid var(--ink-border);
+      border-radius: var(--radius-small);
+      padding: var(--space-tiny) var(--space-xs);
+      cursor: grab;
+      box-shadow: var(--shadow-light);
+      user-select: none;
+      transition: transform 0.1s ease, box-shadow 0.15s ease;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-medium);
+    }
+
+    .card.is-dragging {
+      opacity: 0.4;
+      cursor: grabbing;
+    }
+
+    .card .card-id {
+      font-family: var(--font-mono);
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    .card .card-title {
+      font-size: var(--text-callout);
+      font-weight: 600;
+      color: var(--ink-text);
+      margin-top: 2px;
+      line-height: 1.35;
+    }
+
+    .card .card-meta {
+      display: flex;
+      gap: var(--space-tiny);
+      margin-top: var(--space-tiny);
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+    }
+
+    .card .card-meta .tag {
+      padding: 2px 6px;
+      border-radius: var(--radius-pill);
+      background: var(--ink-surface);
+      font-weight: 600;
+    }
+
+    /* Preview pane */
+    .preview-output {
+      background: var(--ink-dark);
+      color: #E6E6E6;
+      border-radius: var(--radius-control);
+      padding: var(--space-sm) var(--space-md);
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      line-height: 1.55;
+      white-space: pre-wrap;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+
+    .preview-output .preview-heading {
+      color: #82AAFF;
+      font-weight: 700;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: var(--space-md);
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--ink-text);
+      color: #FFFFFF;
+      padding: var(--space-tiny) var(--space-md);
+      border-radius: var(--radius-pill);
+      font-size: var(--text-caption);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 100;
+    }
+
+    .toast.is-visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body class="editor">
+
+  <header class="editor-header">
+    <div>
+      <h1 class="editor-title">{{TITLE}}</h1>
+      <p class="editor-subtitle">{{SUBTITLE}}</p>
+    </div>
+    <div class="editor-actions">
+      <button class="editor-button secondary" id="reset-btn" type="button">Reset</button>
+      <button class="editor-button success" id="copy-btn" type="button">Copy as Markdown</button>
+    </div>
+  </header>
+
+  <div class="editor-workspace">
+
+    <!-- Controls / sortable workspace -->
+    <section class="editor-panel">
+      <div class="editor-label">{{CONTROLS_LABEL}}</div>
+      <h2>{{CONTROLS_HEADING}}</h2>
+
+      <!-- Bucket columns (drag targets) -->
+      <div class="bucket-grid" id="bucket-grid">
+
+        <div class="bucket" data-bucket="now">
+          <div class="bucket-header">
+            <span class="bucket-name">Now</span>
+            <span class="bucket-count" data-count="now">0</span>
+          </div>
+        </div>
+
+        <div class="bucket" data-bucket="next">
+          <div class="bucket-header">
+            <span class="bucket-name">Next</span>
+            <span class="bucket-count" data-count="next">0</span>
+          </div>
+        </div>
+
+        <div class="bucket" data-bucket="later">
+          <div class="bucket-header">
+            <span class="bucket-name">Later</span>
+            <span class="bucket-count" data-count="later">0</span>
+          </div>
+        </div>
+
+        <div class="bucket" data-bucket="cut">
+          <div class="bucket-header">
+            <span class="bucket-name">Cut</span>
+            <span class="bucket-count" data-count="cut">0</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Live preview pane -->
+    <section class="editor-panel">
+      <div class="editor-label">Output preview</div>
+      <h2>Markdown the Copy button will produce</h2>
+      <pre class="preview-output" id="preview-output"></pre>
+    </section>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ================================================================
+    // Vanilla JS only — drag/drop sorter with markdown export.
+    // Replace the INITIAL_DATA below at template-fill time with the
+    // user's actual cards. Keep id stable so the export is meaningful.
+    // ================================================================
+
+    const INITIAL_DATA = [
+      {{INITIAL_DATA}}
+    ];
+
+    const RATIONALE = {{RATIONALE_OBJECT}};
+
+    const state = {
+      items: INITIAL_DATA.map(item => ({ ...item }))
+    };
+
+    const buckets = ['now', 'next', 'later', 'cut'];
+
+    function render() {
+      // Clear existing cards
+      buckets.forEach(b => {
+        const col = document.querySelector(`[data-bucket="${b}"]`);
+        col.querySelectorAll('.card').forEach(c => c.remove());
+      });
+      // Re-render
+      state.items.forEach(item => {
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.draggable = true;
+        card.dataset.id = item.id;
+        card.innerHTML = `
+          <div class="card-id">${item.id}</div>
+          <div class="card-title">${item.title}</div>
+          <div class="card-meta">
+            ${item.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+          </div>
+        `;
+        card.addEventListener('dragstart', onDragStart);
+        card.addEventListener('dragend', onDragEnd);
+        const col = document.querySelector(`[data-bucket="${item.bucket}"]`);
+        col.appendChild(card);
+      });
+      // Update counts
+      buckets.forEach(b => {
+        const n = state.items.filter(i => i.bucket === b).length;
+        document.querySelector(`[data-count="${b}"]`).textContent = n;
+      });
+      updatePreview();
+    }
+
+    function onDragStart(e) {
+      e.target.classList.add('is-dragging');
+      e.dataTransfer.setData('text/plain', e.target.dataset.id);
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function onDragEnd(e) {
+      e.target.classList.remove('is-dragging');
+    }
+
+    document.querySelectorAll('.bucket').forEach(b => {
+      b.addEventListener('dragover', e => {
+        e.preventDefault();
+        b.classList.add('is-drag-over');
+      });
+      b.addEventListener('dragleave', () => b.classList.remove('is-drag-over'));
+      b.addEventListener('drop', e => {
+        e.preventDefault();
+        b.classList.remove('is-drag-over');
+        const id = e.dataTransfer.getData('text/plain');
+        const item = state.items.find(i => i.id === id);
+        if (item) {
+          item.bucket = b.dataset.bucket;
+          render();
+        }
+      });
+    });
+
+    function buildMarkdown() {
+      let out = `# {{COPY_TITLE}}\n\n`;
+      buckets.forEach(b => {
+        const items = state.items.filter(i => i.bucket === b);
+        if (!items.length) return;
+        out += `## ${b.toUpperCase()}\n\n`;
+        items.forEach(it => {
+          out += `- **${it.id}** — ${it.title} _(${it.tags.join(', ')})_\n`;
+        });
+        const note = RATIONALE[b];
+        if (note) out += `\n> ${note}\n`;
+        out += '\n';
+      });
+      return out.trim();
+    }
+
+    function updatePreview() {
+      document.getElementById('preview-output').textContent = buildMarkdown();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('is-visible');
+      setTimeout(() => t.classList.remove('is-visible'), 1600);
+    }
+
+    document.getElementById('copy-btn').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(buildMarkdown());
+        showToast('Copied — paste back into Claude');
+      } catch {
+        showToast('Copy failed — preview is selectable');
+      }
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      state.items = INITIAL_DATA.map(item => ({ ...item }));
+      render();
+      showToast('Reset to initial bucket assignment');
+    });
+
+    render();
+  </script>
+
+</body>
+</html>

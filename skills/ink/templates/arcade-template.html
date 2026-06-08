@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <!-- Arcade Mood: Press Start 2P + VT323 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    /* {{BASE_STYLES}} — paste contents of base-styles.css here */
+
+    /* ================================================================
+       Arcade Mood Overrides (also defined in base-styles.css — included
+       inline for self-contained templates).
+       Pac-Man manual / 80s game journal: pixel display + readable
+       terminal body, arcade yellow accent + ghost-color set, ASCII
+       vocabulary, hard pixel drop-shadows. NEVER round corners.
+       ================================================================ */
+
+    body.mood-arcade {
+      --ink-accent: #FFCC00;
+      --ink-accent-alt-1: #E63946;
+      --ink-accent-alt-2: #4FC3F7;
+      --ink-accent-alt-3: #FFB7CE;
+      --ink-accent-alt-4: #FFB852;
+      --ink-text: #1A1A1A;
+      --ink-text-secondary: #5A4A2A;
+      --ink-text-muted: #8B7A52;
+      --ink-surface: #FFFFFF;
+      --ink-border: #1A1A1A;
+      --ink-border-light: #C8B98A;
+      --ink-dark: #0A0A0A;
+      --font-primary: 'VT323', ui-monospace, monospace;
+      --font-display: 'Press Start 2P', ui-monospace, monospace;
+      --radius-card: 0px;
+      --radius-button: 0px;
+      --radius-control: 0px;
+      --radius-small: 0px;
+      --lh-body: 1.35;
+      background: #F4ECD8;
+    }
+
+    /* Cover: arcade-cabinet attract mode */
+    .cover {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: var(--space-xl) 0;
+      gap: var(--space-xl);
+    }
+
+    .cover-marquee {
+      font-family: var(--font-display);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: clamp(8pt, 1vw, 10pt);
+      color: var(--ink-accent-alt-1);
+      text-align: center;
+      padding: var(--space-sm);
+      border: 3px solid var(--ink-border);
+      background: var(--ink-text);
+      box-shadow: 4px 4px 0 var(--ink-border);
+    }
+
+    .cover-title {
+      font-family: var(--font-display);
+      font-size: clamp(20pt, 5.5vw, 44pt);
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+      color: var(--ink-text);
+      text-align: center;
+      align-self: center;
+    }
+
+    .cover-subtitle {
+      font-family: var(--font-primary);
+      font-size: clamp(14pt, 2vw, 20pt);
+      color: var(--ink-text-secondary);
+      text-align: center;
+      letter-spacing: 0.02em;
+      margin-top: var(--space-md);
+    }
+
+    .cover-meta {
+      font-family: var(--font-display);
+      font-size: clamp(7pt, 0.9vw, 9pt);
+      letter-spacing: 0.16em;
+      color: var(--ink-accent);
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    /* Score-style stat row */
+    .score-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: var(--space-lg);
+      margin: var(--space-xl) 0;
+    }
+
+    .score-stat {
+      border: 3px solid var(--ink-border);
+      background: var(--ink-text);
+      color: var(--ink-accent);
+      padding: var(--space-md);
+      font-family: var(--font-display);
+      box-shadow: 4px 4px 0 var(--ink-border);
+    }
+
+    .score-stat-label {
+      font-size: clamp(6pt, 0.7vw, 8pt);
+      letter-spacing: 0.16em;
+      color: var(--ink-accent-alt-2);
+      margin-bottom: var(--space-xs);
+    }
+
+    .score-stat-value {
+      font-size: clamp(14pt, 2.2vw, 22pt);
+      letter-spacing: 0.04em;
+    }
+
+    /* ASCII pixel-art divider (CSS-drawn, no SVG needed) */
+    .pixel-divider {
+      height: 16px;
+      margin: var(--space-xl) 0;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          var(--ink-border) 0,
+          var(--ink-border) 8px,
+          transparent 8px,
+          transparent 16px),
+        repeating-linear-gradient(
+          90deg,
+          transparent 0,
+          transparent 8px,
+          var(--ink-accent) 8px,
+          var(--ink-accent) 16px);
+      background-size: 16px 8px, 16px 8px;
+      background-position: 0 0, 0 8px;
+      background-repeat: repeat-x;
+    }
+
+    /* Box-drawing callout */
+    .ascii-callout {
+      font-family: var(--font-primary);
+      font-size: clamp(13pt, 1.6vw + 0.4rem, 16pt);
+      line-height: 1.4;
+      border: 3px solid var(--ink-border);
+      background: var(--ink-surface);
+      padding: var(--space-md) var(--space-lg);
+      margin: var(--space-lg) 0;
+      box-shadow: 4px 4px 0 var(--ink-border);
+      position: relative;
+    }
+
+    .ascii-callout::before {
+      content: "▶ ";
+      color: var(--ink-accent);
+      font-family: var(--font-display);
+      font-size: 0.7em;
+      letter-spacing: 0.04em;
+    }
+
+    /* Inline pixel-art SVG placeholder helper class */
+    .pixel-art-frame {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: 3px solid var(--ink-border);
+      background: var(--ink-text);
+      display: grid;
+      place-items: center;
+      box-shadow: 6px 6px 0 var(--ink-border);
+      image-rendering: pixelated;
+    }
+
+    .pixel-art-frame svg {
+      width: 60%;
+      height: 60%;
+      image-rendering: pixelated;
+    }
+
+    @media print {
+      body.mood-arcade {
+        background: #FFFFFF !important;
+      }
+      .cover-marquee,
+      .score-stat,
+      .ascii-callout,
+      .pixel-art-frame {
+        box-shadow: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="mood-arcade">
+  <main class="doc">
+
+    <!-- COVER ============================================================== -->
+    <section class="cover">
+      <div class="cover-marquee">★ INSERT COIN ★ ★ INSERT COIN ★ ★ INSERT COIN ★</div>
+      <div>
+        <h1 class="cover-title">{{TITLE}}</h1>
+        <p class="cover-subtitle">{{SUBTITLE}}</p>
+      </div>
+      <div class="cover-meta">PLAYER 1 • {{AUTHOR}} • {{DATE}}</div>
+    </section>
+
+    <!-- BODY =============================================================== -->
+    <section class="body-content">
+
+      <p class="section-label">▶ STAGE 01</p>
+      <h2 class="title-2">{{SECTION_TITLE}}</h2>
+
+      <p class="body">{{INTRO_PARAGRAPH}}</p>
+
+      <!-- Score-style stat row -->
+      <div class="score-row">
+        <div class="score-stat">
+          <div class="score-stat-label">{{STAT_1_LABEL}}</div>
+          <div class="score-stat-value">{{STAT_1_VALUE}}</div>
+        </div>
+        <div class="score-stat">
+          <div class="score-stat-label">{{STAT_2_LABEL}}</div>
+          <div class="score-stat-value">{{STAT_2_VALUE}}</div>
+        </div>
+        <div class="score-stat">
+          <div class="score-stat-label">{{STAT_3_LABEL}}</div>
+          <div class="score-stat-value">{{STAT_3_VALUE}}</div>
+        </div>
+      </div>
+
+      <div class="pixel-divider"></div>
+
+      <p class="section-label">▶ STAGE 02</p>
+      <h2 class="title-2">{{SECTION_2_TITLE}}</h2>
+
+      <p class="body">{{BODY_PARAGRAPH}}</p>
+
+      <!-- ASCII callout -->
+      <div class="ascii-callout">
+        {{CALLOUT_TEXT}}
+      </div>
+
+      <!-- Pixel art image slot — replace inner SVG with real art when imagery=generated/placeholders -->
+      <div class="pixel-art-frame">
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+          <!-- Default placeholder: 8-bit ghost silhouette -->
+          <rect width="32" height="32" fill="#0A0A0A"/>
+          <g fill="#FFCC00">
+            <rect x="10" y="6" width="12" height="2"/>
+            <rect x="8" y="8" width="16" height="2"/>
+            <rect x="6" y="10" width="20" height="14"/>
+            <rect x="6" y="24" width="2" height="2"/>
+            <rect x="10" y="24" width="2" height="2"/>
+            <rect x="14" y="24" width="2" height="2"/>
+            <rect x="18" y="24" width="2" height="2"/>
+            <rect x="22" y="24" width="2" height="2"/>
+            <rect x="24" y="24" width="2" height="2"/>
+          </g>
+          <g fill="#0A0A0A">
+            <rect x="11" y="14" width="3" height="4"/>
+            <rect x="18" y="14" width="3" height="4"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Pull quote: arcade attract-mode marquee -->
+      <blockquote class="pull-quote-editorial">
+        {{PULL_QUOTE_TEXT}}
+      </blockquote>
+
+      <p class="body">{{BODY_PARAGRAPH_2}}</p>
+
+    </section>
+  </main>
+</body>
+</html>

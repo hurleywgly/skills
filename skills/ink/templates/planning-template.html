@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <style>
+    /* {{BASE_STYLES}} — paste contents of base-styles.css here */
+
+    /* ================================================================
+       Planning-Specific Styles
+       Decision context → options table → recommendation → next actions
+       Default mood: crisp. Override with mood-modernist for thinking docs.
+       ================================================================ */
+
+    body.planning {
+      padding: 0.85in 0.6in;
+      max-width: 100%;
+    }
+
+    /* Header */
+    .plan-header {
+      margin-bottom: var(--space-md);
+    }
+
+    .plan-header .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--space-sm);
+      gap: var(--space-md);
+    }
+
+    .plan-header .plan-title {
+      font-size: var(--text-title-1);
+      font-weight: 700;
+      color: var(--ink-text);
+      line-height: var(--lh-title);
+      letter-spacing: -0.012em;
+    }
+
+    .plan-header .plan-subtitle {
+      font-size: var(--text-callout);
+      color: var(--ink-text-muted);
+      margin-top: var(--space-tiny);
+    }
+
+    .plan-header .plan-meta {
+      font-size: var(--text-caption);
+      color: var(--ink-text-muted);
+      margin-top: var(--space-micro);
+      text-align: right;
+    }
+
+    /* Section Labels */
+    .plan-label {
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+    }
+
+    /* Decision Context */
+    .plan-context {
+      margin-bottom: var(--space-md);
+    }
+
+    .plan-context p {
+      font-size: var(--text-body);
+      line-height: var(--lh-body);
+      color: var(--ink-text);
+      margin-bottom: var(--space-xs);
+    }
+
+    /* Options Comparison Table */
+    .plan-options {
+      margin-bottom: var(--space-md);
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--space-sm);
+      margin-top: var(--space-xs);
+    }
+
+    .option-card {
+      background: var(--ink-surface);
+      border-radius: var(--radius-control);
+      padding: var(--space-sm) var(--space-md);
+      border-top: 3px solid var(--ink-border);
+      page-break-inside: avoid;
+    }
+
+    .option-card.is-recommended {
+      border-top-color: var(--ink-accent);
+      background: var(--ink-accent-light, var(--ink-surface));
+    }
+
+    .option-card .option-label {
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+      margin-bottom: var(--space-tiny);
+    }
+
+    .option-card .option-name {
+      font-size: var(--text-headline);
+      font-weight: 700;
+      color: var(--ink-text);
+      line-height: 1.2;
+      margin-bottom: var(--space-xs);
+    }
+
+    .option-card .option-description {
+      font-size: var(--text-callout);
+      line-height: var(--lh-body);
+      color: var(--ink-text);
+      margin-bottom: var(--space-xs);
+    }
+
+    .option-card .option-row {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-xs);
+      padding-top: var(--space-tiny);
+      border-top: 1px solid var(--ink-border);
+      margin-top: var(--space-xs);
+      font-size: var(--text-annotation);
+    }
+
+    .option-card .option-row .row-label {
+      color: var(--ink-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    .option-card .option-row .row-value {
+      color: var(--ink-text);
+      text-align: right;
+    }
+
+    /* Recommendation */
+    .plan-recommendation {
+      margin-bottom: var(--space-md);
+    }
+
+    .plan-recommendation .recommendation-content {
+      background: var(--ink-accent-light, var(--ink-surface));
+      border-radius: var(--radius-control);
+      padding: var(--space-sm) var(--space-md);
+      border-left: 4px solid var(--ink-accent);
+    }
+
+    .plan-recommendation .recommendation-content .rec-headline {
+      font-size: var(--text-headline);
+      font-weight: 700;
+      color: var(--ink-text);
+      line-height: 1.3;
+      margin-bottom: var(--space-tiny);
+    }
+
+    .plan-recommendation .recommendation-content p {
+      font-size: var(--text-callout);
+      line-height: var(--lh-body);
+      color: var(--ink-text);
+      margin-bottom: var(--space-xs);
+    }
+
+    .plan-recommendation .recommendation-content p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Open Questions */
+    .plan-open-questions {
+      margin-bottom: var(--space-md);
+    }
+
+    .plan-open-questions ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    .plan-open-questions li {
+      font-size: var(--text-callout);
+      line-height: var(--lh-body);
+      color: var(--ink-text);
+      padding-left: var(--space-sm);
+      position: relative;
+      margin-bottom: var(--space-xs);
+    }
+
+    .plan-open-questions li::before {
+      content: "?";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--ink-accent);
+      font-weight: 700;
+    }
+
+    /* Next Actions */
+    .plan-next-actions {
+      margin-bottom: var(--space-md);
+    }
+
+    .plan-next-actions .checklist li {
+      font-size: var(--text-callout);
+    }
+
+    /* Footer */
+    .plan-footer {
+      margin-top: var(--space-md);
+      padding-top: var(--space-sm);
+    }
+
+    .plan-footer .footer-text {
+      font-size: var(--text-annotation);
+      color: var(--ink-text-muted);
+      margin-top: var(--space-tiny);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    @media print {
+      body.planning {
+        padding: 0;
+      }
+      .option-card {
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body class="planning">
+
+  <!-- Preview Bar (visible in browser only) -->
+  <div class="preview-bar no-print">
+    <span><span class="preview-label">PDF</span> &nbsp;Planning Doc Preview</span>
+    <span class="preview-hint">Cmd+P &rarr; Save as PDF &nbsp;|&nbsp; Decision artifact for review</span>
+  </div>
+
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+  <header class="plan-header">
+    <div class="header-row">
+      <div>
+        <h1 class="plan-title">{{TITLE}}</h1>
+        <p class="plan-subtitle">{{SUBTITLE}}</p>
+      </div>
+      <div class="plan-meta">
+        <div>{{AUTHOR}}</div>
+        <div>{{DATE}}</div>
+        <div>{{STATUS}}</div>
+      </div>
+    </div>
+    <div class="accent-bar"></div>
+  </header>
+
+
+  <!-- ============================================================
+       DECISION CONTEXT — what problem, why now, constraints
+       ============================================================ -->
+  <section class="plan-context">
+    <div class="plan-label">Decision Context</div>
+    <p>{{CONTEXT_PARAGRAPH_1}}</p>
+    <p>{{CONTEXT_PARAGRAPH_2}}</p>
+  </section>
+
+
+  <!-- ============================================================
+       OPTIONS — repeat .option-card per option (2–4 typical)
+       Add class="is-recommended" to the preferred one
+       ============================================================ -->
+  <section class="plan-options">
+    <div class="plan-label">Options</div>
+    <div class="options-grid">
+
+      <article class="option-card">
+        <div class="option-label">Option A</div>
+        <div class="option-name">{{OPTION_A_NAME}}</div>
+        <p class="option-description">{{OPTION_A_DESCRIPTION}}</p>
+        <div class="option-row"><span class="row-label">Tradeoffs</span><span class="row-value">{{OPTION_A_TRADEOFFS}}</span></div>
+        <div class="option-row"><span class="row-label">Cost</span><span class="row-value">{{OPTION_A_COST}}</span></div>
+        <div class="option-row"><span class="row-label">Risk</span><span class="row-value">{{OPTION_A_RISK}}</span></div>
+      </article>
+
+      <article class="option-card is-recommended">
+        <div class="option-label">Option B &middot; Recommended</div>
+        <div class="option-name">{{OPTION_B_NAME}}</div>
+        <p class="option-description">{{OPTION_B_DESCRIPTION}}</p>
+        <div class="option-row"><span class="row-label">Tradeoffs</span><span class="row-value">{{OPTION_B_TRADEOFFS}}</span></div>
+        <div class="option-row"><span class="row-label">Cost</span><span class="row-value">{{OPTION_B_COST}}</span></div>
+        <div class="option-row"><span class="row-label">Risk</span><span class="row-value">{{OPTION_B_RISK}}</span></div>
+      </article>
+
+      <article class="option-card">
+        <div class="option-label">Option C</div>
+        <div class="option-name">{{OPTION_C_NAME}}</div>
+        <p class="option-description">{{OPTION_C_DESCRIPTION}}</p>
+        <div class="option-row"><span class="row-label">Tradeoffs</span><span class="row-value">{{OPTION_C_TRADEOFFS}}</span></div>
+        <div class="option-row"><span class="row-label">Cost</span><span class="row-value">{{OPTION_C_COST}}</span></div>
+        <div class="option-row"><span class="row-label">Risk</span><span class="row-value">{{OPTION_C_RISK}}</span></div>
+      </article>
+
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       RECOMMENDATION
+       ============================================================ -->
+  <section class="plan-recommendation">
+    <div class="plan-label">Recommendation</div>
+    <div class="recommendation-content">
+      <div class="rec-headline">{{RECOMMENDATION_HEADLINE}}</div>
+      <p>{{RECOMMENDATION_RATIONALE}}</p>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       OPEN QUESTIONS
+       ============================================================ -->
+  <section class="plan-open-questions">
+    <div class="plan-label">Open Questions</div>
+    <ul>
+      <li>{{OPEN_QUESTION_1}}</li>
+      <li>{{OPEN_QUESTION_2}}</li>
+      <li>{{OPEN_QUESTION_3}}</li>
+    </ul>
+  </section>
+
+
+  <!-- ============================================================
+       NEXT ACTIONS
+       ============================================================ -->
+  <section class="plan-next-actions">
+    <div class="plan-label">Next Actions</div>
+    <ul class="checklist">
+      <li>{{NEXT_ACTION_1}}</li>
+      <li>{{NEXT_ACTION_2}}</li>
+      <li>{{NEXT_ACTION_3}}</li>
+    </ul>
+  </section>
+
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="plan-footer">
+    <div class="accent-bar"></div>
+    <p class="footer-text">{{BRAND}}</p>
+  </footer>
+
+</body>
+</html>
