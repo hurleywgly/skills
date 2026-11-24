@@ -18,7 +18,7 @@ Image generation supports two providers — pick by user preference, content fit
 | **Gemini** (default) | `gemini-2.5-flash-image` (Nano Banana) | ~$0.04 | Fast, decent text rendering, good at illustrative/editorial heroes |
 | **OpenAI** | `gpt-image-2` | ~$0.006 (low) – $0.21 (high) | Sharper prompt adherence, strong typography/text-in-image, more photoreal |
 
-When in doubt, ask: *"Generate this with Gemini Nano Banana (~$0.04) or OpenAI gpt-image-2 (~$0.04–$0.21 depending on quality)?"* Default to **Gemini** if the user has no preference and only one key is configured — fall back to the provider whose key is present.
+When in doubt, ask: *"Generate this with Gemini Nano Banana (~$0.04) or OpenAI gpt-image-2 (~$0.006–$0.21 depending on quality)?"* Default to **Gemini** if the user has no preference and only one key is configured — fall back to the provider whose key is present.
 
 ## Provider routing (decide once, then generate)
 

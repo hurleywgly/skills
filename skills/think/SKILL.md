@@ -37,7 +37,7 @@ If no flags are provided, give the hardening pass first and ask whether to conti
 
 ## Fixed Perspectives
 
-Use these four perspectives inline. Do not ask the user to choose among them, rename them into local lens vocabulary, or load external lens files.
+Use these four perspectives inline, as given. They are fixed so the pass needs no setup.
 
 | Perspective | What it protects |
 |---|---|

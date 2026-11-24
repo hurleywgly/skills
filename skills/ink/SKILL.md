@@ -83,8 +83,8 @@ Collect what's needed for the chosen pattern:
 - **Image strategy** (ask before generating):
   - `none` — text + color blocks only. Lean on typography, accent color, CSS-drawn rules. Default if unclear.
   - `placeholders` — SVG data-URI placeholders sized to layout slots. Free, anchors hero/figure spots.
-  - `generated` — real generated imagery via Gemini Nano Banana (~$0.04) or OpenAI gpt-image-2 (~$0.006–$0.21 depending on quality). Use when the doc actually benefits from photographic or illustrated heroes (monograph plate spreads, folio plate figures, infographics). Routes to Step 5; user can name the provider or Ink picks based on which API key is configured.
-  When in doubt: "Should I generate hero images (Gemini ~$0.04 or OpenAI gpt-image-2 ~$0.04–$0.21), use SVG placeholders, or skip imagery?"
+  - `generated` — real generated imagery via Gemini or OpenAI, paid per image (current prices are in `references/image-generation.md`). Use when the doc actually benefits from photographic or illustrated heroes (monograph plate spreads, folio plate figures, infographics). Routes to Step 5; user can name the provider or Ink picks based on which API key is configured.
+  When in doubt: "Should I generate hero images (paid, I'll quote the cost first), use SVG placeholders, or skip imagery?"
 
 - **Pattern-specific options:**
   - Exploration: How many variants? (default: 6); what dimensions vary? (layout / tone / density / etc.)
@@ -219,7 +219,7 @@ The design system is fully customizable via CSS variables in `templates/base-sty
 
 ### Typography
 **Moods:** `crisp` (system fonts, default) | `monograph` (Cormorant Garamond + EB Garamond) | `folio` (Playfair Display + Libre Baskerville) | `modernist` (DM Serif Display + Lora) | `arcade` (Press Start 2P + VT323)
-**Image strategy:** `none` (text + color blocks, default) | `placeholders` (SVG data-URI blocks) | `generated` via Gemini Nano Banana (~$0.04) OR OpenAI gpt-image-2 (~$0.006–$0.21 by quality tier) — Step 5
+**Image strategy:** `none` (text + color blocks, default) | `placeholders` (SVG data-URI blocks) | `generated` via Gemini or OpenAI, paid per image (Step 5)
 **Fluid scale (clamp):** display / title-0 / title-1 / title-2 / title-3 / title-4 / headline / body / callout / subhead / caption / annotation — all scale with viewport, floor at print-safe pt sizes.
 
 ### Spacing (8px grid)
@@ -255,7 +255,7 @@ Properties of `/ink` that are not negotiable per-doc. They constrain what the sk
 - Two-way interactivity is editor-pattern only. Static patterns stay static.
 - Very long explainers (30+ pages of equivalent print) may have minor pagination inconsistencies if printed.
 - Images must be base64-encoded to stay self-contained.
-- Image generation requires an API key for one of the supported providers (Google Gemini ~$0.04/image, or OpenAI gpt-image-2 ~$0.006–$0.21/image depending on quality tier).
+- Image generation requires an API key for one of the supported providers and costs money per image (see `references/image-generation.md`).
 - Either provider may refuse certain prompts per its own content policy.
 
 ### When to skip /ink

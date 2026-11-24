@@ -145,9 +145,7 @@ Every screenshot is scored against 6 objective criteria. Each scores 0 (fail) or
 ### Phase 2: Figma Setup
 
 1. **File resolution:** create new or verify existing
-2. **Page isolation (CRITICAL):**
-   - ALWAYS create a new dedicated page
-   - NEVER write to existing pages
+2. **Page isolation:** create a new dedicated page for the run and write only there. Existing pages hold the user's own work, and a run that writes into them cannot be cleanly undone.
 3. **Token page (for multi-screen runs):**
    - Create a "Design Tokens" frame with color swatches, type scale, spacing scale, button variants
    - This is the ground truth for cross-screen consistency
@@ -306,11 +304,11 @@ Design is an input to the build loop. The build loop owns the technical lens —
 
 ---
 
-## Figma Frame Rules (CRITICAL)
+## Figma Frame Rules
 
 These prevent the "collapsed container" problem where you have to manually expand frames.
 
-1. **`clipsContent = false`** on ALL container and section frames
+1. **`clipsContent = false`** on every container and section frame
 2. **`layoutSizingVertical = "HUG"`** on page-level and section-level frames — let content determine height
 3. **Only use fixed `resize()`** for elements with known dimensions (buttons, icons, specific cards)
 4. **Top-level screen frames:** width fixed (1440), height HUG
@@ -367,13 +365,13 @@ Five things that make the biggest difference. These should be explicit sub-check
 ## Safety Rules
 
 ### Figma Isolation
-1. ALWAYS create a new page for every design run
+1. Create a new page for every design run (see Page isolation in Phase 2)
 2. Never delete objects the skill didn't create
 3. Pre-flight scan before writes
 4. Set `clipsContent = false` on all containers
 
 ### /figma-use Loading
-Load `/figma-use` skill before EVERY `use_figma` call. No exceptions.
+Load the `/figma-use` skill before every `use_figma` call. The Figma MCP server requires it, and calls made without it fail or write malformed nodes.
 
 ### Human Gates
 - Never self-approve a design direction (diverge checkpoint is mandatory)
