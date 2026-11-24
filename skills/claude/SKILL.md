@@ -1,6 +1,7 @@
 ---
 name: claude
-description: Claude Code second opinion for Codex. Three modes — review (diff review with pass/fail gate), challenge (adversarial break-your-code), consult (ask anything). Trigger on "claude review", "claude challenge", "ask claude", "second opinion from Claude", "consult Claude".
+description: "Get an independent second opinion from Claude Code while another agent (Codex or similar) is driving. Three read-only modes: review (diff review with a pass/fail gate), challenge (adversarial, tries to break the code or plan), consult (ask anything). Use on \"claude review\", \"claude challenge\", \"ask claude\", \"consult Claude\", or \"second opinion from Claude\". Requires the claude CLI."
+argument-hint: "review [instructions] | challenge [focus] | <question>"
 ---
 
 # /claude — Second Opinion via Claude Code

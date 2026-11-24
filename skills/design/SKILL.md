@@ -1,6 +1,7 @@
 ---
 name: design
-description: Autonomous visual design loop — brief-driven Figma design with recursive self-critique, budget tracking, and shareable output
+description: "Run an autonomous Figma design loop from a written brief: build section by section, screenshot, self-critique against a rubric, fix, and repeat until quality converges or the call budget runs out, then hand off a shareable document. Use for brief-driven screen designs or style boards in Figma. Requires the Figma MCP server and its figma-use skill."
+argument-hint: "<description> | new [--type style-board|screen-design] | run <brief-path> [--budget N] [--autonomous] [--stretch]"
 disable-model-invocation: true
 ---
 

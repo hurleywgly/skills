@@ -1,12 +1,9 @@
 ---
 name: auto-mine
-description: Thin autonomous envelope over /mine — runs the mining loop unattended to a fixed budget, read-only, and parks a morning bundle for judgment.
+description: "Run the mine skill unattended to a budget (the overnight gear): admission-gated, read-only, needs explicit user authorization, and parks a morning bundle for review instead of deciding anything. Requires the mine skill to be installed. For a watched run use mine directly."
+argument-hint: "<what to find and where>"
 disable-model-invocation: true
 ---
-
-<!-- PORTABILITY: Inherits /mine's workspace-agnostic constraint. No hardcoded absolute
-paths, no personal names in logic. The "autonomous envelope" is the shared contract for
-running a loop unattended to a budget, read-only, parking a morning bundle for review. -->
 
 # /auto-mine
 
@@ -31,7 +28,7 @@ admission:
     grounding: rubric+authorization            # self-graded T/S/B rubric + standing per-loop authorization
     threshold: ">= 2 of 3 (T/S/B) to KEEP"
     authorization: "kanban: ⚡ Autonomous lane on a task board | or a direct go"
-    rubric: "skills/mine/SKILL.md#scoring"
+    rubric: "the mine skill's SKILL.md, Scoring section"
   budget:                                  # resource-aware — no hard clock/cycle cap
     allocation: resource-aware             # allocate to available tokens/compute + corpus breadth
     stop: convergence-or-envelope-exhausted   # /mine's 3-consecutive-low-yield convergence is the natural stop
@@ -73,4 +70,4 @@ Morning bundle, two surfaces in the loop's own tree:
 - **Mutate** anything — v1 `allows_mutation: false`, and the core is read-only regardless.
 - **Resolve parked decisions** — the capsule and its parked cards are for you to judge in the morning; nothing auto-resolves.
 - **Skip mandatory gates** — admission failure parks (never "continue as gated"); an authorization grounds the metric only and waives no other gate.
-- **Re-document or fork** the `/mine` cycle, scoring, or capsule format — that lives in `skills/mine/SKILL.md`.
+- **Re-document or fork** the `/mine` cycle, scoring, or capsule format — that lives in the `mine` skill's own `SKILL.md`, which is installed next to this skill. If `mine` is not installed, stop and say so.

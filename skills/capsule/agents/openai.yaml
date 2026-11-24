@@ -1,0 +1,7 @@
+interface:
+  display_name: "Capsule"
+  short_description: "Portable, actionable knowledge transfer between agents"
+
+# Mirrors `disable-model-invocation: true` in SKILL.md: run only when asked by name.
+policy:
+  allow_implicit_invocation: false

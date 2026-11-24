@@ -1,0 +1,7 @@
+interface:
+  display_name: "Auto Mine"
+  short_description: "Mine your sources overnight, wake up to the gems"
+
+# Mirrors `disable-model-invocation: true` in SKILL.md: run only when asked by name.
+policy:
+  allow_implicit_invocation: false

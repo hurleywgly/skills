@@ -1,0 +1,3 @@
+# Mirrors `disable-model-invocation: true` in SKILL.md: run only when asked by name.
+policy:
+  allow_implicit_invocation: false

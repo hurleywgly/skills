@@ -1,6 +1,7 @@
 ---
 name: codex
-description: OpenAI Codex second opinion. Three modes — review (diff review with pass/fail gate), challenge (adversarial break-your-code), consult (ask anything). Trigger on "codex review", "codex challenge", "ask codex", "second opinion", "consult codex".
+description: "Get an independent second opinion from OpenAI Codex while Claude Code (or another agent) is driving. Three read-only modes: review (diff review with a pass/fail gate), challenge (adversarial, tries to break the code), consult (ask anything). Use on \"codex review\", \"codex challenge\", \"ask codex\", \"consult codex\", or \"second opinion\". Requires the codex CLI."
+argument-hint: "review [instructions] | challenge [focus] | <question>"
 ---
 
 # /codex — Second Opinion via OpenAI Codex
@@ -15,7 +16,7 @@ Verify `codex` is reachable before running any mode:
 codex --help 2>&1 | tail -5
 ```
 
-Use `timeout: 95000` on the Bash call.
+Allow about 95 seconds for this call (in Claude Code, `timeout: 95000` on the Bash call).
 
 If output contains `Error` or `login` or no commands listed, stop and tell the user:
 > "Codex setup incomplete. Run `codex login` interactively to authenticate, then retry `/codex`."
@@ -32,7 +33,7 @@ Parse the user's input:
      ```bash
      git diff --quiet "origin/$BASE...HEAD" 2>/dev/null && echo "NO_DIFF" || echo "HAS_DIFF"
      ```
-   - If `HAS_DIFF`, use AskUserQuestion with three options: review the diff / challenge the diff / something else (provide prompt).
+   - If `HAS_DIFF`, ask the user to pick one of three options (with AskUserQuestion where the host has it): review the diff / challenge the diff / something else (provide prompt).
    - If `NO_DIFF`, ask what to consult about.
 
 Detect the base branch:
@@ -52,7 +53,7 @@ Run Codex code review against the current branch diff.
 codex review --base "$BASE" 2>&1
 ```
 
-Use `timeout: 300000` on the Bash call.
+Allow five minutes (in Claude Code, `timeout: 300000` on the Bash call).
 
 If the user provided custom instructions (e.g., `/codex review focus on security`):
 

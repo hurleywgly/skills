@@ -1,12 +1,9 @@
 ---
 name: capsule
-description: Create and load Capsules — self-contained markdown artifacts for agent-to-agent knowledge transfer with automatic complexity detection and mandatory actionability
+description: "Create or load a Capsule: a self-contained markdown file that transfers knowledge, patterns, skills, or a whole system from one agent or session to another. Sizes itself automatically (quick, standard, deep), sanitizes sensitive data, and always ends in a concrete integration plan. Use for handoffs between agents, sessions, tools, or people."
+argument-hint: "[what to capture] | load <path>"
 disable-model-invocation: true
 ---
-
-<!-- PORTABILITY: This skill is published to github.com/hurleywgly/skills and must remain workspace-agnostic.
-No hardcoded absolute paths. No personal names in logic. Use workspace-relative conventions —
-the agent resolves paths from its own CLAUDE.md / AGENTS.md or workspace root at runtime. -->
 
 # /capsule
 

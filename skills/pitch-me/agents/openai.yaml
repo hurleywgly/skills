@@ -1,0 +1,3 @@
+interface:
+  display_name: "Pitch Me"
+  short_description: "N distinct concepts before you commit to one"

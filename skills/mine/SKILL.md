@@ -1,12 +1,9 @@
 ---
 name: mine
-description: Point it at any knowledge source, get back condensed insights as a capsule
+description: "Mine a knowledge source (notes, a folder, a repo, a zip archive, a website) for buried insights and package the keepers as one capsule file. Use for requests like \"what's useful in this export\", \"dig through my notes for X\", or to resume or check a multi-session mining run. Read-only on the source."
+argument-hint: "<what to find and where> | resume | status"
 disable-model-invocation: true
 ---
-
-<!-- PORTABILITY: This skill must remain workspace-agnostic.
-No hardcoded absolute paths. No personal names in logic. No system-specific dependencies.
-Only requires standard Claude Code tools: Read, Write, Edit, Glob, Grep, Bash, Agent, WebFetch. -->
 
 # /mine
 

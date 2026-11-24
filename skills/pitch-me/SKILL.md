@@ -1,6 +1,7 @@
 ---
 name: pitch-me
-description: Divergent concept pitches. Say "pitch me N ideas on X" and get N distinct concepts thrown at the wall — each with research backing, an independent outside take, a visual, and a viability score. Output as a coherent /ink exploration grid. The divergent sibling to convergent planning passes — they converge; this one pitches.
+description: "Pitch N distinct concepts before committing to one. Use when the user says \"pitch me\", \"give me N ideas\", \"N ways to\", \"throw spaghetti\", or when the open question is what to build rather than how. Each concept gets research backing, an independent outside take, a visual, and a viability score, rendered as one browsable HTML grid. Not for convergent questions or when the direction is already locked."
+argument-hint: "<brief> [--count=9] [--visual=svg|nano|mj] [--screenshots] [--council] [--no-outside-take]"
 ---
 
 # /pitch-me
@@ -20,13 +21,13 @@ When the choice space is wide, get pitched before you commit. `/pitch-me` produc
 
 - Direction is already locked → use a planning pass
 - Question is binary → just decide
-- You need execution, not exploration → `/build`
+- You need execution, not exploration → build it directly
 - Question is convergent (single best answer exists) → use a multi-perspective analysis pass
 
 ## Composes with
 
 ```
-/pitch-me (diverge)  →  multi-perspective analysis (converge)  →  planning pass (plan)  →  /build (ship)
+/pitch-me (diverge)  →  multi-perspective analysis (converge)  →  planning pass (plan)  →  build (ship)
 ```
 
 | Skill | Role |
@@ -34,8 +35,8 @@ When the choice space is wide, get pitched before you commit. `/pitch-me` produc
 | `/pitch-me` | Spread N concepts wide |
 | Multi-perspective analysis pass | Multi-perspective convergence on top picks |
 | Planning pass | Turn the winning concept into a ship plan |
-| `/midjourney-prompt` | Develop the visual hero for the chosen direction |
-| `/ink` | Always the output format |
+| An image-prompt skill (optional) | Develop the visual hero for the chosen direction |
+| `/ink` | The output format. If `ink` is not installed, write a plain self-contained HTML grid with the same sections |
 | Multi-phase workflow | Wrap the whole pipeline across multiple sessions |
 
 ## Invocation
@@ -55,18 +56,18 @@ When the choice space is wide, get pitched before you commit. `/pitch-me` produc
 Extract from `<brief>`: goal, audience, constraints (tech / licensing / budget / timeline), success metric. If anything material is missing, ASK ONCE before fanning out — wrong constraints poison every concept downstream.
 
 ### 2. Research fanout (3 parallel agents)
-Spawn three `general-purpose` Agents in parallel via a single message:
+Run three research sub-agents in parallel (in Claude Code, three `general-purpose` Agents in a single message). If the host has no sub-agents, run the three passes yourself, one after another:
 
 - **Agent A — Facts:** what's actually true about the topic. Sources, data, primary references. URLs cited inline.
 - **Agent B — Conversation state:** what's already been said, what's the discourse temperature, what's been beaten to death, where's the white space.
 - **Agent C — Asker posture:** what tools/voice/aesthetic does the asker have available, what would feel "obviously them," what would feel off-brand. Reads from the project's root instruction file (CLAUDE.md / AGENTS.md), any memory/ notes, and recent work logs.
 
 ### 3. Independent outside take
-Get an independent second opinion from another AI system (e.g. via a `/codex` or `/claude` consult) with the brief + a synthesis of A/B/C. Its job: sharpen the framing, name the failure mode of the obvious angle, propose 1–2 high-leverage moves that the in-house thinking will under-weight. This take is intentionally adversarial.
+Get an independent second opinion from another AI system (via the `codex` or `claude` skill in consult mode, if one is installed) with the brief + a synthesis of A/B/C. Its job: sharpen the framing, name the failure mode of the obvious angle, propose 1–2 high-leverage moves that the in-house thinking will under-weight. This take is intentionally adversarial.
 
-Skip with `--no-outside-take` only if you've already done this manually.
+Skip with `--no-outside-take` only if you've already done this manually. If no second system is reachable, say so in the artifact rather than presenting an in-house take as independent.
 
-### 4. Diverge (Claude generation)
+### 4. Diverge
 Generate N concepts. Each one must:
 
 - Be playable / actionable / shippable within the brief
@@ -93,10 +94,10 @@ Per concept, render a visual at the chosen fidelity:
 - **`nano`** — Nano Banana 2 illustration (~$0.04 per concept). Better hero shots when text overlays in HTML afterward.
 - **`mj`** — Full Midjourney render (~$0.10 per concept, slower). Reserved for serious / shippable explorations.
 
-Default to `svg`. Upgrade to `nano`/`mj` only for the picked concept(s) downstream via `/midjourney-prompt`.
+Default to `svg`. Upgrade to `nano`/`mj` only for the picked concept(s) downstream. Both cost money per image, so confirm before rendering more than a handful.
 
 ### 6. (Optional) Real-world screenshots
-If `--screenshots`, for each concept browse via `mcp__claude-in-chrome__*` for the closest real-world parallel and embed an actual screenshot. Example: a Tinder-style concept → screenshot of an existing card-swipe interface. Helps the reader calibrate "I know what this looks like."
+If `--screenshots`, for each concept use whatever browser tool the host provides (for example Claude in Chrome) to find the closest real-world parallel and embed an actual screenshot. Example: a Tinder-style concept → screenshot of an existing card-swipe interface. Helps the reader calibrate "I know what this looks like."
 
 ### 7. (Optional) Convergence pass
 If `--council`, after the pitch, run a multi-perspective analysis pass on the top 3 concepts (by viral × build-cost-inverse score). This produces divergence → convergence in a single invocation. Output the convergence pass as a second section in the artifact.
@@ -112,10 +113,10 @@ Synthesize into three buckets:
 Output a `/ink` exploration grid with:
 
 - Brief recap + constraints block (safe / not-safe two-column)
-- Thesis strip (if a unifying argument emerged from research + Codex)
+- Thesis strip (if a unifying argument emerged from research + the outside take)
 - N concept cards (3-up grid, responsive)
 - Recommendation strip (3 buckets, color-coded)
-- 2–3 visual direction prompts for `/midjourney-prompt` next step
+- 2–3 visual direction prompts for the next step
 - Next-move block
 
 ## Outputs
@@ -133,7 +134,7 @@ Slug derived from brief topic (kebab-case, suffixed with date if collision).
 
 - **N concepts that are M minor variations** — diversity beats count. Better to ship 6 truly different concepts than 12 with palette swaps.
 - **Skipping the outside take "to save time"** — losing the independent take is losing the value. Use `--no-outside-take` only if you've done the equivalent manually.
-- **Auto-rendering hero MJ images for all N concepts** — start with SVG sketches; render the chosen direction later via `/midjourney-prompt`. Don't burn $0.10 × 9 on unpicked work.
+- **Auto-rendering hero MJ images for all N concepts** — start with SVG sketches; render the chosen direction later. Don't burn $0.10 × 9 on unpicked work.
 - **Posting the exploration as the deliverable** — `/pitch-me`'s output is divergent thinking, not finished work. It's the menu, not the meal. Always pair with a planning pass or direct execution.
 - **Letting the recommendation tail wag the dog** — if the recommendation is foregone before research, you've skipped the divergent step. Re-run with truly open framing.
 
@@ -159,6 +160,3 @@ Diverge before you converge. A multi-perspective analysis pass is the convergenc
 /pitch-me "Names for the new skill" --count=15 --no-outside-take
 ```
 
-## Origin
-
-Spawned 2026-05-15 from a creative-exploration session. The workflow — parallel research → independent outside take → divergent generation → per-concept SVG → /ink grid → recommendation — emerged organically during a creative-exploration request. First real invocation produced a 9-concept exploration that landed on a single anchored direction.

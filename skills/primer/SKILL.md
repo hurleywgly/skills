@@ -1,6 +1,7 @@
 ---
 name: primer
-description: Deep-dive a technical announcement into a research doc, multi-perspective primer site, and deployed shareable URL
+description: "Turn a significant technical announcement, release, or viral thread into a shareable primer: a research doc plus a single-file interactive HTML explainer built from parallel research and four analysis perspectives, optionally deployed to a public URL. Use when the user says \"make a primer\" or \"break this down\" about a launch. Not for quick summaries, social posts, or research with no artifact."
+argument-hint: "<url(s) or pasted source> [angle or tone]"
 ---
 
 # /primer
@@ -31,7 +32,7 @@ The user provides:
 
 ### Phase 1: Parallel Research (3 agents)
 
-Launch 3 research agents simultaneously in a single message:
+Launch 3 research agents simultaneously in a single message (if the host has no sub-agents, run the three passes yourself in sequence):
 
 **Agent 1 — Source Material:**
 - Fetch all URLs (project pages, demos, GitHub READMEs, shortened links)
@@ -117,6 +118,8 @@ Launch 2 agents simultaneously:
 
 ### Phase 5: Deploy
 
+Deploying publishes the primer at a public URL. Deploy when the user asked for a shareable link; otherwise finish Phase 4, show the local HTML, and ask before publishing. If the `vercel` CLI is missing or not logged in, skip this phase and hand over the HTML file with a note on how to deploy it.
+
 ```bash
 mkdir -p /tmp/[topic]-primer
 cp output/[topic]-primer.html /tmp/[topic]-primer/index.html
@@ -156,9 +159,3 @@ If requested:
 
 Primer output is HTML-default for human review. When delivering via a chat or email channel that won't render raw HTML, also produce a PDF via Chrome `--print-to-pdf`.
 
-## Prior Art
-
-| Primer | Subject | Design | URL |
-|--------|---------|--------|-----|
-| Autonomous Agents | ClawdBot/OpenClaw, heartbeat model, autoresearch | Dark tech dashboard | `output/autonomous-agents-primer.html` |
-| Pretext | Cheng Lou's text measurement library | Editorial/typographic | https://pretext-primer.vercel.app |
