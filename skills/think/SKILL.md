@@ -1,6 +1,6 @@
 ---
 name: think
-description: "Harden an idea, plan, or decision before it becomes a commitment: a four-perspective pass (clarify, craft, systems, risk), a challenge to the strongest assumption, then focused one-at-a-time questions. Use when the user says think this through, poke holes, what am I missing, sanity-check, or pressure-test this. Not for execution, generating many options, or code review."
+description: "Harden an idea, plan, or decision before it becomes a commitment: frame it working backwards from the outcome, find the gaps between that outcome and the idea, run a four-perspective pass (clarify, craft, systems, risk) over those gaps, challenge the strongest assumption, then ask focused one-at-a-time questions. Use when the user says think this through, poke holes, what am I missing, sanity-check, or pressure-test this. Not for execution, generating many options, or code review."
 argument-hint: "<idea|plan|file> [--depth=quick|normal|deep] [--questions=N] [--manifest]"
 ---
 
@@ -8,7 +8,7 @@ argument-hint: "<idea|plan|file> [--depth=quick|normal|deep] [--questions=N] [--
 
 Harden an idea before it turns into a plan.
 
-Four fixed perspectives, a direct challenge, then focused one-at-a-time questions. No setup, no roles to pick, nothing read from the workspace unless the user points at it.
+Start from the outcome and work backwards, then four fixed perspectives, a direct challenge, and focused one-at-a-time questions. No setup, no roles to pick, nothing read from the workspace unless the user points at it.
 
 ## When To Use
 
@@ -21,8 +21,7 @@ Four fixed perspectives, a direct challenge, then focused one-at-a-time question
 - The user asks for execution now -> build or edit directly
 - The user wants broad divergent options -> pitch or brainstorm instead
 - The user wants a code review -> review the diff directly
-- The user wants a full multi-perspective deliberation ceremony -> use a dedicated deliberation skill instead
-- The user wants a long one-question-at-a-time interview only -> use a dedicated grilling/interview skill
+- The user wants a long one-question-at-a-time interview only -> run that interview directly
 
 ## Invocation
 
@@ -37,7 +36,7 @@ If no flags are provided, give the hardening pass first and ask whether to conti
 
 ## Fixed Perspectives
 
-Use these four perspectives inline, as given. They are fixed so the pass needs no setup.
+Use these four perspectives inline. Do not ask the user to choose among them, rename them into local lens vocabulary, or load external lens files.
 
 | Perspective | What it protects |
 |---|---|
@@ -48,25 +47,30 @@ Use these four perspectives inline, as given. They are fixed so the pass needs n
 
 ## Process
 
-### 1. Frame
+### 1. Frame, working backwards
 
-Restate the idea in 2-4 sentences. Name:
+Start from the end, not the idea. Have the user describe the outcome first: who this is for, and what is true for them once it has worked. Then work back to the idea as the proposed way of getting there. Framing it this way exposes the gaps between "what we want to be true" and "what this idea actually does", and those gaps are what the rest of the pass works on.
 
-- The core claim or move
-- The intended audience or user
-- What success would look like
+- If the user gave only the idea, ask for the outcome in one question, or draft it yourself in two or three sentences and ask them to correct it. Their correction is usually more useful than a blank-page answer.
+- If they already framed it this way, restate it and move on.
+
+Then name:
+
+- The outcome, in the user's words
+- The core claim or move that is supposed to produce it
+- The gaps: what has to be true between the two that nobody has said yet
 - What is explicitly out of scope or still unknown
 
 If the source is a file or repo surface, inspect it before judging. If the user is only brainstorming, keep the framing provisional.
 
 ### 2. Harden
 
-Produce a compact multi-perspective pass:
+Produce a compact multi-perspective pass. The four perspectives look at the same gaps from step 1, so expect them to land on the same weak spots from different sides; that overlap is the signal, not redundancy.
 
 ```markdown
 ## Working Read
 
-[2-4 sentence framing]
+[the outcome, the move, and the gaps between them, in 2-4 sentences]
 
 ## Four Passes
 
@@ -109,7 +113,7 @@ If deeper pressure is useful, ask one question at a time. Do not bulk-ask.
 *Recommended answer:* [your best guess, so the user can accept or correct it]
 ```
 
-Choose the next question by highest leverage, not strict rotation. Avoid asking what the source material already answers. Stop when any of these happens:
+Choose the next question by highest leverage, not strict rotation. Stay on the gap that matters most and come at it from a second or third perspective before moving on: a Systems question and a Risk question about the same gap often draw out things the first answer skipped. Avoid asking what the source material already answers. Stop when any of these happens:
 
 - Question budget is reached
 - Two consecutive answers do not materially change the idea

@@ -36,7 +36,7 @@
   /* Modernist — modernist / architectural, disciplined grid */
   --font-display-modernist: 'DM Serif Display', 'Freight Big', Georgia, serif;
   --font-body-modernist: 'Lora', 'Palatino', Georgia, serif;
-  /* Arcade — pixel-manual / Pac-Man journal, 8-bit display + readable terminal body */
+  /* Arcade — retro pixel manual, 8-bit display + readable terminal body */
   --font-display-arcade: 'Press Start 2P', 'Silkscreen', ui-monospace, monospace;
   --font-body-arcade: 'VT323', 'IBM Plex Mono', ui-monospace, monospace;
 
@@ -675,9 +675,9 @@ figcaption .plate-number {
   font-size: clamp(40pt, 9vw, 80pt);
 }
 
-/* Mood overrides — Arcade (pixel-manual, Pac-Man journal) */
+/* Mood overrides — Arcade (retro pixel manual) */
 .mood-arcade {
-  --ink-accent: #FFCC00;            /* Pac-Man yellow */
+  --ink-accent: #FFCC00;            /* arcade cabinet yellow */
   --ink-accent-alt-1: #E63946;      /* Blinky red */
   --ink-accent-alt-2: #4FC3F7;      /* Inky cyan */
   --ink-accent-alt-3: #FFB7CE;      /* Pinky pink */
@@ -1123,6 +1123,48 @@ pre code {
   padding: 0;
   border-radius: 0;
 }
+
+/* Annotated diffs and code review */
+.diff-block {
+  overflow: hidden;
+  border: 1px solid var(--ink-border);
+  border-radius: var(--radius-control);
+  background: #FFFFFF;
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+}
+
+.diff-line {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr) auto;
+  gap: var(--space-xs);
+  padding: 3px var(--space-xs);
+  border-left: 3px solid transparent;
+  white-space: pre-wrap;
+}
+
+.diff-line::before {
+  content: attr(data-line);
+  color: var(--ink-text-muted);
+  text-align: right;
+  user-select: none;
+}
+
+.diff-add { background: color-mix(in srgb, var(--ink-success) 10%, white); border-left-color: var(--ink-success); }
+.diff-remove { background: color-mix(in srgb, var(--ink-error) 10%, white); border-left-color: var(--ink-error); }
+.diff-context { color: var(--ink-text-secondary); }
+
+.review-annotation {
+  max-width: 34ch;
+  padding-left: var(--space-xs);
+  border-left: 1px solid var(--ink-border);
+  color: var(--ink-text-secondary);
+  white-space: normal;
+}
+
+.review-severity-error { color: var(--ink-error); font-weight: 700; }
+.review-severity-warning { color: var(--ink-warning); font-weight: 700; }
+.review-severity-success { color: var(--ink-success); font-weight: 700; }
 
 
 /* --------------------------------------------------------------------------

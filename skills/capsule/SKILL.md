@@ -53,14 +53,12 @@ Assess source material and auto-select tier:
 1. Includes skill definitions, schemas, or infrastructure changes that need to be **installed** in the receiving system? -> **Deep**
 1b. Includes code or configs that **illustrate a point** but don't need installation? -> **Standard** with code inline
 2. Includes 3+ distinct learnings, patterns, or strategic shifts? -> **Standard**
-2b. Is a session handoff, meeting prep, or context fork? -> **Standard** (needs Integration Plan for receiver to pick up where sender left off)
+2b. Is a session handoff, meeting prep, or context fork? -> **Standard** (needs Integration Plan for receiver to pick up where sender left off). The size rule in Phase 3 can still drop a short handoff to Quick; when it does, keep the next step as one line in Core Content
 3. Otherwise -> **Quick**
 
 Announce the detected tier and rationale. Let the user override if they disagree.
 
-**Category detection**: Alongside tier, classify the capsule category (Full System, Knowledge Pillar, Conversation Thread, or Living Reference) using the heuristics in the Capsule Categories section. Announce the detected category. Category informs compression strategy in Phase 3 but does not change tier selection.
-
-**Archetype detection**: Alongside tier and category, classify the capsule archetype — the temporal transfer pattern describing how the knowledge behaves after delivery. Use the heuristics in the Capsule Archetypes section. Announce the detected archetype. Archetype informs compression strategy in Phase 3 but does not change tier selection.
+**Category and archetype**: Alongside tier, classify the capsule's category (what the receiver needs to do: Full System, Knowledge Pillar, Conversation Thread, or Living Reference) and its archetype (how the knowledge behaves after delivery: Perishable, Handoff, Seed, Steroid, Delta, Trainer, or Dormant). The heuristics and the compression strategy for each are in `references/taxonomy.md`; read it now. Announce both. They shape compression in Phase 3 and do not change the tier.
 
 ### Phase 3: Extraction & Assembly
 
@@ -70,21 +68,23 @@ Announce the detected tier and rationale. Let the user override if they disagree
 
 Classification heuristic: **"If changing a single character could change the behavior of a system that consumes this artifact, route to Verbatim Payloads. Everything else gets LLM-compressed."**
 
-Behavior varies by tier. Each tier runs a sequence of review perspectives (a lightweight multi-perspective analysis pass) over the assembled content.
+Behavior varies by tier. Load lenses from the workspace's `lenses/` directory as specified.
 
-**Quick (50-150 lines)**
+**Size.** The line counts below are ceilings, not targets. A capsule is read in full by an agent with a limited context window, so every line it does not need costs the receiver attention. Write the smallest capsule that still lets the receiver act without a follow-up question, and stop there. A capsule longer than the material it carries has failed: when the source is short and the receiver can open it, send the pointer plus the decisions, open questions and next step, and drop to the Quick tier even if the content would otherwise read as Standard.
+
+**Quick (up to about 60 lines)**
 - Direct extraction, structured sections
-- Perspective: Synthesis only
+- Lens: Synthesizer only
 - Focus on clarity and conciseness
 - No Integration Plan required
 
-**Standard (150-400 lines)**
+**Standard (up to about 200 lines)**
 - Multi-topic extraction with pattern identification
 - Generate numbered action items and integration steps
-- Perspectives: Synthesis -> Risk
-- Include Patterns & Learnings, Integration Plan, and Signals sections
+- Lens: Synthesizer -> Guardian
+- Include the Integration Plan. Include Patterns & Learnings and Signals only when there is something real to put in them; an empty or padded section costs the receiver more than its absence
 
-**Deep (400+ lines)**
+**Deep (as long as the payloads require, with the narrative around them held to Standard length)**
 - Full extraction with skill artifacts inline
 - JSON schemas if relevant
 - Concrete integration plan with install/setup commands
@@ -92,19 +92,21 @@ Behavior varies by tier. Each tier runs a sequence of review perspectives (a lig
   - Complete SKILL.md inline (if <200 lines)
   - Public URL + install instructions
   - Full specification sufficient to recreate from scratch
-- For Full System capsules: after extracting components, explicitly map how they connect at runtime — dependency chains, composition patterns (parallel vs sequential), workflow sequences, and which components are portable vs platform-specific. Capture these in the System Relationships section.
-- Perspectives: Synthesis -> Systems -> Risk -> Design
-- Apply packaging principles: discovery, fidelity assessment, knowledge file curation
+- Lens: Synthesizer -> Architect -> Guardian -> Sculptor
+- Apply `/projector` principles: discovery, fidelity assessment, knowledge file curation
 
-**Perspective activation**: For each perspective in the sequence, apply that lens to the assembled content — Synthesis (clarity, what matters), Systems (how components relate), Risk (gaps, edge cases, completeness), Design (narrative polish). Each perspective reviews and enriches the output of the previous one.
+**Lens activation**: For each lens in the sequence, read the lens file from `lenses/[name].md` (relative to the workspace root) and apply its perspective to the assembled content. Each lens reviews the output of the previous one and may correct it, cut from it, or add something the receiver would be blocked without. A lens pass that only adds commentary has made the capsule worse.
 
-**Skipping perspectives**: If a perspective doesn't apply to the material, skip it, proceed with the default review, and note in the output which perspectives were skipped.
+**Missing lenses**: If `lenses/[name].md` doesn't exist (e.g., receiving system lacks lens files), skip that lens activation, proceed with default perspective, and name the unavailable lenses in one line in section 7 of the capsule.
 
 **Source compression**: When source material is verbose relative to the target tier, compress before assembling:
 - Strip ceremony (headers, boilerplate, repeated context the receiver won't need)
 - Preserve specifics (exact commands, file paths, config values, code snippets)
+- Preserve relational structures (composition patterns, dependency chains, workflow sequences, portable-vs-specific distinctions) as named, addressable elements — not scattered within component descriptions
 - Convert narrative into structured form (paragraphs become bullet points or tables)
 - Keep the ratio: if a 500-line source doc feeds a Quick capsule, extract the 10 lines that matter, not a 150-line summary of 500 lines
+- Point instead of copying when the receiver can open the source: give the path or URL and say exactly what to read there. A pointer is smaller than a summary and loses nothing. Copy content in only when the receiver cannot reach it (a different machine, a different owner, a session that is ending)
+- Before compressing, list the source's distinct items (decisions, facts, open questions, artifacts). Each one ends up in the capsule, behind a pointer, or in a one-line "Left out" note saying what was dropped and why. Loss should be a choice the receiver can see, not something that happens during summarizing
 
 ### Phase 4: Sanitization
 
@@ -135,7 +137,8 @@ Self-check before writing to disk. Evaluate each criterion and report results:
 4. **Proportionality**: Does depth match tier? Flag bloated Quick capsules or thin Deep capsules.
 5. **Receivability**: Does this capsule work if the receiver has never seen the source system? Flag any section that assumes intimate knowledge of the sender's setup.
 6. **Fidelity**: For each Verbatim Payload, verify content exactly matches source. Compute hash. Flag any payload that appears modified.
-7. **Relationship Fidelity**: For Full System capsules, verify that cross-component relationships, composition patterns, and portability boundaries are explicitly captured — not scattered within component descriptions.
+7. **Coverage**: Walk the item list from Phase 3. Every item is present, pointed to, or named in "Left out". Flag anything that disappeared without a trace.
+8. **Economy**: Could any section be cut, turned into a table, or replaced by a pointer without the receiver losing the ability to act? If so, do it before writing.
 
 Present verification results to the user. User approves, requests adjustments, or overrides.
 
@@ -266,21 +269,15 @@ Numbered steps. Prerequisites listed upfront.
 Each step follows: **Step N: [Action]** / Where: [path] / Do: [instruction] / Verify: [confirmation] / Rollback: [if fails]. Mark each step as `[auto]` (agent executes) or `[manual]` (human required).
 This section is why capsules transfer capability, not just information.
 
-## 5b. System Relationships               [DEEP only, when source is Full System]
-How components connect at runtime. Dependency declarations, composition
-patterns, workflow sequences, and portability boundaries.
-
-Format per relationship:
-- **[Component A] → [Component B]**: [how/why they connect]
-- **Portable**: [what survives platform changes]
-- **Platform-specific**: [what needs replacement on a different system]
-
 ## 6. Signals                             [STANDARD+]
 Suggestions for the receiving system to evaluate.
 Not mandates — prompts for the receiver's own judgment.
 
-## 7. Sanitization Notes                  [ALL, if applied]
-What was stripped and why. Helps the receiver know
+## 7. Sanitization Notes and Left Out    [ALL, when either applies]
+What was stripped and why, a "Left out" line for anything
+deliberately dropped during compression, and any lenses that were
+unavailable. Include this section whenever something was dropped,
+even if sanitization itself was skipped. Helps the receiver know
 what context is missing and whether to request it.
 
 ## 8. Verbatim Payloads                    [STANDARD+, when applicable]
@@ -303,88 +300,13 @@ Content below MUST be reproduced exactly. No paraphrasing, reformatting, or comp
 
 ---
 
-## Perspective Sequences by Tier
+## Lens Sequences by Tier
 
 | Tier | Sequence | Rationale |
 |------|----------|-----------|
-| Quick | Synthesis | Clarity and focus only |
-| Standard | Synthesis -> Risk | Strategic extraction + completeness/risk check |
-| Deep | Synthesis -> Systems -> Risk -> Design | Full analysis: strategy, systems, protection, then narrative polish |
-
----
-
-## Capsule Categories
-
-Categories are orthogonal to tiers — **category = receiver intent**, **tier = output volume**. Classification question: **"What does the receiver need to DO?"**
-
-| Category | Receiver Intent | Key Preservation Target |
-|----------|----------------|------------------------|
-| **Full System** | Operate within the system | Operating manual, system boundaries, constraints |
-| **Knowledge Pillar** | Understand a domain | Conceptual relationships, depth |
-| **Conversation Thread** | Continue in-flight work | Decisions, open questions, temporal context |
-| **Living Reference** | Stay current on evolving state | Structure for incremental update, delta-friendliness |
-
-### Category Detection (Phase 2)
-
-Detect category alongside tier during Complexity Detection. Category influences compression strategy in Phase 3 but does NOT override tier selection.
-
-**Detection heuristic:**
-1. Source material describes a complete system with operational rules, constraints, skills, or infrastructure → **Full System**
-2. Source material is structured domain knowledge organized topically (documentation, guides, specifications) → **Knowledge Pillar**
-3. Source material is a temporal conversation or session with decisions, open questions, in-flight work → **Conversation Thread**
-4. Source material is an evolving state artifact that changes over time and needs delta-friendly structure → **Living Reference**
-
-### Compression Strategy by Category
-
-- **Full System**: Preserve the operating manual. Keep system boundaries, constraints, decision rationale, integration points. Compress verbose implementation details and redundant documentation.
-- **Knowledge Pillar**: Preserve conceptual relationships. Keep how things connect, the "why," and representative examples rather than exhaustive enumeration. Compress boilerplate.
-- **Conversation Thread**: Preserve decisions and open questions. Keep what was decided and by whom, what's unresolved, specific in-flight context (file paths, branch names, error messages). Compress deliberation narrative.
-- **Living Reference**: Preserve structure over content. Keep the schema and update conventions. Include `last_updated` markers per section. Optimize for cheap incremental updates.
-
----
-
-## Capsule Archetypes
-
-Archetypes are orthogonal to both tiers and categories — **archetype = temporal transfer pattern**, describing how the knowledge behaves after delivery. Classification question: **"What is the shelf-life and activation pattern of this knowledge?"**
-
-Ordered by shelf-life (shortest to longest):
-
-| Archetype | Transfer Pattern | Optimize For |
-|-----------|-----------------|--------------|
-| **Perishable** | Use once, discard | Aggressive compression, minimal patterns section |
-| **Handoff** | Baton pass, continuity transfer | Decisions made, open threads, where-we-left-off context |
-| **Seed** | Intentionally incomplete, designed for receiver to expand | The question/direction; strip supporting detail |
-| **Steroid** | Rapid large-scale absorption, act immediately | Action items and critical context; compress background |
-| **Delta** | Incremental sync, periodic change snapshot | Changes only; assume base context exists in receiver |
-| **Trainer** | Permanent learning, long-term integration | Conceptual relationships, the "why," transferable principles |
-| **Dormant** | Pre-loaded, inactive until triggered | Trigger conditions and the full payload |
-
-### Archetype Detection (Phase 2)
-
-Detect archetype alongside tier and category during Complexity Detection. Archetype influences compression strategy in Phase 3 but does NOT override tier selection.
-
-**Detection heuristic:**
-1. Source material serves a single task with no reuse value (error logs, one-off requests) → **Perishable**
-2. Source material continues in-flight work from a prior session, picking up where it left off → **Handoff**
-3. Source material plants a direction or question without prescribing the path, designed for the receiver to explore → **Seed**
-4. Source material introduces a large, urgent shift the receiver must internalize and act on immediately → **Steroid**
-5. Source material provides incremental updates to an already-established base context → **Delta**
-6. Source material teaches concepts, patterns, or principles meant to be retained permanently → **Trainer**
-7. Source material should sit inactive until a specific condition or question triggers it → **Dormant**
-
-### Compression Strategy by Archetype
-
-- **Perishable**: Compress aggressively. Minimal or no Patterns section. Strip everything the receiver won't need after the single task completes.
-- **Handoff**: Preserve decisions, open questions, and temporal state. Compress deliberation narrative. Keep specific artifacts (branch names, file paths, error messages).
-- **Seed**: Preserve the core question or direction. Strip supporting detail and evidence — the receiver should explore fresh, not inherit the sender's framing.
-- **Steroid**: Preserve action items and critical context for immediate execution. Compress background rationale and history.
-- **Delta**: Preserve changes only. Assume the receiver has base context. Use diff-style structure where possible. Strip unchanged material entirely.
-- **Trainer**: Preserve conceptual relationships, the "why," and representative examples. Compress boilerplate and exhaustive enumeration. Optimize for long-term retention.
-- **Dormant**: Preserve trigger conditions explicitly and the full payload intact. The receiver needs to know exactly when to activate and have everything ready when that moment comes.
-
-### Audience-Targeting (Modifier)
-
-Any archetype can carry audience-targeting attributes — who sees it, what's redacted, what level of detail is appropriate. This is not a separate archetype but a modifier that applies to any of the seven types. It connects directly to the sanitization layer (same-owner vs. cross-team vs. public transfers).
+| Quick | Synthesizer | Clarity and focus only |
+| Standard | Synthesizer -> Guardian | Strategic extraction + completeness/risk check |
+| Deep | Synthesizer -> Architect -> Guardian -> Sculptor | Full analysis: strategy, systems, protection, then narrative polish |
 
 ---
 
@@ -397,12 +319,12 @@ Any archetype can carry audience-targeting attributes — who sees it, what's re
 
 **Multi-pattern transfer:**
 ```
-/capsule "Package up the review-perspective patterns, compounding loop, and zero-dependency architecture for a new workspace"
+/capsule "Package up the lens sequence patterns, compounding loop, and zero-dependency architecture for a new workspace"
 ```
 
 **Skill replication:**
 ```
-/capsule "Replicate /jira, /today, and /pdf skills for an external system"
+/capsule "Replicate three of my skills for an external system"
 ```
 
 **Load an existing capsule:**
@@ -417,11 +339,15 @@ Any archetype can carry audience-targeting attributes — who sees it, what's re
 
 ## Integration
 
-Works with other skills in your workspace:
-- **Input from**: Any session context, extracted session learnings, skill definitions
+Works with other skills:
+- **Input from**: Any session context, `/update-from-session` learnings, skill definitions
 - **Output to**: Resolved output directory (see Phase 6), receiving systems via load mode
-- **Related**: any packaging skill (sub-skill principles for Deep tier packaging)
+- **Related**: `/projector` (sub-skill principles for Deep tier packaging)
 
-## Output Location
+## Outputs
 
-Capsules are saved to `{output_dir}/[slug]-capsule.md`. See Phase 6 for resolution logic.
+| Artifact | Path | Shape | Consumed by |
+|----------|------|-------|-------------|
+| Capsule | `{output_dir}/[slug]-capsule.md` | Canonical Capsule Schema (see above) — sections 1-8 by tier | `/capsule load`, `/channel`, agent-to-agent transfer, Claude.ai Projects, ChatGPT Projects |
+
+`output_dir` resolution lives in Phase 6. If schema or path changes, update this table — downstream skills (`/channel`, `/capsule load`) parse the structure.
