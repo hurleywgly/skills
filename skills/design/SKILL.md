@@ -1,88 +1,77 @@
 ---
 name: design
-description: Autonomous visual design loop — brief-driven Figma design with recursive self-critique, budget tracking, and shareable output
+description: "Run a visual design loop from a written brief or a plain description: explore several directions, narrow to one, then build section by section, get each round critiqued by an outside reviewer, fix, and repeat until it converges or the budget runs out, ending in a shareable document. Prefers Figma; works without it by drawing on an HTML/SVG canvas or an open-source design tool. Use for brief-driven screen designs or style boards; --stretch runs a longer, breadth-scaled turn."
+argument-hint: "<description> | new [--type style-board|screen-design] | run <brief-path> [--canvas figma|html|<tool>] [--budget N] [--autonomous] [--stretch]"
 disable-model-invocation: true
 ---
 
 # /design
 
-Autonomous visual design loop — create, critique, refine, and document visual designs in Figma.
+A design loop that explores before it commits, then builds, gets critiqued from outside, and refines, staying on the original request the whole way.
 
-## Purpose
+## How it works
 
-Run structured design work through Figma's MCP tools. The core innovation: a **recursive self-critique loop** where the agent creates, screenshots, evaluates its own work via vision analysis, makes targeted fixes, and repeats until quality converges or budget exhausts.
+The shape is the double diamond from product design: go wide, narrow, then build and narrow again.
 
-Same loop DNA as a brief-driven research or build loop (scored, gated, structured logging), adapted for visual design where iteration means **section-level refinement with objective scoring**.
+1. **Frame** the request.
+2. **Diverge:** produce several genuinely different directions.
+3. **Converge:** pick a smaller subset or one, with a stated reason. This is the diverge checkpoint.
+4. **Build and refine:** create a section, capture it, have an outside reviewer critique it against the rubric, fix, repeat.
+5. **Compose, finish, and hand off** a shareable document.
 
-## Subcommands
+Two things hold across every step. The original request is the reference point: before each round, reread the brief's Intent and drop any change that does not serve it, because long loops drift toward polishing whatever is on screen. And the agent never approves its own direction or its own work as final; a human or an outside reviewer does.
 
-The simplest invocation is a plain description — `/design a landing page for a telehealth app` — which turns what you said into a brief and runs the loop. Add `--stretch` to any invocation to go wider in one longer turn. The explicit subcommands below give finer control.
+## Invocation
 
-### `/design new`
+The simplest form is a plain description, `/design a landing page for a telehealth app`, which becomes a brief and runs the loop.
 
-Guided brief creation + execution. Asks targeted questions based on what's missing, then runs.
+- `/design new` asks only for what is missing from the brief, then runs. `--type style-board|screen-design` skips the type question.
+- `/design run [brief-path]` executes or resumes a run from a brief.
+- `--canvas figma|html|<tool>` picks where the design is drawn (see Canvas). Default: Figma when it is connected, otherwise HTML.
+- `--budget N` overrides the run's call budget (Figma canvas only).
+- `--autonomous` skips the human checkpoints after the diverge checkpoint. Outside critique still runs.
+- `--stretch` runs a longer, wider turn; see Gears.
 
-**Flags:**
-- `--type style-board|screen-design` — skip type selection (default: ask)
-- `--autonomous` — skip human checkpoints (still respects call budget and self-critique loop)
-- `--stretch` — longer breadth-scaled turn (more sections/screens), fewer checkpoints, deterministic stop, hands back (see **Gear: `--stretch`** below)
+## Canvas
 
-### `/design run [brief-path]`
+Prefer Figma, because the result is editable by a designer and feeds the build flow. It is not required.
 
-Execute or resume a design run from an existing brief file.
+| Canvas | Use when | How a round is captured |
+|---|---|---|
+| **Figma** | The Figma MCP server is connected | Screenshot of the frame. Read `references/figma.md` before the first call: it holds the page-isolation, frame, budget and rate-limit rules. |
+| **HTML/SVG** | No Figma, or the user wants a file they can open anywhere | One self-contained HTML file per run, rendered in the host's browser and screenshotted |
+| **Open-source design tool** | The user names one the host can drive (a whiteboard or vector tool with an API, CLI or MCP server) | That tool's export or a screenshot |
 
-**Flags:**
-- `--budget N` — override max Figma API calls for this run (default: 60)
-- `--autonomous` — skip human checkpoints
-- `--stretch` — longer breadth-scaled design turn (more sections/screens), fewer checkpoints, deterministic stop, hands back (see **Gear: `--stretch`** below)
+Say which canvas you chose and why in one line. The loop, rubric and critique are the same on every canvas; only the drawing and capture calls differ. If the preferred canvas fails mid-run, say so and ask before switching, since the two results are not interchangeable.
 
----
+## The brief
 
-## Gear: `--stretch`
-
-`--stretch` runs `/design` as a **longer, breadth-scaled gated turn** — the design loop running long, NOT an unattended overnight run.
-
-**What it changes:** raises the run's `max_calls` ceiling to cover more sections/screens in one turn (e.g. a full multi-page site rather than a single landing page), checks in less often, and hands back the assembled artifact + scores at a deterministic stop (all sections converged · stretch call-ceiling · daily floor · two-429 abort).
-
-**What it never changes** (stretch goes wider, not lower-quality):
-- The **self-critique loop is NOT skipped** — every section still creates → screenshots → scores → fixes. stretch covers more sections, not sloppier ones.
-- The **daily rate-tracker floor stays** — still refuse to start under 20 remaining; stretch raises the *run* budget, never the daily safety floor.
-- Figma isolation (new page), per-section budget fairness, and the two-429 abort all still apply.
-- The diverge checkpoint stays mandatory at least once — never self-approve a direction.
-
-Composes with `--autonomous` (skip interactive checkpoints; self-critique still runs): `/design run [brief] --stretch --autonomous` = a long, multi-section turn with no mid-run pauses that still hands back at the deterministic stop. Triggers on **breadth** (section/screen count, scope), not risk.
-
----
-
-## Brief Schema
-
-Briefs live in `skills/design/runs/[slug]/brief.md`. YAML frontmatter + markdown body.
+Briefs and all run state live in `output/design/runs/[slug]/`, relative to the workspace root. A brief is YAML frontmatter plus a short markdown body:
 
 ```markdown
 ---
-slug: homepage-redesign
+slug: example-landing
 type: screen-design              # style-board | screen-design
 status: draft                    # draft | active | iterating | complete
-figma_file_key: null             # null = create new file; or existing file key
-figma_page_name: null            # null = create new page
-max_iterations: 2                # refinement cycles per section (recommended: 2)
-max_calls: 60                    # hard cap on Figma API calls this run
+canvas: figma                    # figma | html | <tool name>
+directions: 3                    # how many directions to explore before converging
+max_iterations: 3                # refinement rounds per section
+review_rounds: 2                 # outside-critique rounds on the composed whole
 quality_floor: 4                 # minimum rubric score to advance (out of 6)
 checkpoint_every: 3              # human checkpoint interval (sections completed)
-motion_spec: true                # generate animation/motion annotations
-created: 2026-04-05
+motion_spec: true                # write animation/motion annotations
 ---
 
-# [Design Name]
+# [Design name]
 
 ## Intent
-[1-2 sentences: what this design needs to accomplish.]
+[1-2 sentences: what this design needs to accomplish. Every round is checked against this.]
 
 ## Feel
-[Evocative phrases. "Poolsuite warmth meets Linear precision"]
+[Evocative phrases.]
 
 ## Inspiration
-- [image path, URL, or Figma link]
+- [image path, URL, or design link]
 
 ## Anti-References
 [What to avoid]
@@ -90,24 +79,75 @@ created: 2026-04-05
 ## Constraints
 [Brand rules, viewport targets, tech stack]
 
+## Tokens
+[Colors, type sizes and spacing scale this design must use. The rubric's color and spacing checks compare against these; if none are given, declare them here before building.]
+
 ## Sections
-[Ordered list of sections to design. Each gets its own iteration cycle.]
-1. Navigation
-2. Hero
-3. Value props
-4. Templates
-5. Final CTA
-6. Footer
+[Ordered list. Each gets its own refinement loop.]
 
 ## Existing Work
-[Figma files, style guides, token pages to reference]
+[Files, style guides, token pages to reference]
 ```
 
----
+Figma runs add `figma_file_key`, `figma_page_name` and `max_calls`; see `references/figma.md`.
 
-## The Self-Critique Rubric
+## The loop
 
-Every screenshot is scored against 6 objective criteria. Each scores 0 (fail) or 1 (pass).
+### 1. Frame
+
+Read the brief (or turn the description into one). Restate the Intent in one sentence and list what is out of scope. If something material is missing, ask once.
+
+### 2. Diverge
+
+Produce `directions` (default three) genuinely different takes on the whole design: different layout idea, different visual attitude, different emphasis. Three colorways of one layout do not count. Keep them cheap: a rough frame, a small HTML sketch, or a thumbnail each, enough to react to. On the HTML canvas put all of them side by side in one `directions.html` and capture it as `screenshots/00-directions`. The point is to see the range before committing, because the first idea is usually the most expected one.
+
+### 3. Converge (the diverge checkpoint)
+
+Show the directions side by side with one line each on what it bets on and where it is weak. Recommend a subset or one, and say why. Then stop for the human's choice. This checkpoint always happens at least once per run, including under `--autonomous` and `--stretch`; the agent does not pick its own direction. If the human combines two, restate the combined direction before building.
+
+### 4. Build and refine, per section
+
+For each section in the brief, in order:
+
+1. **Create** the section on the canvas.
+2. **Capture** it (screenshot or export).
+3. **Critique from outside.** Send the capture, the brief's Intent, Constraints and Tokens, and the rubric to a reviewer that did not build it (see Outside critique). A screenshot alone cannot show exact gaps or color values, so also send the measured ones (computed spacing and colors from the browser, or the values from the canvas) or the reviewer will fail those criteria for lack of evidence. Ask for a score per criterion and, for each problem, the specific fix.
+4. **Decide.** Score at or above `quality_floor`: advance. Below it with rounds left: apply the fixes and repeat from step 2. Out of rounds: advance and flag the section. Score fell since the last round of the same section: stop and flag the regression.
+5. **Log** the round: score, issues, fixes, and a one-line request check ("still serving: [Intent]").
+
+Check in with the human every `checkpoint_every` sections: scores, captures, remaining budget, and one specific question.
+
+### 5. Compose
+
+Once all sections exist, capture the whole design and run `review_rounds` outside-critique rounds on it: vertical rhythm, color balance, consistency of repeated elements, and whether the whole still answers the Intent. Keep going past `review_rounds` only while the reviewer is still finding problems that matter and budget remains. Changes made after the final review round have not been reviewed: either spend one more round on them or say plainly in the hand-off that they are unreviewed.
+
+### 6. Motion spec (if `motion_spec: true`)
+
+Static canvases cannot show motion, so write it down: a small motion system (enter, exit, micro, emphasis, each with duration and easing) and per-section notes on what moves, in what order. Put it on the canvas where that is possible and in `motion-spec.md` in the run folder.
+
+### 7. Finish
+
+Before presenting: consistent spacing, meaningful layer or element names, colors that match the declared tokens, no placeholder text. On Figma, also run the frame checks in `references/figma.md`.
+
+### 8. Hand off and close
+
+Make a shareable HTML document with a skill that renders composed HTML pages (such as `ink`, if installed), saved as `output.html` in the run folder (this name wins over that skill's default) with the captures embedded so the file stands alone; if none is installed, write a plain self-contained HTML page. It holds: a hero capture, the three or four decisions that shaped the design (including which direction won and why), the screens, the motion summary, and what is next.
+
+Then update the brief's `status`, write the pickup note (below), and report: where the design lives, scores, flagged items. If the run belongs to a project, add an entry to that project's own log with the design's location so its build work can find it.
+
+## Outside critique
+
+The builder is a poor judge of its own layout, so every critique round goes to a reviewer with no stake in the work.
+
+- First choice: a different model. Use the installed second-opinion skill for the other vendor (`codex` when Claude is driving, `claude` when Codex is driving). Save the capture inside the folder the reviewer runs in and name it by path in the request; a second-opinion skill takes a text prompt and reads files itself. Give it the rendered HTML/SVG source instead if it cannot read images.
+- Otherwise: a fresh sub-agent that gets only the capture, the Intent and Constraints, and the rubric, with none of the build conversation.
+- If neither exists: critique it yourself, and say in the run log and the hand-off that the critique was not independent.
+
+Ask the reviewer for problems and fixes, not approval. Record who reviewed each round.
+
+## Rubric
+
+Each capture is scored on six criteria, 0 or 1 each.
 
 | # | Criterion | 0 (fail) | 1 (pass) | How to check |
 |---|-----------|----------|----------|-------------|
@@ -118,338 +158,56 @@ Every screenshot is scored against 6 objective criteria. Each scores 0 (fail) or
 | 5 | **Density** | Too sparse (wireframe) or too cramped | Professional density — information-rich, not cluttered | Does it look like a shipped product? |
 | 6 | **Completeness** | Missing elements, placeholder text, dead ends | All scoped elements present with realistic content | Compare to section spec in brief |
 
-**Scoring thresholds:**
-- **Score 5-6:** Converged. Stop iterating on this section.
-- **Score 3-4:** Targeted fixes needed. Run one more refinement cycle.
-- **Score 0-2:** Structural rework needed. Flag for human review before burning more calls.
+- **5-6:** converged; stop iterating on this section.
+- **3-4:** targeted fixes; run another round.
+- **0-2:** structural rework; flag for the human before spending more.
 
-**What the rubric does NOT evaluate (flag for human, don't score):**
-- "Does it feel on-brand?" — too subjective for self-critique
-- "Would a user trust this?" — needs human judgment
-- Animation timing and easing — can't evaluate from static screenshot
+The rubric does not judge whether it feels on-brand, whether a user would trust it, or animation timing. Flag those for the human.
 
----
+Five habits account for most of the polish: one spacing scale (4/8/12/16/24/32/48/64), layered shadows over flat borders, at most three type sizes per section, at most two accent colors per screen, and generous vertical padding between sections.
 
-## Behavior: `/design run`
+## Gears
 
-### Phase 1: Load Brief + Budget Check
+`--stretch` runs the same loop as one longer, wider turn : more sections or screens, fewer check-ins, and a hand-back at a fixed stop (all sections converged, or the budget ceiling). It goes wider, not lower: the diverge checkpoint, outside critique, and every budget floor still apply. It composes with `--autonomous`.
 
-1. Read brief file, validate required fields (intent, scope, sections)
-2. **Check daily budget.** Read `skills/design/rate-tracker.json`
-   - If remaining < `max_calls`: warn user, suggest reducing scope
-   - If remaining < 20: refuse to start
-3. **Calculate per-section budget:** `max_calls / (sections × 3)` — ensures fair distribution
-4. Create run directory, initialize `run-log.md`
+## Session handoff
 
-### Phase 2: Figma Setup
-
-1. **File resolution:** create new or verify existing
-2. **Page isolation (CRITICAL):**
-   - ALWAYS create a new dedicated page
-   - NEVER write to existing pages
-3. **Token page (for multi-screen runs):**
-   - Create a "Design Tokens" frame with color swatches, type scale, spacing scale, button variants
-   - This is the ground truth for cross-screen consistency
-   - Cost: 2-3 calls. Pays back across all screens.
-4. **Context scan** if existing work referenced
-
-**Increment call counter after every Figma MCP tool call.**
-
-### Phase 3: Section Loop (The Recursive Core)
-
-For each section in the brief's section list, in order:
-
-```
-SECTION LOOP:
-  Step 1: CREATE section in Figma (1-3 use_figma calls)
-  Step 2: SCREENSHOT the section (1 get_screenshot call)
-  Step 3: SCORE against 6-point rubric (free — vision analysis, no API call)
-  Step 4: DECISION
-    if score >= quality_floor → ADVANCE to next section
-    if score < quality_floor AND iterations < max_iterations → FIX and re-score
-    if iterations >= max_iterations → ADVANCE with flag
-    if score decreased from previous iteration → STOP, flag regression
-  Step 5: LOG iteration (score, issues, fixes applied, call count)
-```
-
-**Refinement cycle (Step 4 → FIX):**
-1. The critique output must include **specific fix instructions**, not just problems
-   ```
-   ISSUE: Feature cards have uneven spacing — left gap ~40px, right ~20px
-   FIX: Set uniform gap in auto-layout to 24px on node [ID]
-   ```
-2. Apply targeted fixes via `use_figma` (1-2 calls)
-3. Re-screenshot and re-score
-4. Max 2 refinement cycles per section (the sweet spot — cycle 1 catches 70% of issues, cycle 2 catches 20%, cycle 3 is almost always wasted)
-
-**Budget per section:** ~7 calls (create 3 + screenshot 1 + fix 2 + screenshot 1)
-
-**Checkpoint** every `checkpoint_every` sections:
-Present scores, screenshots, and remaining budget. Let human redirect before burning more calls.
-
-### Phase 4: Full-Page Composition Pass
-
-After all sections are built:
-
-1. **Screenshot the full page** (1 call)
-2. **Evaluate cross-section coherence** (free vision analysis):
-   - Vertical rhythm between sections
-   - Color balance across the whole composition
-   - Consistent header/CTA/footer sizing
-3. **Fix section spacing** if needed (1-2 calls)
-4. **Final screenshot** (1 call)
-
-### Phase 5: Motion Spec (if `motion_spec: true`)
-
-Generate animation/motion direction. Figma is static, but the agent specifies motion precisely.
-
-**Create a "Motion Spec" frame** on the same page with:
-
-```
-MOTION SYSTEM
-| Pattern    | Duration | Easing              | Use                          |
-|------------|----------|---------------------|------------------------------|
-| enter      | 400ms    | ease-out-expo       | Elements entering viewport   |
-| exit       | 200ms    | ease-in             | Elements leaving             |
-| micro      | 150ms    | ease-in-out         | Hover, toggle, button press  |
-| emphasis   | 600ms    | spring(1, 80, 10)   | Celebration, completion      |
-```
-
-**Per-section motion annotations:**
-```
-HERO
-  1. Headline — fade-in + translateY(20px→0), 600ms ease-out, delay 0ms
-  2. Subhead — fade-in, 400ms ease-out, delay 200ms
-  3. CTA — fade-in + scale(0.95→1), 400ms spring, delay 400ms
-  4. Hero visual — bars stagger-in left→right, 30ms stagger, 300ms each
-```
-
-Cost: 1-2 `use_figma` calls for the spec frame.
-
-### Phase 6: Finishing Pass
-
-Before presenting, run invisible craft checks:
-
-1. **Frame sizing:** Set `clipsContent = false` and `layoutSizingVertical = "HUG"` on all container frames (prevents collapsed/clipped content)
-2. **Alignment audit:** Verify consistent spacing
-3. **Layer naming:** Rename auto-generated names ("Rectangle 47" → meaningful)
-4. **Color check:** Verify all colors match token set
-5. **Text check:** No placeholder text remaining
-
-### Phase 7: Output Document
-
-Generate a shareable HTML/PDF document:
-1. Hero shot of final design
-2. Design intent (3-4 key decisions)
-3. Screens grouped by flow
-4. Motion spec summary
-5. What's next
-
-### Phase 8: Close Run
-
-1. Update brief frontmatter: `status: complete` (or `iterating` if pausing mid-run)
-2. Update rate tracker with final call count
-3. **Write pickup note** at bottom of run-log (see Session Handoff below)
-4. **Project logging:** If the run is tied to a project, log the design work into that project's files:
-   - Add an entry to the project's worklog/changelog
-   - Update project state with the Figma file key + page name so downstream build work can reference the designs
-   - Follow a dual-logging pattern: design work belongs to the project, not just the skill
-   - For standalone one-off designs (not tied to a project), no external logging needed
-5. Report: Figma link, call count, scores, flagged items
-
----
-
-## Session Handoff
-
-Design sessions consume large context windows. The system must support clean session boundaries.
-
-### Closing a Session
-
-Before ending a conversation with active design work, write a **pickup note** at the bottom of the run-log:
+Design runs are long, so the run folder is the state. Before ending a session with work in progress, add a pickup note at the bottom of `run-log.md`:
 
 ```markdown
 ## Pickup Note (YYYY-MM-DD)
-**Last worked:** [section/screen name], iteration [N], score [N/6]
-**Next:** [specific next action — what to build or fix]
-**Reviewer feedback:** [any direction, preferences, or corrections from this session]
-**Remaining budget:** [N] calls today
+**Last worked:** [section], round [N], score [N/6]
+**Next:** [specific next action]
+**Feedback from this session:** [direction, preferences, corrections]
 **Open questions:** [anything unresolved]
-**Figma state:** file [key], page "[name]", [N] screens complete
+**Canvas state:** [where the design lives; N screens complete]
 ```
 
-### Starting a New Session
+To resume: read the brief, read the last pickup note, check the canvas matches it, continue.
 
-When resuming a `/design run`:
-1. Read the brief (frontmatter has status + current state)
-2. Read the run-log's last pickup note
-3. Read Figma file metadata (`get_metadata`) to verify current state
-4. Continue from where the pickup note says
+## Design to build
 
-No capsule needed for same-project continuation — the run directory IS the state.
+`/design` does not hand off straight to code. Its artifacts (screens, tokens, motion spec) are referenced from project tasks; the build work pulls those tasks and consults the design as context. Design owns the visual lens; build owns requirements, architecture and testing.
 
-### Design → Build Handoff
+## Safety
 
-`/design` does NOT hand off directly to code. The flow is:
-
-```
-/design → Figma artifacts (screens, components, tokens, motion spec)
-    ↓
-Project requirements/tasks reference the Figma designs
-    ↓
-a build loop pulls tasks → consults Figma designs as context → implements
-    ↓
-implementation may use a Figma-to-code tool (e.g. /figma-implement-design)
-```
-
-Design is an input to the build loop. The build loop owns the technical lens — requirements, architecture, testing. `/design` owns the visual lens — layout, tokens, motion, brand fidelity. They reference each other but don't call each other directly.
-
----
-
-## Figma Frame Rules (CRITICAL)
-
-These prevent the "collapsed container" problem where you have to manually expand frames.
-
-1. **`clipsContent = false`** on ALL container and section frames
-2. **`layoutSizingVertical = "HUG"`** on page-level and section-level frames — let content determine height
-3. **Only use fixed `resize()`** for elements with known dimensions (buttons, icons, specific cards)
-4. **Top-level screen frames:** width fixed (1440), height HUG
-5. **Never hardcode height** on auto-layout parents — they should grow with content
-
----
-
-## Rate Limit Management
-
-### Call Budget
-
-Track in `skills/design/rate-tracker.json`:
-```json
-{ "date": "2026-04-05", "calls": 0 }
-```
-
-- **Before each call:** check run budget AND daily budget (reserve 20 for manual use)
-- **At 75% of run budget:** switch to finalize mode (polish only)
-- **On 429 response:** wait 60 seconds. Two 429s = abort with summary.
-
-### Call Cost Estimates
-
-| Operation | Typical calls |
-|-----------|--------------|
-| File + page + token page setup | 3-5 |
-| One section (create + screenshot) | 4-5 |
-| One refinement cycle (fix + screenshot) | 2-3 |
-| Full-page composition pass | 3-4 |
-| Motion spec | 1-2 |
-| Finishing pass | 2-3 |
-
-**Budget models:**
-
-| Scope | Sections | Iterations | Total calls |
-|-------|----------|-----------|------------|
-| Style board | 6 | 1 each | ~35-45 |
-| Landing page (6 sections) | 6 | 2 each | ~55-70 |
-| 5-page site | 25+ | 2 each | ~120-150 |
-
----
-
-## The 80/20 of Visual Polish
-
-Five things that make the biggest difference. These should be explicit sub-checks in the rubric:
-
-1. **Consistent spacing scale** — Use 4/8/12/16/24/32/48/64. Nothing else. Eliminates 50% of "it feels off."
-2. **Layered shadows, not flat borders** — Two-layer shadows (subtle ambient + directional) make surfaces real.
-3. **Type scale discipline** — Max 3 sizes per section: heading, body, caption.
-4. **Color restraint** — Max 2 accent colors per screen. Everything else is surfaces.
-5. **Whitespace as a feature** — 48-80px vertical section padding. Content needs breathing room.
-
----
-
-## Safety Rules
-
-### Figma Isolation
-1. ALWAYS create a new page for every design run
-2. Never delete objects the skill didn't create
-3. Pre-flight scan before writes
-4. Set `clipsContent = false` on all containers
-
-### /figma-use Loading
-Load `/figma-use` skill before EVERY `use_figma` call. No exceptions.
-
-### Human Gates
-- Never self-approve a design direction (diverge checkpoint is mandatory)
-- Checkpoints present a position + specific question
-- `--autonomous` skips human checkpoints but still runs self-critique loop
-
-### Budget Protection
-- Hard cap per run. Log every call.
-- Daily awareness: warn < 50 remaining; refuse < 20
-- Per-section budget prevents one section from starving others
-
----
+- Write only to a page or file this run created, and never delete objects it did not create, so a run cannot damage existing design work.
+- Respect the run budget; on Figma that includes the daily call floor in `references/figma.md`.
+- The diverge checkpoint and human checkpoints present a position and a specific question; `--autonomous` skips only the later checkpoints.
 
 ## Outputs
 
 | Artifact | Path | Shape | Consumed by |
 |----------|------|-------|-------------|
-| Figma file | Figma (file key + page name) | Frames per brief sections | Human review, `/figma-implement-design` |
-| Run log | `design/runs/[slug]/run-log.md` | Cycle history, scores, pickup note, budget tracking | `/design run` resume, human review |
-| Output doc | Generated as shareable HTML/PDF | Hero shot + intent + screens + motion + next | Human, sharing |
-| Project log | The project's worklog/changelog | Design entry with Figma key + page name | A build loop (indirectly, via project tasks) |
+| Brief | `output/design/runs/[slug]/brief.md` | Frontmatter + Intent, Feel, Sections | `/design run` |
+| Run log | `output/design/runs/[slug]/run-log.md` | Directions considered, round history, reviewer, scores, pickup note | `/design run` resume, human review |
+| Captures | `output/design/runs/[slug]/screenshots/` | The directions, one image per section per round, and the final | Outside reviewer, hand-off doc |
+| Design | Figma file and page, or `output/design/runs/[slug]/design.html` (plus `directions.html` for the diverge step) | Frames or sections per the brief | Human review, design-to-code work |
+| Hand-off doc | `output/design/runs/[slug]/output.html` | Hero, decisions, screens, motion, next | Human, sharing |
+| Figma call tracker | `output/design/rate-tracker.json` | `{ "date", "calls" }` | Figma runs only |
 
-**Handoff rule:** `/design` artifacts feed a build loop via project tasks, NOT directly to code. If output paths change, update this table.
+If these paths or shapes change, update this table.
 
-## Multi-Page Coherence
+## What to expect
 
-For runs with multiple screens:
-
-1. **Token page first** — build before any screens. Color swatches, type scale, button variants. Cost: 2-3 calls.
-2. **JS constants in every script** — define colors/sizes at top of each `use_figma` call
-3. **Coherence verification pass** — after all screens built, screenshot each, run one vision comparison checking: header heights, CTA consistency, font sizes, footer match
-4. **Fix drift** before closing
-
----
-
-## Run Directory Structure
-
-```
-skills/design/
-├── SKILL.md
-├── rate-tracker.json
-└── runs/
-    └── [slug]/
-        ├── brief.md
-        ├── run-log.md
-        ├── screenshots/
-        │   ├── section-hero-v0.png
-        │   ├── section-hero-v1.png
-        │   ├── full-page-final.png
-        │   └── ...
-        ├── motion-spec.md        # if motion_spec: true
-        └── output.html           # shareable HTML/PDF document
-```
-
----
-
-## Integration
-
-| Skill | Relationship |
-|-------|-------------|
-| `/figma-use` | **Mandatory prerequisite** — loaded before every `use_figma` call |
-| HTML/PDF export | Output document generation |
-| Research findings | Inform brief requirements |
-| A build loop | Project tasks may trigger design briefs; consumes design artifacts |
-| `/figma-generate-design` | May use for initial bulk screen generation |
-| `/figma-implement-design` | Downstream — turns designs into code |
-
----
-
-## Quality Ceiling (Honest Assessment)
-
-The recursive loop produces **B+ quality** — clean, consistent, well-spaced, design-system-correct layouts. It raises the floor significantly (C+ → B+) by catching spacing errors, color drift, hierarchy problems, and missing elements.
-
-It does NOT produce agency-level (A+) work. That requires:
-- Custom illustration and iconography
-- Micro-typographic decisions (kerning, optical alignment)
-- Intentional rule-breaking by someone who knows which rules to break
-- Art direction — choosing *what* to show, not just *how*
-
-**The honest framing:** This system produces layouts that a human designer could take from B+ to A in one focused session. That is genuinely valuable compared to starting from a blank file.
+The loop reliably produces clean, consistent, well-spaced layouts, and catches spacing errors, color drift, hierarchy problems and missing elements. It does not replace custom illustration, micro-typography, or the art direction of choosing what to show. Treat the result as a strong base a designer can finish in one focused session.

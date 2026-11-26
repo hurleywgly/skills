@@ -1,18 +1,15 @@
 ---
 name: mine
-description: Point it at any knowledge source, get back condensed insights as a capsule
+description: "Mine one or many knowledge sources of any kind (notes, folders, repos, archives, websites, screenshots, PDFs, pasted text) for buried insights and package the keepers as one capsule file. Use for requests like \"what's useful in this export\", \"dig through my notes and these screenshots for X\", or to resume or check a multi-session mining run. Runs on its own for longer the broader the question and the more varied the sources. Read-only on the sources."
+argument-hint: "<what to find and where> | resume | status"
 disable-model-invocation: true
 ---
-
-<!-- PORTABILITY: This skill must remain workspace-agnostic.
-No hardcoded absolute paths. No personal names in logic. No system-specific dependencies.
-Only requires standard Claude Code tools: Read, Write, Edit, Glob, Grep, Bash, Agent, WebFetch. -->
 
 # /mine
 
 You have years of notes, old exports, and forgotten files. You reference them occasionally. Most of that knowledge is buried — scattered across apps, hard drives, old jobs, old codebases. `/mine` digs it out.
 
-Point it at any knowledge source. Get back a single capsule with the condensed findings — ready to hand to another agent, read yourself, or feed into a project.
+Point it at any knowledge source, or several at once (say, a folder of screenshots plus an Apple Notes folder). Get back a single capsule with the condensed findings — ready to hand to another agent, read yourself, or feed into a project.
 
 ## Examples
 
@@ -24,6 +21,7 @@ Point it at any knowledge source. Get back a single capsule with the condensed f
 | `/mine product positioning insights from my notes` | Searches all your notes for a specific topic |
 | `/mine summarize https://docs.example.com` | Crawls a docs site and distills the key information |
 | `/mine all the frameworks in ~/notes/` | Sweeps a local folder for a specific category of knowledge |
+| `/mine pricing ideas from ~/Desktop/screenshots and my Hustle notes` | Reads the screenshots and the Notes folder together and merges what they say into one capsule |
 | `/mine resume` | Picks up a multi-session run where it left off |
 | `/mine status` | Shows progress on a running multi-session job |
 
@@ -32,8 +30,8 @@ Point it at any knowledge source. Get back a single capsule with the condensed f
 ### 1. Parse
 
 Read the natural language request and determine:
-- **Source type** — notes, files, repo, zip, or web (infer from context: "my notes" = iCloud Notes, a `.zip` path = archive, a URL = web, a directory path = files/repo)
-- **Scope** — specific folder/path, or the whole source
+- **Sources** — one or several, of any type. Infer each from context: "my notes" = iCloud Notes, a `.zip` path = archive, a URL = web, a directory path = files/repo, image files = screenshots. The table under Sources lists the common ones; anything else you can read (a PDF, a pasted transcript, an export in an odd format, a connected app) is fair game. Use whatever access the host gives you
+- **Scope** — specific folder/path, or the whole source, per source
 - **Mission** — directed (looking for something specific) or exhaustive (surface everything valuable)
 
 If anything is ambiguous, ask one clarifying question — don't interrogate.
@@ -42,27 +40,37 @@ If anything is ambiguous, ask one clarifying question — don't interrogate.
 
 ### 2. Enumerate
 
-List what's available in the source:
+List what's available in each source:
 - **Notes:** folder names, note counts per folder
 - **Files/Repo:** glob for readable files, group by subdirectory
 - **ZIP:** `unzip -l` to list contents
 - **Web:** fetch the root page, extract internal links
+- **Screenshots/images/PDFs:** glob for the files, count them, note date range if filenames carry one
+- **Anything else:** list its items the most direct way available
 
 Show the user what was found and confirm scope before mining.
 
-**Scale estimate:** If the source has more items than 20 cycles can cover (100+ items), say so: "This source has [N] items. At 20 cycles I'll cover roughly [M]. Want to narrow scope, raise the limit, or proceed?" Be honest about coverage.
+**Set the run length.** How long the run goes on its own depends on how hard the question is and how varied the sources are, because a narrow question on one source is answered quickly and a check-in costs nothing, while a broad sweep across mixed sources only pays off if it is allowed to keep going.
+
+| The request | Cycle budget | Check-ins |
+|---|---|---|
+| Narrow question, one source | about 5 | none; report when done |
+| Broad question on one source, or a narrow one across 2-3 sources | about 20 | one, midway or when a source finishes |
+| Exhaustive or open-ended, across several source types | about 40, continuing as a multi-session run if needed | when each source finishes |
+
+Say the budget you chose and why in one line before starting. If the sources hold more than the budget can cover, say so: "These sources have [N] items. At [budget] cycles I'll cover roughly [M]. Narrow the scope, raise the limit, or proceed?" Be honest about coverage.
 
 ### 3. Mine (cycle loop)
 
-Process content in batches of 3-5 items per cycle. For each item:
+Process content in batches of 3-5 items per cycle. With several sources, work through them in the order most likely to answer the mission, and tag every finding with the source it came from. For each item:
 
-**Fetch** — get the plaintext content. Chunk items over 10K chars into ~4K windows.
+**Fetch** — get the content as text. Read images and screenshots directly and transcribe what matters. Chunk items over 10K chars into ~4K windows.
 
 **Extract** — pull out findings. Look for: insights, frameworks, decisions, quotes, ideas, patterns, contacts, action items.
 
 **Score** — apply the rubric (see Scoring below). Keep findings scoring >= 2, discard the rest.
 
-**Deduplicate** — merge substantially overlapping findings.
+**Deduplicate** — merge substantially overlapping findings. When two sources say the same thing, keep one finding and list both sources; agreement across sources is worth noting.
 
 **Adapt** — high yield (3+ kept)? Go deeper in this area. Low yield (0-1)? Move on.
 
@@ -70,15 +78,15 @@ Process content in batches of 3-5 items per cycle. For each item:
 - Mission is answered (directed mode)
 - Source is exhausted
 - 3 consecutive cycles with < 2 kept findings
-- Max cycles reached (default 20)
+- The cycle budget set in step 2 is reached
 
-**Checkpoint** every 5 cycles — show top findings and yield trend, ask to continue/adjust/stop.
+**Check in** only where the run-length table says to. At a check-in, show top findings and yield trend and ask to continue, adjust, or stop. Between check-ins, keep going.
 
 ### 4. Package
 
 Produce a single capsule file with all kept findings organized by theme.
 
-**Output location:** `mining/[slug].capsule.md` (or the current working directory if no `mining/` directory exists).
+**Output location:** `output/mine/[slug].capsule.md`, relative to the workspace root (create the folder if it is missing).
 
 **Quality gate:** If fewer than 3 findings score 3/3, flag the capsule as low-confidence and note which areas had thin coverage.
 
@@ -95,7 +103,7 @@ Produce a single capsule file with all kept findings organized by theme.
 
 > [One-line summary of what was mined and what was found]
 
-**Source:** [what was mined — e.g., "iCloud Notes / Education folder"]
+**Source:** [what was mined — e.g., "iCloud Notes / Education folder"; list each one when there are several]
 **Mission:** [what was searched for, or "exhaustive sweep"]
 **Mined:** [date]
 **Items processed:** [N items across M groups]
@@ -148,6 +156,12 @@ Tag each kept finding: `insight` | `framework` | `decision` | `idea` | `contact`
 | **Git repo** | Path with `.git`, or "repo"/"codebase" | Glob + Read + git log | CLI / Desktop |
 | **ZIP archive** | `.zip` file path | `unzip -l` / `unzip -p` | CLI / Desktop |
 | **Website** | URL | WebFetch | All (including web) |
+| **Screenshots / images** | Image file paths or a folder of them | Glob + Read (read the image directly) | CLI / Desktop |
+| **PDFs and documents** | `.pdf`, `.docx`, exported files | Read, or the host's document tool | CLI / Desktop |
+| **Pasted text** | Text in the request itself | Already in context | All |
+| **Anything else** | Named by the user | Whatever access the host provides (a connector, a CLI, an export) | Varies |
+
+This table is a starting point, not a whitelist. One run can mix any of these.
 
 ### Source access patterns
 
@@ -174,7 +188,7 @@ If `unzip` is not available, try `python3 -m zipfile` as fallback.
 
 For large sources (hundreds of notes, big repos), a single session won't cover everything. When the agent detects this:
 
-1. **Auto-creates a run-log** at `mining/runs/[slug]/run-log.md` with a progress tracker
+1. **Auto-creates a run-log** at `output/mine/runs/[slug]/run-log.md` with a progress tracker
 2. **Tracks which items have been processed** so `/mine resume` picks up where it left off
 3. **Produces intermediate capsules** at checkpoints so you get value before the full sweep completes
 4. **Final capsule** replaces intermediates when the run completes
@@ -187,14 +201,14 @@ Multi-session runs require persistent filesystem access (CLI or Desktop app, not
 
 | Artifact | Path | Shape | Consumed by |
 |----------|------|-------|-------------|
-| Capsule | `mining/[slug].capsule.md` (or cwd) | Markdown — header (Source, Mission, Findings count, Confidence) → Findings by Theme → Raw Findings table → What's Left | Human reader, `/capsule load`, agent-to-agent transfer, paste into Claude Projects |
+| Capsule | `output/mine/[slug].capsule.md` | Markdown — header (Source, Mission, Findings count, Confidence) → Findings by Theme → Raw Findings table → What's Left | Human reader, `/channel`, `/capsule load`, paste into Claude Projects |
 
-If the output path or shape changes, bump this table — downstream tools that load the capsule read the file structure.
+If the output path or shape changes, bump this table — downstream skills (`/channel`, `/capsule`) read the file structure.
 
 ## Safety Rules
 
 1. **Read-only** — never modify, delete, or create items in any source
-2. **Max cycles** — no unbounded runs (default 20, ask before exceeding)
+2. **Bounded runs** — every run has the cycle budget set in step 2; ask before exceeding it
 3. **Chunk long content** — never process > 10K chars in a single extraction pass
 4. **Timeouts** — 15s for AppleScript, 30s for WebFetch; retry once, then skip
 5. **Protect sensitive content** — extract patterns and lessons, never extract personal details about health, therapy, relationships, legal matters, third-party personal information, confidential business information, or credentials. If a source contains sensitive material, mine the transferable insight without the private details.

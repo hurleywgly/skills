@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ink"
+  short_description: "Composed HTML for ideas that need layout"
+  default_prompt: "Use $ink to turn this material into a composed HTML artifact."

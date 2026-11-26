@@ -1,0 +1,3 @@
+interface:
+  display_name: "Claude"
+  short_description: "A Claude gut-check when another model is driving"

@@ -1,12 +1,15 @@
 ---
 name: [brief name]
-domain: [your domain name]
-status: draft
+domain: [your domain] | generic
+status: draft | active | complete
 created: [YYYY-MM-DD]
 cycles_completed: 0
 ---
 
 # [Brief Name]
+
+## North Star
+[What you want out of this research, in your words. One of: a goal or decision it should inform, one metric you want to know or move, or a specific detail you want a focused answer on.]
 
 ## Research Question
 [One sentence — the core question this research answers.]
@@ -18,6 +21,7 @@ cycles_completed: 0
 ## Personas
 [List of persona files to activate for this research.]
 - personas/[domain]/[persona].md
+- personas/generic/[persona].md (domain: [parameterize])
 
 ## Sources
 [Where to search, ordered by priority.]
@@ -29,7 +33,7 @@ cycles_completed: 0
 
 ## Cycle Budget
 - **Time per cycle:** 3-5 minutes
-- **Max cycles:** 10
+- **Max cycles:** 20
 - **Stop condition:** 3 consecutive cycles with <2 new insights
 
 ## Quality Signal
@@ -41,7 +45,7 @@ Each finding scored on 3-point rubric:
 Score >= 2 = KEEP. Score < 2 = DISCARD.
 
 ## Existing Knowledge
-[What we already know — prevents rediscovery. Link to existing research docs or summarize key points.]
+[What we already know — prevents rediscovery. Link to existing research docs.]
 
 ## Output
-[What you want from the synthesis. E.g., "themed findings with recommended actions" or "capsule for handoff to design team"]
+[Capsule tier + archetype for the synthesis. E.g., "Standard Seed capsule"]

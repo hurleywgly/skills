@@ -33,15 +33,15 @@ npx skills add hurleywgly/skills --all
 | Skill | What it does |
 |-------|--------------|
 | [research](skills/research) | Send agents to dig up insights across the web |
-| [mine](skills/mine) | Have agents sift information and find gems on your behalf |
-| [auto-mine](skills/auto-mine) | Mine your sources overnight, wake up to the gems |
+| [mine](skills/mine) | Have agents sift one or many sources and find gems on your behalf |
 
 ### 🗣️ Communicate better
 | Skill | What it does |
 |-------|--------------|
 | [ink](skills/ink) | Visualize just about anything in HTML |
-| [primer](skills/primer) | Turn any tech announcement into a simple breakdown |
-| [design](skills/design) | Turn a one-line brief into polished Figma screens |
+| [primer](skills/primer) | Learn a hard topic from a simple visual explainer |
+| [design](skills/design) | Explore directions, pick one, and refine it with outside critique |
+| [js-art](skills/js-art) | Wall art drawn in code that looks hand-made |
 
 ### 🧠 Think sharper
 | Skill | What it does |
@@ -66,9 +66,24 @@ npx skills add hurleywgly/skills --all
 | [pull-digg](skills/pull-digg) | Staying on top of the AI-news firehose |
 | [events](skills/events) | Surface the local events worth your time, scored to you |
 
+## Using them
+
+- **Claude Code:** type `/<name>`, for example `/think should we ship the free tier first?`. Skills without a manual-only flag also load on their own when your request matches.
+- **Codex:** type `$<name>` or pick from `/skills`.
+- **Manual-only skills:** `research`, `design`, `capsule`, `mine`, `channel`, `events`, `pull-digg`, and `update-from-session` run long, spend money, or write files, so they only run when you call them by name. That is set for Claude Code (`disable-model-invocation` in `SKILL.md`) and for Codex (`agents/openai.yaml`).
+- **Dependencies between skills:** `pitch-me` renders through `ink` and uses `codex` or `claude` for its outside take when one is installed. `design` prefers the Figma MCP server and works without it, and uses `codex` or `claude` as its outside reviewer when one is installed. `codex` and `claude` need their own CLI, logged in with a subscription.
+
 ## Compatibility
 
-These skills run wherever the [`skills`](https://github.com/vercel-labs/skills) CLI installs them — Claude Code, Codex, Cursor, opencode, and dozens of other agents. Each skill's `SKILL.md` is the portable contract; the `README.md` explains what it's for.
+These skills run wherever the [`skills`](https://github.com/vercel-labs/skills) CLI installs them: Claude Code, Codex, Cursor, opencode, and dozens of other agents. Each skill's `SKILL.md` is the portable contract; the `README.md` explains what it's for.
+
+## Contributing
+
+Skills here must stay workspace-agnostic: no absolute paths, no personal names in the logic, and a fallback wherever a step names one host's tool. Keep `SKILL.md` under 500 lines and move optional detail into `references/`. Run the linter before opening a PR:
+
+```bash
+python3 scripts/validate.py
+```
 
 ## License
 

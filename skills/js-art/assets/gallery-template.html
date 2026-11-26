@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Art Gallery</title>
+<style>
+:root{--bg:#f4efe4;--card:#fffaf0;--ink:#1c2340;--muted:#5b6180;--line:#e2d9c6;--accent:#e3a535;--warn:#c8553c}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#12172a;--card:#1a2038;--ink:#ece6d8;--muted:#a3a9c4;--line:#2a3152}}
+:root[data-theme="dark"]{--bg:#12172a;--card:#1a2038;--ink:#ece6d8;--muted:#a3a9c4;--line:#2a3152}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1500px;margin:0 auto;padding:40px 16px 80px}
+h1{font-family:Georgia,"Iowan Old Style",serif;font-size:clamp(34px,5vw,60px);line-height:1;margin:0 0 10px;letter-spacing:-.01em}
+.sub{color:var(--muted);max-width:780px;margin:0 0 28px}
+.brief{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:0 0 20px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.box h3{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.box ul{margin:0;padding-left:18px}.box p{margin:0}
+.thesis{border-left:4px solid var(--accent);padding:10px 16px;margin:0 0 34px;font-family:Georgia,serif;font-size:20px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:26px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.frame{background:#0d0f16;padding:14px;position:relative}
+canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#efe6d2}
+.printing{position:absolute;inset:14px;display:grid;place-items:center;color:#d8d0bc;font-size:14px;letter-spacing:.1em;text-transform:uppercase}
+.meta{padding:16px 20px 20px}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.meta h2{font-family:Georgia,serif;margin:0;font-size:28px}
+.num{color:var(--muted);font-size:13px;white-space:nowrap}
+.tag{margin:4px 0 10px;font-size:17px}
+.row{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;color:var(--muted);margin:6px 0}
+.row b{color:var(--ink);font-weight:500}
+.sw{display:inline-flex;gap:4px;vertical-align:middle}
+.sw i{width:14px;height:14px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.15)}
+.stars{color:var(--accent);letter-spacing:2px}
+.risk{font-size:14px;margin-top:8px;color:var(--warn)}
+button{font:inherit;font-size:13px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer;margin-top:10px}
+button:hover{border-color:var(--ink)}
+.recs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:40px 0 0}
+.recs .box:nth-child(1){border-top:5px solid #2f62b0}.recs .box:nth-child(2){border-top:5px solid var(--accent)}.recs .box:nth-child(3){border-top:5px solid var(--warn)}
+@media (max-width:900px){.grid,.brief,.recs{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+/*__ENGINE__*/
+</script>
+<script>
+/* pieces file must define: INKS, META {title, sub, inBounds[], outBounds[], thesis, recs:{ship,follow,skip}, media?, paper?}
+   and PIECES [{fn, seed, label, name, tag, tech, pal[], fit, risk, media?, inks?, paper?}] */
+/*__PIECES__*/
+</script>
+<script>
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+document.title=META.title;
+document.getElementById('app').innerHTML=`<h1>${esc(META.title)}</h1><p class="sub">${esc(META.sub||'')}</p>
+<div class="brief"><div class="box"><h3>In bounds</h3><ul>${(META.inBounds||[]).map(t=>`<li>${esc(t)}</li>`).join('')}</ul></div>
+<div class="box"><h3>Out of bounds</h3><ul>${(META.outBounds||[]).map(t=>`<li>${esc(t)}</li>`).join('')}</ul></div></div>
+${META.thesis?`<div class="thesis">${esc(META.thesis)}</div>`:''}
+<div class="grid">${PIECES.map((P,i)=>`<article class="card"><div class="frame"><canvas id="cv${i}"></canvas><div class="printing" id="pr${i}">pulling print…</div></div>
+<div class="meta"><div class="top"><h2>${esc(P.name)}</h2><span class="num">${esc(P.label||'')}</span></div><p class="tag">${esc(P.tag||'')}</p>
+<div class="row"><span><b>Technique</b> ${esc(P.tech||'')}</span></div>
+<div class="row"><span><b>Inks</b> <span class="sw">${(P.pal||[]).map(c=>`<i style="background:${(P.inks||INKS)[c]}"></i>`).join('')}</span></span>
+${P.fit?`<span><b>Fit</b> <span class="stars">${'★'.repeat(P.fit)}${'☆'.repeat(5-P.fit)}</span></span>`:''}</div>
+${P.risk?`<div class="risk">${esc(P.risk)}</div>`:''}<button data-i="${i}">Save PNG</button></div></article>`).join('')}</div>
+${META.recs?`<div class="recs"><div class="box"><h3>Ship now</h3><p>${esc(META.recs.ship||'')}</p></div><div class="box"><h3>Follow-up</h3><p>${esc(META.recs.follow||'')}</p></div><div class="box"><h3>Skip / pivot</h3><p>${esc(META.recs.skip||'')}</p></div></div>`:''}`;
+document.addEventListener('click',e=>{const b=e.target.closest('button[data-i]');if(!b)return;const i=b.dataset.i,a=document.createElement('a');a.download=PIECES[i].name.toLowerCase().replace(/\s+/g,'-')+'.png';a.href=document.getElementById('cv'+i).toDataURL('image/png');a.click()});
+(async()=>{for(let i=0;i<PIECES.length;i++){const P=PIECES[i],lab=document.getElementById('pr'+i);await new Promise(r=>setTimeout(r,20));
+  try{const p=new Print(document.getElementById('cv'+i),{seed:P.seed,inks:P.inks||INKS,paper:P.paper||META.paper,media:P.media||META.media});P.fn(p);await p.finish();lab.remove()}
+  catch(err){console.error(P.name,err);lab.textContent='misprint: '+err.message}}
+  document.body.dataset.done='1'})();
+</script>
+</body>
+</html>

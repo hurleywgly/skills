@@ -1,0 +1,170 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fail() {
+  printf 'BRIDGE ERROR: %s\n' "$1" >&2
+  exit "${2:-1}"
+}
+
+usage() {
+  cat <<'USAGE'
+Usage: codex-subscription-bridge [options] < prompt.txt
+
+Options:
+  --mode consult|review|challenge
+  --model NAME           Optional. Omit to use the Codex CLI's own default model
+                         (recommended). NAME is an alias (astra, sol, terra, luna)
+                         or any slug in `codex debug models --bundled`.
+  --effort LEVEL         Optional. Defaults to medium.
+                         Validated against the model's catalog entry when --model is given.
+  --cwd DIR
+  --uncommitted          Review uncommitted work (review mode only)
+  --base BRANCH          Review against a base branch (review mode only)
+  --preflight            Verify auth and model route without inference
+  --help
+
+The bridge is read-only, ephemeral, ChatGPT-authenticated, and fail-closed.
+USAGE
+}
+
+MODE=consult
+MODEL_ALIAS=
+EFFORT=
+WORKDIR=$PWD
+REVIEW_SCOPE=uncommitted
+BASE_BRANCH=
+PREFLIGHT=0
+
+while (($#)); do
+  case "$1" in
+    --mode) [[ $# -ge 2 ]] || fail '--mode needs a value'; MODE=$2; shift 2 ;;
+    --model) [[ $# -ge 2 ]] || fail '--model needs a value'; MODEL_ALIAS=$2; shift 2 ;;
+    --effort) [[ $# -ge 2 ]] || fail '--effort needs a value'; EFFORT=$2; shift 2 ;;
+    --cwd) [[ $# -ge 2 ]] || fail '--cwd needs a value'; WORKDIR=$2; shift 2 ;;
+    --uncommitted) REVIEW_SCOPE=uncommitted; BASE_BRANCH=; shift ;;
+    --base) [[ $# -ge 2 ]] || fail '--base needs a value'; REVIEW_SCOPE=base; BASE_BRANCH=$2; shift 2 ;;
+    --preflight) PREFLIGHT=1; shift ;;
+    --help|-h) usage; exit 0 ;;
+    *) fail "unknown option: $1" ;;
+  esac
+done
+
+case "$MODE" in
+  consult|review|challenge) ;;
+  *) fail "unsupported mode: $MODE" ;;
+esac
+
+# Aliases are the only place model slugs are pinned. Checked against
+# `codex debug models --bundled` on 2026-11-26. No --model means the CLI default.
+case "$MODEL_ALIAS" in
+  '') MODEL= ;;
+  astra) MODEL=gpt-6-astra ;;
+  sol) MODEL=gpt-6.2-sol ;;
+  terra) MODEL=gpt-5.6-terra ;;
+  luna) MODEL=gpt-6-luna ;;
+  gpt-*|codex-*) MODEL=$MODEL_ALIAS ;;
+  *) fail "unsupported model: $MODEL_ALIAS (use astra, sol, terra, luna, or a slug from: codex debug models --bundled)" ;;
+esac
+
+# Default effort. With --ignore-user-config the CLI would otherwise run at effort "none".
+EFFORT=${EFFORT:-medium}
+[[ "$EFFORT" =~ ^(low|medium|high|xhigh|max|ultra)$ ]] || fail "unsupported effort: $EFFORT"
+[[ -d "$WORKDIR" ]] || fail "working directory does not exist: $WORKDIR"
+WORKDIR=$(cd "$WORKDIR" && pwd -P)
+
+command -v codex >/dev/null 2>&1 || fail 'codex CLI not found'
+command -v jq >/dev/null 2>&1 || fail 'jq not found'
+
+CLEAN_ENV=(
+  env
+  -u OPENAI_API_KEY
+  -u OPENAI_BASE_URL
+  -u OPENAI_ORG_ID
+  -u OPENAI_PROJECT_ID
+  -u CODEX_API_KEY
+  -u AZURE_OPENAI_API_KEY
+  -u AZURE_OPENAI_ENDPOINT
+  -u AWS_BEARER_TOKEN_BEDROCK
+  -u GOOGLE_APPLICATION_CREDENTIALS
+)
+
+AUTH_STATUS=$("${CLEAN_ENV[@]}" codex login status 2>&1) || fail 'Codex authentication check failed' 3
+[[ "$AUTH_STATUS" == 'Logged in using ChatGPT' ]] || fail 'Codex is not authenticated through ChatGPT; API/provider fallback is forbidden' 3
+
+if [[ -n "$MODEL" ]]; then
+  MODEL_CATALOG=$("${CLEAN_ENV[@]}" codex debug models --bundled 2>/dev/null) || fail 'Could not read bundled Codex model catalog' 4
+  # Presence in the catalog is the gate, not the picker flag (some models are hidden from the picker).
+  printf '%s' "$MODEL_CATALOG" | jq -e --arg model "$MODEL" \
+    '.models[] | select(.slug == $model and (.visibility == "list" or .visibility == "hide"))' >/dev/null \
+    || fail "requested model is not present in the bundled catalog: $MODEL" 4
+  if [[ -n "$EFFORT" ]]; then
+    printf '%s' "$MODEL_CATALOG" | jq -e --arg model "$MODEL" --arg effort "$EFFORT" \
+      '.models[] | select(.slug == $model) | .supported_reasoning_levels[] | select(.effort == $effort)' >/dev/null \
+      || fail "model $MODEL does not support effort $EFFORT per the bundled catalog" 4
+  fi
+fi
+
+ROUTE_MODEL=${MODEL:-CLI default model}
+ROUTE_EFFORT=${EFFORT:-default effort}
+
+if ((PREFLIGHT)); then
+  printf 'PREFLIGHT PASS: ChatGPT auth; route %s @ %s; no inference run\n' "$ROUTE_MODEL" "$ROUTE_EFFORT"
+  exit 0
+fi
+
+USER_PROMPT=$(cat)
+[[ -n "${USER_PROMPT//[[:space:]]/}" ]] || {
+  [[ "$MODE" == review ]] || fail 'consult and challenge modes require a prompt on stdin'
+}
+
+READ_ONLY_RULES='You are a read-only Codex teammate invoked by Claude Code. Do not edit or write files, change git state, commit, push, deploy, publish, purchase, send messages, use credentials, alter external state, or invoke another agent. Inspect only the supplied working directory. Return concrete evidence and label anything unverified.'
+
+if [[ "$MODE" == challenge ]]; then
+  USER_PROMPT=$'Find failure modes, regressions, unsafe assumptions, and missing verification. No compliments.\n\n'"$USER_PROMPT"
+fi
+
+FULL_PROMPT="$READ_ONLY_RULES"$'\n\n'"$USER_PROMPT"
+CAPTURE_FILE=$(mktemp -t codex-subscription-bridge.XXXXXX)
+trap 'rm -f "$CAPTURE_FILE"' EXIT
+
+CODEX_COMMAND=(
+  "${CLEAN_ENV[@]}"
+  codex
+  -a never
+  exec
+  --ignore-user-config
+  --ephemeral
+  --skip-git-repo-check
+  -C "$WORKDIR"
+  -s read-only
+  --color never
+)
+if [[ -n "$MODEL" ]]; then CODEX_COMMAND+=(-m "$MODEL"); fi
+if [[ -n "$EFFORT" ]]; then CODEX_COMMAND+=(-c "model_reasoning_effort=\"$EFFORT\""); fi
+
+printf 'AUTH ROUTE: ChatGPT account (included allowance and/or ChatGPT credits; never API-key billing)\n'
+printf 'REQUESTED ROUTE: %s @ %s, read-only, ephemeral\n' "$ROUTE_MODEL" "$ROUTE_EFFORT"
+
+set +e
+if [[ "$MODE" == review ]]; then
+  if [[ "$REVIEW_SCOPE" == base ]]; then
+    printf '%s' "$FULL_PROMPT" | "${CODEX_COMMAND[@]}" review --base "$BASE_BRANCH" - 2>&1 | tee "$CAPTURE_FILE"
+  else
+    printf '%s' "$FULL_PROMPT" | "${CODEX_COMMAND[@]}" review --uncommitted - 2>&1 | tee "$CAPTURE_FILE"
+  fi
+else
+  printf '%s' "$FULL_PROMPT" | "${CODEX_COMMAND[@]}" - 2>&1 | tee "$CAPTURE_FILE"
+fi
+CODEX_STATUS=${PIPESTATUS[1]}
+set -e
+
+[[ "$CODEX_STATUS" -eq 0 ]] || fail "Codex exited with status $CODEX_STATUS" "$CODEX_STATUS"
+if [[ -n "$MODEL" ]]; then
+  grep -Eq "^model:[[:space:]]+$MODEL$" "$CAPTURE_FILE" || fail 'Codex model banner did not match the requested model' 5
+fi
+if [[ -n "$EFFORT" ]]; then
+  grep -Eq "^reasoning effort:[[:space:]]+$EFFORT$" "$CAPTURE_FILE" || fail 'Codex effort banner did not match the requested effort' 5
+fi
+USED_MODEL=$(grep -E -m1 '^model:' "$CAPTURE_FILE" | sed -E 's/^model:[[:space:]]+//' || true)
+USED_EFFORT=$(grep -E -m1 '^reasoning effort:' "$CAPTURE_FILE" | sed -E 's/^reasoning effort:[[:space:]]+//' || true)
+printf 'ROUTE USED: %s @ %s\n' "${USED_MODEL:-unknown}" "${USED_EFFORT:-unknown}"

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Design"
+  short_description: "Explore, pick, build, get outside critique, refine"
+
+# Mirrors `disable-model-invocation: true` in SKILL.md: run only when asked by name.
+policy:
+  allow_implicit_invocation: false

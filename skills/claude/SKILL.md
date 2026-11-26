@@ -1,198 +1,298 @@
 ---
 name: claude
-description: Claude Code second opinion for Codex. Three modes — review (diff review with pass/fail gate), challenge (adversarial break-your-code), consult (ask anything). Trigger on "claude review", "claude challenge", "ask claude", "second opinion from Claude", "consult Claude".
+description: "Bring in Claude Code as a teammate while Codex (or another agent) is driving. Read-only by default: review (diff review with a pass/fail gate), challenge (adversarial, tries to break the code or plan), consult (ask anything); plus explicit, bounded delegated execution. Runs on the Claude CLI's own default model on the user's subscription unless the user names a model, effort, Fast mode, or Ultracode, and stops to ask before any call that would bill an API key. Use on \"claude review\", \"claude challenge\", \"ask claude\", \"second opinion from Claude\", \"consult Claude\", \"delegate to Claude\", \"Claude teammate\", or requests naming a Claude configuration such as \"Opus high\", \"Opus high fast\", \"Fable ultracode\", or \"Sonnet medium\". Requires the claude CLI."
+argument-hint: "review [instructions] | challenge [focus] | delegate <task> | <question> [model effort fast ultracode]"
 ---
 
-# /claude — Second Opinion via Claude Code
+# /claude — Claude Code Teammates for Codex
 
-Wraps the `claude` CLI to get an independent second opinion from Claude while Codex is driving the session. Present Claude output verbatim — do not summarize or truncate.
+Use the installed `claude` CLI as a teammate inside a Codex-led workflow. Default to read-only second-opinion work. Enter delegated execution only when the user explicitly asks Claude to implement, execute, or own a bounded task.
 
-This is the mirror of `/codex`.
+Present Claude's answer verbatim. Add Codex synthesis only after Claude's complete output.
 
-## Step 0: Preflight
+## 0. Preflight
 
-Verify `claude` is reachable before running any mode:
+Run:
 
 ```bash
+claude --version
 claude --help
+claude auth status
 ```
 
-If output contains auth/setup errors or the command is missing, stop and tell the user:
-> "Claude setup incomplete. Run `claude auth` interactively to authenticate, then retry `/claude`."
+The flags this skill uses (`--effort`, including `ultracode`, `--settings`, `--setting-sources`, `--max-budget-usd`) must appear in `claude --help` for the installed version. If one is missing, say which and stop; do not guess at an older syntax.
 
-## Step 0.5: Context Brief
+If `claude auth status` is nonzero, reports `"loggedIn": false`, or a smoke call returns an OAuth/authentication error, stop:
 
-Every invocation should prepend this brief to the Claude prompt. Keep it tight; Claude may also load repo-local `CLAUDE.md` automatically.
+> Claude setup incomplete. Run `claude auth login` interactively, then retry `/claude`.
 
-```text
-You are being invoked as the independent second opinion in a Codex-first workflow. Your output will be shown verbatim to the user; Codex may add disagreement notes after, but should not summarize or filter you.
+Do not treat `claude --help` succeeding as proof that inference is authenticated.
 
-The workspace may be markdown-heavy and often has many generated or untracked files; do not flag noise from generated or untracked files unless it directly affects the requested task. Real code review usually happens in the project source directories.
+### Spend guardrail
 
-What the user wants from you:
-- No compliments and no generic summary of what the code does.
-- Disagree freely with Codex or prior framing when the evidence supports it.
-- Use severity markers like [P0], [P1], critical, or high only when they should mechanically fail the gate.
-- Be specific: cite files, lines, commands, failure modes, and exact assumptions.
-- If the prompt is malformed, the diff is empty, or the scope is too broad, say so directly.
+Before any inference, read `authMethod` in the `claude auth status` output. Calls must run on the user's Claude subscription.
 
-Noise to avoid:
-- Praise for structure.
-- Generic best-practice reminders unrelated to the diff.
-- "Add tests" without naming the behavior that is untested.
-- Complaints about untracked generated files.
+An API key in the environment takes precedence over a subscription login in headless calls, so a machine can be logged in with a subscription and still bill the key. To keep calls on the subscription, run every `claude` command in this skill with the key variables removed from the child process:
 
-Your last paragraph is high-value if output is truncated later, so make it a conclusion or the most important finding.
+```bash
+CLAUDE_ENV=(env -u ANTHROPIC_API_KEY -u ANTHROPIC_AUTH_TOKEN)
+"${CLAUDE_ENV[@]}" claude auth status
 ```
 
-## Step 1: Detect Mode
+Read that output. Proceed only when `authMethod` is `claude.ai` (a `subscriptionType` is shown) and no `apiKeySource` line appears.
 
-Parse the user's input:
+If the CLI is not logged in once the key is removed, the only way to run would be the API key, billed per token. Stop before running anything and tell the user:
 
-1. `/claude review` or `/claude review <instructions>` -> **Review mode**
-2. `/claude challenge` or `/claude challenge <focus>` -> **Challenge mode**
-3. `/claude <prompt>` -> **Consult mode**
-4. `/claude` alone -> auto-detect:
-   - Check for a diff:
-     ```bash
-     git diff --quiet "origin/$BASE...HEAD" 2>/dev/null && echo "NO_DIFF" || echo "HAS_DIFF"
-     ```
-   - If `HAS_DIFF`, ask whether to review the diff, challenge the diff, or consult about something else.
-   - If `NO_DIFF`, ask what to consult about.
+> This Claude call would bill the Anthropic API key, not a subscription. Options: log the CLI in with your subscription (`claude auth login`), or tell me to go ahead on the API key and give a spending cap.
 
-Detect the base branch:
+Go ahead on an API key only after the user says so in this conversation, and then pass `--max-budget-usd` with the cap they gave.
+
+The JSON result carries a `total_cost_usd` figure even on a subscription. It is an estimate of what the call would have cost at API rates, not a charge, but it does show how much of the plan's usage a call consumed; report it.
+
+## 1. Select the Teammate Configuration
+
+### Default: let the CLI choose
+
+Pass no `--model` and no `--effort`. The Claude CLI's own default is what its maker currently recommends and what the user's plan is set up for, and it stays current without this file being edited.
+
+Use something else only when the user asks for it in this request. A harder task is not, by itself, a reason to upgrade; if you think a stronger model would change the answer, say so and let the user choose, because stronger models, higher effort, Fast and Ultracode all cost more.
+
+Parse what they named, from flags or natural language:
+
+- `--model <name>` or "using Fable"
+- `--effort <level>` or "at medium" (levels are listed in `claude --help`)
+- `--fast` / `--standard`
+- `--fallback-model <models>` only when the user explicitly permits fallback
+- `--subagent-model <model>` only when workflow workers should differ from the lead
+
+Model names are not listed here because they change with each release. When the user names a family ("opus", "sonnet", "fable"), pass that alias; aliases float to the latest model in the family. When they name a version, pass the full model ID exactly as they gave it; if you are unsure of the ID, ask rather than construct one.
+
+### Keep the four controls distinct
+
+- **Model** chooses the model.
+- **Effort** chooses adaptive reasoning depth.
+- **Fast** is a lower-latency, higher-cost configuration that only some models support, and which ones changes between releases. Never assume: request it, then check `fast_mode_state` in the result (section 6). If it comes back off, say so and do not present the run as Fast.
+- **Ultracode** is workflow orchestration, not a model. `--effort ultracode` runs the lead at high effort and lets Claude create dynamic workflows across many subagents.
+
+The word `ultracode` inside a `claude -p` prompt does not trigger a workflow. In headless calls, pass `--effort ultracode`.
+
+### When the user names an exact model
+
+A named model is an exact pin:
+
+1. Pass the full `--model` ID.
+2. Pass the requested `--effort`.
+3. Set per-run settings with an empty fallback chain.
+4. Set `CLAUDE_CODE_NO_MODEL_FALLBACK=1`.
+5. Set `CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1` unless the user explicitly requests a mixed-model advisor.
+6. For Ultracode or other subagent work, set `CLAUDE_CODE_SUBAGENT_MODEL` to the same exact ID unless the user requests mixed routing.
+7. Verify the requested primary model appears in `modelUsage`. A wrong-model result does not satisfy the task.
+
+Use:
+
+```bash
+CLAUDE_SETTINGS='{"fastMode":false,"fallbackModel":[]}'
+```
+
+For a Fast run:
+
+```bash
+CLAUDE_SETTINGS='{"fastMode":true,"fallbackModel":[]}'
+```
+
+Passing `fastMode` through `--settings` makes it session-local in `-p` mode and does not change the user's saved default. Always pass `fastMode: false` for standard-speed calls so another session's persistent preference cannot leak in.
+
+Only omit `CLAUDE_CODE_NO_MODEL_FALLBACK` and add `--fallback-model` when the user explicitly authorizes fallback. Remember that a safety fallback is also model substitution; an exact pin should fail closed rather than silently become another model.
+
+## 2. Detect Mode
+
+1. `/claude review [focus]` → **review**, read-only
+2. `/claude challenge [focus]` → **challenge**, read-only
+3. `/claude consult <question>` or `/claude <question>` → **consult**, read-only
+4. `/claude delegate <task>` or `/claude execute <task>` → **delegate**, writable and explicit
+5. `/claude` alone → inspect for a diff, then ask the user which mode to use
+
+Never infer delegate mode from a question about capability, a request for a plan, or the presence of an implementation task in repository state.
+
+Detect the review base:
 
 ```bash
 BASE=$(gh pr view --json baseRefName -q .baseRefName 2>/dev/null \
   || git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@refs/remotes/origin/@@' \
   || echo "main")
-echo "BASE: $BASE"
 ```
 
-## Step 2A: Review Mode
+## 3. Context Brief
 
-Run Claude as a read-oriented reviewer against the current branch diff. Prefer `claude -p` over interactive mode.
-
-Prompt shape:
+Prepend this to every prompt:
 
 ```text
-<context brief>
+You are a Claude Code teammate in a Codex-led workflow. Your output will be shown verbatim to the user. Codex may add disagreement notes afterward but will not summarize or filter you.
 
-Review the changes on this branch against origin/$BASE. Inspect the diff with git as needed.
+Follow the repository's AGENTS.md/CLAUDE.md and stay inside the task's write scope.
 
-Focus: <custom instructions, or "find correctness, security, data-loss, race-condition, migration, and UX regressions">
-
-Return findings first, ordered by severity, with file/line references where possible. No compliments. No summary preamble.
+Be direct. No praise or generic summary. Disagree when evidence supports it. Cite files, lines, commands, failure modes, and assumptions. If the prompt, diff, scope, or evidence is insufficient, state exactly what is missing. End with the conclusion or most important finding.
 ```
 
-Command shape:
+For delegated execution, append:
+
+```text
+You own this bounded task. Inspect before editing, stay within the stated write scope, run proportionate verification, and report changed files plus test results. Do not commit, push, open a PR, deploy, publish, message anyone, or alter external state unless the user explicitly authorized that action.
+```
+
+## 4. Invocation Contract
+
+Run from the target repository. Use `--setting-sources project` so project settings and instructions apply without inheriting the user's broad user/local permission allowlists.
+
+Capture JSON so routing can be verified while Claude's textual answer remains verbatim. This is the fully pinned form; on the default route, drop `--model`, `--effort`, `CLAUDE_CODE_SUBAGENT_MODEL` and `CLAUDE_CODE_NO_MODEL_FALLBACK`, and keep everything else:
 
 ```bash
-claude -p "<prompt>" \
-  --permission-mode dontAsk \
-  --allowedTools "Read,Grep,Glob,Bash(git diff:*),Bash(git status:*),Bash(git log:*),Bash(git show:*),Bash(git branch:*),Bash(git rev-parse:*),Bash(gh pr view:*)" \
-  --disallowedTools "Edit,MultiEdit,Write,NotebookEdit" \
-  2>&1
+CLAUDE_JSON=$(
+  printf '%s' "$PROMPT" | \
+  "${CLAUDE_ENV[@]}" \
+  CLAUDE_CODE_NO_MODEL_FALLBACK=1 \
+  CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1 \
+  CLAUDE_CODE_SUBAGENT_MODEL="$CLAUDE_MODEL" \
+  claude -p \
+    --model "$CLAUDE_MODEL" \
+    --effort "$CLAUDE_EFFORT" \
+    --settings "$CLAUDE_SETTINGS" \
+    --setting-sources project \
+    --output-format json \
+    <mode-specific permission flags>
+)
 ```
 
-If constrained tool patterns are rejected by the installed Claude CLI, retry with:
+Send the prompt on stdin, as shown. The tool flags take a list, so a prompt placed after them as a trailing argument is read as one more tool name and the CLI exits with "Input must be provided". Keep stderr separate from `CLAUDE_JSON`; merging it with `2>&1` can make the JSON unparsable. Surface any stderr warning alongside routing metadata.
+
+Do not set `CLAUDE_CODE_SUBAGENT_MODEL` when the user explicitly requests a different worker model. Do not set `CLAUDE_CODE_NO_MODEL_FALLBACK` when the user explicitly supplies a fallback chain.
+
+Claude Code may record a small Haiku auxiliary call for harness work even when the requested primary model and every task subagent are exactly pinned. Treat `claude-haiku-*` in `modelUsage` as auxiliary metadata, not evidence of fallback. `CLAUDE_CODE_NO_MODEL_FALLBACK=1` is the fail-closed substitution guard; the requested primary model must still appear.
+
+On an approved API-key run, always pass `--max-budget-usd` (see the spend guardrail). Ultracode can spawn dozens to hundreds of agents; use it only when requested or clearly named.
+
+### Read-only permission flags
+
+Use for review, challenge, and consult:
 
 ```bash
-claude -p "<prompt>" \
-  --permission-mode dontAsk \
-  --tools "Read,Grep,Glob,Bash" \
-  --disallowedTools "Edit,MultiEdit,Write,NotebookEdit" \
-  2>&1
+--permission-mode dontAsk \
+--tools "Read,Grep,Glob,Bash" \
+--allowedTools "Read,Grep,Glob,Bash(git diff *),Bash(git status *),Bash(git log *),Bash(git show *),Bash(git branch *),Bash(git rev-parse *),Bash(gh pr view *),Bash(find *),Bash(rg *)" \
+--disallowedTools "Edit,MultiEdit,Write,NotebookEdit"
 ```
 
-Parse the output for severity markers:
-- `[P0]` or `[P1]` or `critical` or `high` -> gate **FAIL**
-- None of the above -> gate **PASS**
-- Empty output or setup noise -> gate **UNKNOWN**
+Keep the prompt explicitly read-only. If Ultracode is used in a read-only mode, retain the write-tool denials for every workflow worker.
 
-Present:
+### Delegate permission flags
 
-```text
-CLAUDE SAYS (code review):
-════════════════════════════════════════
-<full claude output, verbatim>
-════════════════════════════════════════
-GATE: PASS / FAIL (N critical findings) / UNKNOWN (no model output)
+Delegate mode requires an explicit target repository and write scope. Use:
+
+```bash
+--permission-mode auto
 ```
 
-## Step 2B: Challenge Mode
+Do not use `--dangerously-skip-permissions`. Add narrow `--allowedTools` rules only for commands the bounded task requires. For concurrent Codex/Claude work, use `--worktree <name>` or otherwise partition file ownership before dispatch so teammates cannot overwrite each other.
 
-Adversarial mode — Claude tries to break the code or plan.
+## 5. Mode Prompts
 
-Default prompt:
+### Review
 
 ```text
 <context brief>
 
-Review the changes on this branch against origin/$BASE. Run git diff as needed. Your job is to find ways this code will fail in production. Think like an attacker and a chaos engineer. Find edge cases, race conditions, security holes, resource leaks, data loss, migration traps, and ambiguous product behavior. Be adversarial. No compliments — just the problems.
+Review this branch against origin/<BASE>. Inspect the diff with git.
+Focus: <custom focus, or correctness, security, data loss, races, migrations, and UX regressions>.
+
+Return findings first, ordered by severity, with file and line references. No compliments or summary preamble. Do not edit files.
 ```
 
-With focus:
+Gate the response:
+
+- `[P0]`, `[P1]`, `critical`, or `high` → **FAIL**
+- none → **PASS**
+- empty output, auth/setup noise, or routing mismatch → **UNKNOWN**
+
+### Challenge
 
 ```text
 <context brief>
 
-Review the changes on this branch against origin/$BASE. Focus specifically on <FOCUS>. Find every way this could fail. Be adversarial. No compliments.
+Review this branch against origin/<BASE>. Find every realistic way it can fail in production, especially <focus if supplied>. Think like an attacker and chaos engineer. Look for edge cases, races, security holes, resource leaks, data loss, migration traps, and ambiguous product behavior. No compliments. Do not edit files.
 ```
 
-Run with the same `claude -p` command shape as review mode.
-
-Present:
-
-```text
-CLAUDE SAYS (adversarial challenge):
-════════════════════════════════════════
-<full output, verbatim>
-════════════════════════════════════════
-```
-
-## Step 2C: Consult Mode
-
-Ask Claude anything about the codebase, plan, or workspace state.
-
-Prompt shape:
+### Consult
 
 ```text
 <context brief>
 
 Question from the user via Codex:
-<user prompt>
+<question>
 
-Answer directly. If the question requires inspecting local files, inspect them. If the available context is insufficient, say exactly what is missing.
+Answer directly. Inspect local files when needed. Do not edit files. If evidence is insufficient, state exactly what is missing.
 ```
 
-Run:
+### Delegate
+
+```text
+<context brief>
+<delegated-execution brief>
+
+Task:
+<outcome>
+
+Write scope:
+<exact paths or modules>
+
+Constraints:
+<tests, boundaries, forbidden actions, and completion condition>
+```
+
+If model routing itself is part of the authorization boundary, do not let Claude select a different model for a workflow stage.
+
+## 6. Verify and Present
+
+Treat the JSON envelope as harness metadata, not Claude's answer.
+
+Check:
 
 ```bash
-claude -p "<prompt>" \
-  --permission-mode dontAsk \
-  --allowedTools "Read,Grep,Glob,Bash(git diff:*),Bash(git status:*),Bash(git log:*),Bash(git show:*),Bash(find:*),Bash(rg:*)" \
-  --disallowedTools "Edit,MultiEdit,Write,NotebookEdit" \
-  2>&1
+printf '%s' "$CLAUDE_JSON" | jq -r '.modelUsage | keys[]?'
+printf '%s' "$CLAUDE_JSON" | jq '{fast_mode_state, speed: .usage.speed}'
+printf '%s' "$CLAUDE_JSON" | jq -r '.result // empty'
 ```
+
+Fail routing when:
+
+- a model was named and that exact model is absent from `modelUsage` (on the default route, report whichever model `modelUsage` shows)
+- an unapproved non-Haiku peer model appears without an explicitly mixed-model route
+- Fast was requested and `fast_mode_state` is not `on`
+- `.is_error` is true, `.terminal_reason` is an API/setup error, or model output is empty
+
+Use `fast_mode_state` as the Fast-mode ground truth. Aggregate `.usage.speed` can remain `standard` when the run includes auxiliary standard-speed work even though the primary request ran with Fast enabled.
+
+An organization may clamp effort. Plain-text Claude runs warn when requested effort is reduced, while JSON can apply the clamp silently. If exact effort is authorization-critical, run a minimal plain-text preflight with the same model and effort and reject any clamp warning before the real task.
 
 Present:
 
 ```text
-CLAUDE SAYS (consult):
+CLAUDE SAYS (<mode> — <CLI default | requested <model> @ <effort>>, <standard|fast>, <single-agent|ultracode>):
 ════════════════════════════════════════
-<full output, verbatim>
+<.result exactly as returned; no summary or truncation>
 ════════════════════════════════════════
+ROUTING: PASS — primary: <model from modelUsage>; auxiliary: <other modelUsage keys or none>; fast mode: <fast_mode_state>; billing: <subscription | API key, approved cap $N>
+GATE: <review mode only>
 ```
 
-After presenting, add Codex disagreement notes only when useful:
-> "Note: I disagree on X because Y."
+On mismatch, use `ROUTING: FAIL`, show the actual metadata and Claude result verbatim, and do not present the work as satisfying the requested teammate configuration.
 
 ## Rules
 
-- **Present output verbatim.** Never summarize Claude's response before showing it. If output exceeds reasonable length, save full output to a temp file and show the tail plus file path.
-- **Read-oriented.** Use `claude -p` with write tools disallowed. Do not let the second-opinion call edit files.
-- **Use repo context.** Do not pass `--bare` by default; repo-local `CLAUDE.md` is useful context.
-- **Add synthesis after, not instead of.** Codex commentary comes after the full Claude output.
-- **Auth failures.** If Claude hangs on setup or prints auth errors, stop and tell the user to run `claude auth` interactively first.
-- **Keep severity meaningful.** `[P0]`, `[P1]`, `critical`, and `high` affect the review gate.
+- Preserve Claude's output verbatim; synthesis comes after it.
+- Default to the CLI's own model on the subscription; a named model is an opt-in and then an exact pin unless the user says “latest” or explicitly permits fallback.
+- Stop and ask before any call that would bill an API key.
+- Read-only is the default. Delegate mode must be explicit and bounded.
+- Fast is session-local and only valid where `fast_mode_state` confirms it.
+- Ultracode is expensive orchestration, not decorative wording.
+- Never claim a route worked from flags alone; verify the returned metadata.
+- Never claim the skill is end-to-end ready while Claude authentication is unhealthy.

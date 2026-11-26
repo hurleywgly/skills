@@ -1,0 +1,7 @@
+interface:
+  display_name: "Mine"
+  short_description: "Sift a knowledge source and keep the gems"
+
+# Mirrors `disable-model-invocation: true` in SKILL.md: run only when asked by name.
+policy:
+  allow_implicit_invocation: false
